@@ -3,8 +3,8 @@ var javadocsearchframeScriptMetadata = <><![CDATA[
 // @name          Javadoc Search Frame
 // @namespace     http://userscripts.org/users/46156
 // @description   Incremental search frame for Javadoc packages and classes.
-// @homepage      http://userscripts.org/scripts/show/23200
-// @version       UNRELEASED
+// @homepage      http://code.google.com/p/javadoc-search-frame
+// @version       9th January 2009
 // @include       */allclasses-frame.html
 // ==/UserScript==
 ]]></>.toString();
@@ -371,8 +371,6 @@ var is = UnitTestSuite.is;
  */
 
 
-// TODO : Doco
-
 /**
  * Create a new UnitTestResult.
  * @class Unit test result; returned by {@link UnitTestSuite#run}.
@@ -394,14 +392,24 @@ UnitTestResult = function (resultsByFunctionUnderTest) {
     });
 };
 
+/**
+ * @returns the total number of assertions made by the unit test
+ */
 UnitTestResult.prototype.getNumberOfAssertions = function () {
     return this.numberOfAssertions;
 };
 
+/**
+ * @returns the number of failed assertions made by the unit test
+ */
 UnitTestResult.prototype.getNumberOfFailedAssertions = function () {
     return this.numberOfFailedAssertions;
 };
 
+/**
+ * @returns true if an exception was thrown during execution of the unit test,
+ * false otherwise
+ */
 UnitTestResult.prototype.wasExceptionThrown = function () {
     this.exceptionThrown;
 };
