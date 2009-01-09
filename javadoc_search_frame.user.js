@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Javadoc Search Frame
 // @namespace     http://userscripts.org/users/46156
-// @description   Incremental search frame for Javadoc packages and classes. Last updated 24th February 2008.
+// @description   Incremental search frame for Javadoc packages and classes. Last updated 3rd March 2008.
 // @include       */allclasses-frame.html
 // ==/UserScript==
 // 
@@ -136,11 +136,13 @@ function init() {
 
     // Hide the package list frame.
     var frameset = top.document.getElementsByTagName("frameset")[0].getElementsByTagName("frameset")[0];
-    frameset.setAttribute("rows", "0,*");
-    frameset.setAttribute("border", 0);
-    frameset.setAttribute("frameborder", 0);
-    frameset.setAttribute("framespacing", 0);
-    scroll(0, 0);
+    if (frameset != undefined) {
+        frameset.setAttribute("rows", "0,*");
+        frameset.setAttribute("border", 0);
+        frameset.setAttribute("frameborder", 0);
+        frameset.setAttribute("framespacing", 0);
+        scroll(0, 0);
+    }
 
     // Give the search field focus.
     view.focusField();
@@ -184,17 +186,20 @@ function getAllClassLinks() {
     classLinks.push(packagesHeader);
     defaultHTML += packagesHeader.html;
 
-    var packagesInnerHtml = top.frames[0].document.body.innerHTML;
-    var packagesRegex = /<a [^>]+>([^<]+)<\/a\s*>/gi;
-    while ((matches = packagesRegex.exec(packagesInnerHtml)) != null) {
-        if (matches[1] != "All Classes") {
-            var html = matches[0]
-                    .replace("package-frame.html", "package-summary.html")
-                    .replace("target=\"packageFrame\"", "target=\"classFrame\"");
-            cl = getPackageClassLink(matches[1], html, i);
-            classLinks.push(cl);
-            defaultHTML += cl.html;
-            i++;
+    var packageFrame = top.frames[0];
+    if (packageFrame.name == "packageListFrame") {
+        var packagesInnerHtml = packageFrame.document.body.innerHTML;
+        var packagesRegex = /<a [^>]+>([^<]+)<\/a\s*>/gi;
+        while ((matches = packagesRegex.exec(packagesInnerHtml)) != null) {
+            if (matches[1] != "All Classes") {
+                var html = matches[0]
+                        .replace("package-frame.html", "package-summary.html")
+                        .replace("target=\"packageFrame\"", "target=\"classFrame\"");
+                cl = getPackageClassLink(matches[1], html, i);
+                classLinks.push(cl);
+                defaultHTML += cl.html;
+                i++;
+            }
         }
     }
 
