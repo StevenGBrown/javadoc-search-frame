@@ -4,7 +4,7 @@ var javadocsearchframeScriptMetadata = <><![CDATA[
 // @namespace     http://userscripts.org/users/46156
 // @description   Incremental search frame for Javadoc packages and classes.
 // @homepage      http://code.google.com/p/javadoc-search-frame
-// @version       9th January 2009
+// @version       DEVELOPMENT
 // @include       */allclasses-frame.html
 // ==/UserScript==
 ]]></>.toString();
@@ -60,7 +60,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 var SEARCH_ACCESS_KEY = 's';
 
 /**
- * Access key that will focus on the search field when activated ('s').
+ * Access key that will clear the search field when activated ('a').
  * To activate in Mozilla Firefox 2.0 or later press Alt+Shift+A.
  */
 var ERASE_ACCESS_KEY = 'a';
