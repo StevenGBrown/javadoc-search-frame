@@ -847,24 +847,70 @@ Query.isAnchorSearchStarted = function () {
 };
 
 Query.createCondition = function () {
-    if (this.search.length === 0 || this.search === '*') {
+    return Query._createCondition(this.search);
+};
+
+Query._createCondition = function (searchString) {
+    if (searchString.length === 0 || searchString === '*') {
         return function (link) {
             return true;
         };
     }
 
-    var pattern = this.getRegex();
+    var pattern = this._getRegex(searchString);
 
     return function (link) {
         return link.matches(pattern);
     };
 };
 
+UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
+    var packageHeader = new HeaderLink(LINKTYPE.PACKAGE);
+    var javaIoPackage = new PackageLink('java.io');
+    var javaLangPackage = new PackageLink('java.lang');
+    var classHeader = new HeaderLink(LINKTYPE.CLASS);
+    var javaIoCloseableClass = new ClassLink('java.io', 'Closeable');
+    var javaLangObjectClass = new ClassLink('java.lang', 'Object');
+
+    var allLinks = [
+        packageHeader, javaIoPackage, javaLangPackage,
+        classHeader, javaIoCloseableClass, javaLangObjectClass];
+
+    var assertThatSearchResultFor = function (searchString, searchResult) {
+        assertThat('Search for: ' + searchString,
+                   allLinks.filter(Query._createCondition(searchString)),
+                   is(searchResult));
+    };
+
+    assertThatSearchResultFor('java.io',
+            is([packageHeader, javaIoPackage, classHeader, javaIoCloseableClass]));
+    assertThatSearchResultFor('j',
+            is(allLinks));
+    assertThatSearchResultFor('J',
+            is(allLinks));
+    assertThatSearchResultFor('Object',
+            is([packageHeader, classHeader, javaLangObjectClass]));
+    assertThatSearchResultFor('O',
+            is([packageHeader, classHeader, javaLangObjectClass]));
+    assertThatSearchResultFor('java.lang.Object',
+            is([packageHeader, classHeader, javaLangObjectClass]));
+    assertThatSearchResultFor('java.lang',
+            is([packageHeader, javaLangPackage, classHeader, javaLangObjectClass]));
+    assertThatSearchResultFor('java.lang.',
+            is([packageHeader, classHeader, javaLangObjectClass]));
+    assertThatSearchResultFor('java.*.o*e',
+            is([packageHeader, classHeader, javaIoCloseableClass, javaLangObjectClass]));
+});
+
 Query.getRegex = function () {
+    return Query._getRegex(this.search);
+};
+
+Query._getRegex = function (searchString) {
     var pattern = '^';
 
-    for (i = 0; i < this.search.length; i++) {
-        var character = this.search.charAt(i);
+    for (i = 0; i < searchString.length; i++) {
+        var character = searchString.charAt(i);
         if (/[A-Z]/.test(character) && i > 0) {
             // An uppercase character which is not at the beginning of the
             // search input string. Perform a case-insensitive match of this
@@ -1279,7 +1325,7 @@ HeaderLink.prototype.toString = function () {
  */
 PackageLink = function (packageName, html) {
     this.packageName = packageName;
-    this.html = html;
+    this.html = html || '<br/>';
     this.url = null;
 };
 
@@ -1319,7 +1365,7 @@ PackageLink.prototype.toString = function () {
  */
 ClassLink = function (packageName, className, html) {
     this.className = className;
-    this.html = html;
+    this.html = html || '<br/>';
     this.url = null;
     this.canonicalName = packageName + '.' + className;
 };
