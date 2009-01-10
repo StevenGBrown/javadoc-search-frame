@@ -594,7 +594,7 @@ WebPage.SETTINGS = {
                     isChecked : !trueChecked, isDisabled : !UserPreference.canGetAndSet(), isDefault : !trueDefault});
 
             return  '<p>\n' +
-                    '<b>' + name + '</b><br/>\n' +
+                    '<b>' + key + '</b><br/>\n' +
                     trueRadioButtonHTML + '<br/>\n' +
                     falseRadioButtonHTML + '<br/>\n' +
                     '</p>\n';
