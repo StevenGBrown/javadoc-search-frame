@@ -611,7 +611,8 @@ WebPage.SETTINGS = {
             } else {
                 instructions +=
                         '<font color=RED>\n' +
-                        'Settings cannot be configured. Please upgrade to the latest version of Greasemonkey.\n' +
+                        'Settings cannot be configured. The GM_getValue and GM_setValue ' +
+                        'functions are not supported by your browser.\n' +
                         '</font>\n';
             }
             instructions += '</p>\n';
