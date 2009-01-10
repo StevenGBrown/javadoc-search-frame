@@ -1,4 +1,3 @@
-var javadocsearchframeScriptMetadata = <><![CDATA[
 // ==UserScript==
 // @name          Javadoc Search Frame
 // @namespace     http://userscripts.org/users/46156
@@ -7,7 +6,12 @@ var javadocsearchframeScriptMetadata = <><![CDATA[
 // @version       DEVELOPMENT
 // @include       */allclasses-frame.html
 // ==/UserScript==
-]]></>.toString();
+
+var SCRIPT_META_DATA = {
+    name : 'Javadoc Search Frame',
+    version : 'DEVELOPMENT',
+    homepage : 'http://code.google.com/p/javadoc-search-frame'
+};
 
 /**
 LICENSING
@@ -90,28 +94,6 @@ var MENU_REPLACEMENT = {
         return anchorLink.getNameWithoutParameter();
     }
 };
-
-/**
- * An associative array containing the metadata block properties of this script.
- */
-var SCRIPT_META_DATA = function () {
-    var metadataAsObject = {};
-    var metadataAsString = javadocsearchframeScriptMetadata;
-    var lines = metadataAsString.split(/[\r\n]+/).filter(/\/\/ @/);
-    metadataAsObject.include = [];
-    metadataAsObject.exclude = [];
-    for each (var line in lines) {
-        var result = line.match(/\/\/ @(\S+)\s*(.*)/);
-        var name = result[1];
-        var value = result[2];
-        if (metadataAsObject[name] instanceof Array) {
-           metadataAsObject[name].push(value);
-        } else {
-            metadataAsObject[name] = value;
-        }
-    }
-    return metadataAsObject;
-}();
 
 /**
  * Types used to classify links found in the package list or class list frames.
