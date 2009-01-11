@@ -774,7 +774,7 @@ WebPage._open = function (page) {
     pageBodyInnerHTML +=
             '<h1>' + SCRIPT_META_DATA.name + '</h1>\n' +
             '<p>\n' +
-            'This version released: ' + SCRIPT_META_DATA.version + '<br/>\n' +
+            'Version: ' + SCRIPT_META_DATA.version + '<br/>\n' +
             '<a href="' + SCRIPT_META_DATA.homepage + '">' + SCRIPT_META_DATA.homepage + '</a>\n' +
             '</p>\n' +
             '<hr/>\n' +
