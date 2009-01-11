@@ -95,29 +95,8 @@ var MENU_REPLACEMENT = {
     }
 };
 
-/**
- * Types used to classify links found in the package list or class list frames.
- */
-var LINKTYPE = {
-    PACKAGE : 'package',
-    INTERFACE : 'interface',
-    CLASS : 'class',
-    ENUM : 'enum',
-    EXCEPTION : 'exception',
-    ERROR : 'error',
-    ANNOTATION : 'annotation'
-};
-
-/**
- * An array of link types in the order they will be displayed in the search
- * list.
- */
-var LINKTYPES = [ LINKTYPE.PACKAGE, LINKTYPE.INTERFACE, LINKTYPE.CLASS,
-        LINKTYPE.ENUM, LINKTYPE.EXCEPTION, LINKTYPE.ERROR, LINKTYPE.ANNOTATION ];
-
-
-var ALL_CLASS_LINKS = [];
-var CURRENT_CLASS_LINKS = [];
+var ALL_LINKS = [];
+var CURRENT_LINKS = [];
 var TOP_CLASS_LINK = null;
 var TOP_ANCHOR_LINK = null;
 var LAST_AUTO_OPEN_URL = null;
@@ -795,6 +774,154 @@ WebPage._open = function (page) {
 
 /*
  * ----------------------------------------------------------------------------
+ * LINKTYPE
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class LinkType (undocumented).
+ */
+LinkType = function(name, header) {
+    this.name = name;
+    this.header = header;
+};
+
+LinkType.prototype.getHeader = function () {
+    return this.header;
+};
+
+LinkType.prototype.toString = function () {
+    return this.name;
+};
+
+LinkType.PACKAGE = new LinkType('package', 'Packages');
+LinkType.INTERFACE = new LinkType('interface', 'Interfaces');
+LinkType.CLASS = new LinkType('class', 'Classes');
+LinkType.ENUM = new LinkType('enum', 'Enums');
+LinkType.EXCEPTION = new LinkType('exception', 'Exceptions');
+LinkType.ERROR = new LinkType('error', 'Errors');
+LinkType.ANNOTATION = new LinkType('annotation', 'Annotation Types');
+
+LinkType.values = function () {
+    return [ LinkType.PACKAGE, LinkType.INTERFACE, LinkType.CLASS,
+        LinkType.ENUM, LinkType.EXCEPTION, LinkType.ERROR, LinkType.ANNOTATION ];
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * PACKAGELINK AND CLASSLINK
+ * ----------------------------------------------------------------------------
+ */
+
+function parseURL(anchorElementHTML) {
+    var rx = /href\s*=\s*(?:"|')([^"']+)(?:"|')/;
+    var matches;
+    if ((matches = rx.exec(anchorElementHTML)) !== null) {
+        var relativeURL = matches[1];
+        var windowURL = location.href;
+        var absoluteURL = windowURL.substring(0, windowURL.lastIndexOf('/') + 1) + relativeURL;
+        return absoluteURL;
+    }
+    return null;
+}
+
+
+/**
+ * @class PackageLink (undocumented).
+ */
+PackageLink = function (packageName, html) {
+    this.packageName = packageName;
+    this.html = html || '<br/>';
+    this.url = null;
+};
+
+PackageLink.prototype.matches = function (regex) {
+    return regex.test(this.packageName);
+};
+
+PackageLink.prototype.getHTML = function () {
+    return this.html;
+};
+
+PackageLink.prototype.getType = function () {
+    return LinkType.PACKAGE;
+};
+
+PackageLink.prototype.getPackageName = function () {
+    return this.packageName;
+};
+
+PackageLink.prototype.getUrl = function () {
+    if (!this.url) {
+        this.url = parseURL(this.html);
+    }
+    return this.url;
+};
+
+PackageLink.prototype.equals = function (obj) {
+    return obj instanceof PackageLink &&
+           this.packageName === obj.packageName &&
+           this.html === obj.html;
+};
+
+PackageLink.prototype.toString = function () {
+    return this.html + ' (' + this.packageName + ')';
+};
+
+
+/**
+ * @class ClassLink (undocumented).
+ */
+ClassLink = function (type, packageName, className, html) {
+    this.type = type;
+    this.className = className;
+    this.html = html || '<br/>';
+    this.url = null;
+    this.canonicalName = packageName + '.' + className;
+};
+
+ClassLink.prototype.matches = function (regex) {
+    return regex.test(this.className) || regex.test(this.canonicalName);
+};
+
+ClassLink.prototype.getHTML = function () {
+    return this.html;
+};
+
+ClassLink.prototype.getType = function () {
+    return this.type;
+};
+
+ClassLink.prototype.getClassName = function () {
+    return this.className;
+};
+
+ClassLink.prototype.getPackageName = function () {
+    return this.canonicalName.substring(0, this.canonicalName.length - this.className.length - 1);
+};
+
+ClassLink.prototype.getUrl = function () {
+    if (!this.url) {
+        this.url = parseURL(this.html);
+    }
+    return this.url;
+};
+
+ClassLink.prototype.equals = function (obj) {
+    return obj instanceof ClassLink &&
+           this.type === obj.type &&
+           this.canonicalName === obj.canonicalName &&
+           this.html === obj.html;
+};
+
+ClassLink.prototype.toString = function () {
+    return this.html + ' (' + this.canonicalName + ')';
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
  * QUERY
  * ----------------------------------------------------------------------------
  */
@@ -862,16 +989,13 @@ Query._createCondition = function (searchString) {
 };
 
 UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
-    var packageHeader = new HeaderLink(LINKTYPE.PACKAGE);
     var javaIoPackage = new PackageLink('java.io');
     var javaLangPackage = new PackageLink('java.lang');
-    var classHeader = new HeaderLink(LINKTYPE.CLASS);
-    var javaIoCloseableClass = new ClassLink('java.io', 'Closeable');
-    var javaLangObjectClass = new ClassLink('java.lang', 'Object');
+    var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
+    var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
 
     var allLinks = [
-        packageHeader, javaIoPackage, javaLangPackage,
-        classHeader, javaIoCloseableClass, javaLangObjectClass];
+        javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass];
 
     var assertThatSearchResultFor = function (searchString, searchResult) {
         assertThat('Search for: ' + searchString,
@@ -880,23 +1004,23 @@ UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
     };
 
     assertThatSearchResultFor('java.io',
-            is([packageHeader, javaIoPackage, classHeader, javaIoCloseableClass]));
+            is([javaIoPackage, javaIoCloseableClass]));
     assertThatSearchResultFor('j',
             is(allLinks));
     assertThatSearchResultFor('J',
             is(allLinks));
     assertThatSearchResultFor('Object',
-            is([packageHeader, classHeader, javaLangObjectClass]));
+            is([javaLangObjectClass]));
     assertThatSearchResultFor('O',
-            is([packageHeader, classHeader, javaLangObjectClass]));
+            is([javaLangObjectClass]));
     assertThatSearchResultFor('java.lang.Object',
-            is([packageHeader, classHeader, javaLangObjectClass]));
+            is([javaLangObjectClass]));
     assertThatSearchResultFor('java.lang',
-            is([packageHeader, javaLangPackage, classHeader, javaLangObjectClass]));
+            is([javaLangPackage, javaLangObjectClass]));
     assertThatSearchResultFor('java.lang.',
-            is([packageHeader, classHeader, javaLangObjectClass]));
+            is([javaLangObjectClass]));
     assertThatSearchResultFor('java.*.o*e',
-            is([packageHeader, classHeader, javaIoCloseableClass, javaLangObjectClass]));
+            is([javaIoCloseableClass, javaLangObjectClass]));
 });
 
 Query.getRegex = function () {
@@ -1264,146 +1388,6 @@ Container.prototype.print = function (msg) {
 
 /*
  * ----------------------------------------------------------------------------
- * SUPPORTING CLASSES: PACKAGES AND CLASSES SEARCH
- * ----------------------------------------------------------------------------
- */
-
-function parseURL(anchorElementHTML) {
-    var rx = /href\s*=\s*(?:"|')([^"']+)(?:"|')/;
-    var matches;
-    if ((matches = rx.exec(anchorElementHTML)) !== null) {
-        var relativeURL = matches[1];
-        var windowURL = location.href;
-        var absoluteURL = windowURL.substring(0, windowURL.lastIndexOf('/') + 1) + relativeURL;
-        return absoluteURL;
-    }
-    return null;
-}
-
-
-/**
- * @class HeaderLink (undocumented).
- */
-HeaderLink = function (type) {
-    var header;
-    if (type === LINKTYPE.CLASS) {
-        header = 'Classes';
-    } else if (type === LINKTYPE.ANNOTATION) {
-        header = 'Annotation Types';
-    } else {
-        header = type.charAt(0).toUpperCase() + type.substring(1) + 's';
-    }
-
-    this.html = '<br/><b>' + header + '</b>';
-};
-
-HeaderLink.prototype.matches = function (regex) {
-    return true;
-};
-
-HeaderLink.prototype.getHTML = function () {
-    return this.html;
-};
-
-HeaderLink.prototype.equals = function (obj) {
-    if (obj instanceof HeaderLink) {
-        return this.html === obj.html;
-    }
-    return false;
-};
-
-HeaderLink.prototype.toString = function () {
-    return this.html;
-};
-
-
-/**
- * @class PackageLink (undocumented).
- */
-PackageLink = function (packageName, html) {
-    this.packageName = packageName;
-    this.html = html || '<br/>';
-    this.url = null;
-};
-
-PackageLink.prototype.matches = function (regex) {
-    return regex.test(this.packageName);
-};
-
-PackageLink.prototype.getHTML = function () {
-    return this.html;
-};
-
-PackageLink.prototype.getPackageName = function () {
-    return this.packageName;
-};
-
-PackageLink.prototype.getUrl = function () {
-    if (!this.url) {
-        this.url = parseURL(this.html);
-    }
-    return this.url;
-};
-
-PackageLink.prototype.equals = function (obj) {
-    if (obj instanceof PackageLink) {
-        return this.packageName === obj.packageName && this.html === obj.html;
-    }
-    return false;
-};
-
-PackageLink.prototype.toString = function () {
-    return this.html + ' (' + this.packageName + ')';
-};
-
-
-/**
- * @class ClassLink (undocumented).
- */
-ClassLink = function (packageName, className, html) {
-    this.className = className;
-    this.html = html || '<br/>';
-    this.url = null;
-    this.canonicalName = packageName + '.' + className;
-};
-
-ClassLink.prototype.matches = function (regex) {
-    return regex.test(this.className) || regex.test(this.canonicalName);
-};
-
-ClassLink.prototype.getHTML = function () {
-    return this.html;
-};
-
-ClassLink.prototype.getClassName = function () {
-    return this.className;
-};
-
-ClassLink.prototype.getPackageName = function () {
-    return this.canonicalName.substring(0, this.canonicalName.length - this.className.length - 1);
-};
-
-ClassLink.prototype.getUrl = function () {
-    if (!this.url) {
-        this.url = parseURL(this.html);
-    }
-    return this.url;
-};
-
-ClassLink.prototype.equals = function (obj) {
-    if (obj instanceof ClassLink) {
-        return this.canonicalName === obj.canonicalName && this.html === obj.html;
-    }
-    return false;
-};
-
-ClassLink.prototype.toString = function () {
-    return this.html + ' (' + this.canonicalName + ')';
-};
-
-
-/*
- * ----------------------------------------------------------------------------
  * SUPPORTING CLASSES: METHOD SEARCH
  * ----------------------------------------------------------------------------
  */
@@ -1657,8 +1641,8 @@ function init() {
     var searchListStopWatch = new StopWatch();
     var packageLinks = getPackageLinks(packagesInnerHTML);
     var classLinks = getClassLinks(classesInnerHTML);
-    ALL_CLASS_LINKS = packageLinks.concat(classLinks);
-    if (ALL_CLASS_LINKS.length === 0) {
+    ALL_LINKS = packageLinks.concat(classLinks);
+    if (ALL_LINKS.length === 0) {
         return false;
     }
     searchListStopWatch.stop();
@@ -1779,15 +1763,10 @@ function getPackageLinks(packagesInnerHTML) {
     var html;
     var link;
     var matches;
-    var packagesHeader;
     var packagesRegex = /<a[^>]+>([^<]+)<\/a\s*>/gi;
 
     while ((matches = packagesRegex.exec(packagesInnerHTML)) !== null) {
         if (matches[1] !== 'All Classes') {
-            if (!packagesHeader) {
-                packagesHeader = new HeaderLink(LINKTYPE.PACKAGE);
-                packageLinks.push(packagesHeader);
-            }
             html = matches[0]
                     .replace(/package-frame.html/gi, 'package-summary.html')
                     .replace(/target\s*=\s*"packageFrame"/gi, 'target="classFrame"');
@@ -1801,43 +1780,42 @@ function getPackageLinks(packagesInnerHTML) {
 
 UnitTestSuite.testFunctionFor('getPackageLinks(packagesInnerHTML)', function () {
 
-    var headerClassLink = new HeaderLink(LINKTYPE.PACKAGE);
     var packagePath = 'java/applet/';
     var package = 'java.applet';
 
     var lowerCaseHtml =
             '<a href="' + packagePath + 'package-frame.html" target="packageFrame">' + package + '</a>';
-    var lowerCaseClassLink = new PackageLink(package,
+    var lowerCaseLink = new PackageLink(package,
             '<a href="' + packagePath + 'package-summary.html" target="classFrame">' + package + '</a>');
     assertThat('lowercase html tags',
-            getPackageLinks(lowerCaseHtml), is([headerClassLink, lowerCaseClassLink]));
+            getPackageLinks(lowerCaseHtml), is([lowerCaseLink]));
 
     var upperCaseHtml =
             '<A HREF="' + packagePath + 'package-frame.html" TARGET="packageFrame">' + package + '</A>';
-    var upperCaseClassLink = new PackageLink(package,
+    var upperCaseLink = new PackageLink(package,
             '<A HREF="' + packagePath + 'package-summary.html" target="classFrame">' + package + '</A>');
     assertThat('uppercase html tags',
-            getPackageLinks(upperCaseHtml), is([headerClassLink, upperCaseClassLink]));
+            getPackageLinks(upperCaseHtml), is([upperCaseLink]));
 
     var lowerCaseWithWhitespaceHtml =
             '<a   href  =  "' + packagePath + 'package-frame.html"   target  =  "packageFrame"  >' +
             package + '</a  >';
-    var lowerCaseWithWhitespaceClassLink = new PackageLink(package,
+    var lowerCaseWithWhitespaceLink = new PackageLink(package,
             '<a   href  =  "' + packagePath + 'package-summary.html"   target="classFrame"  >' +
             package + '</a  >');
     assertThat('lowercase html tags with additional whitespace',
             getPackageLinks(lowerCaseWithWhitespaceHtml),
-            is([headerClassLink, lowerCaseWithWhitespaceClassLink]));
+            is([lowerCaseWithWhitespaceLink]));
 
     var upperCaseWithWhitespaceHtml =
             '<A   HREF  =  "' + packagePath + 'package-frame.html"   TARGET  =  "packageFrame"  >' +
             package + '</A  >';
-    var upperCaseWithWhitespaceClassLink = new PackageLink(package,
+    var upperCaseWithWhitespaceLink = new PackageLink(package,
             '<A   HREF  =  "' + packagePath + 'package-summary.html"   target="classFrame"  >' +
             package + '</A  >');
     assertThat('uppercase html tags with additional whitespace',
             getPackageLinks(upperCaseWithWhitespaceHtml),
-            is([headerClassLink, upperCaseWithWhitespaceClassLink]));
+            is([upperCaseWithWhitespaceLink]));
 
     // Assert that the All Classes anchor is ignored when looking for packages.
     assertThat('"All Classes" is not a match (lowercase html tags)',
@@ -1878,28 +1856,27 @@ function getClassesInnerHtml() {
  * 
  * @param classesInnerHTML the inner HTML of the body element of the classes
  *                         list frame
- * @returns an array of {@HeaderLink} and {@link ClassLink} objects
+ * @returns an array of {@link ClassLink} objects
  */
 function getClassLinks(classesInnerHTML) {
     if (!classesInnerHTML) {
         return [];
     }
 
-    var classLinks = [];
     var cl;
     var matches;
 
     var classLinksMap = {};
-    LINKTYPES.forEach(function (type) {
+    LinkType.values().forEach(function (type) {
         classLinksMap[type] = [];
     });
 
     function checkForExceptionOrErrorType(type, className) {
-        if (type === LINKTYPE.CLASS) {
+        if (type === LinkType.CLASS) {
             if (endsWith(className, 'Exception')) {
-                type = LINKTYPE.EXCEPTION;
+                type = LinkType.EXCEPTION;
             } else if (endsWith(className, 'Error')) {
-                type = LINKTYPE.ERROR;
+                type = LinkType.ERROR;
             }
         }
         return type;
@@ -1914,11 +1891,11 @@ function getClassLinks(classesInnerHTML) {
         var typeInTitle = matches[1];
         var packageName = matches[2];
         var className = rightTrim(matches[3]);
+        var type = LinkType[typeInTitle.toUpperCase()];
+        type = checkForExceptionOrErrorType(type, className);
 
         cl = new ClassLink(
-                packageName, className, entireMatch + ' [ ' + packageName + ' ]');
-        var type = typeInTitle.toLowerCase();
-        type = checkForExceptionOrErrorType(type, className);
+                type, packageName, className, entireMatch + ' [ ' + packageName + ' ]');
         classLinksMap[type].push(cl);
         anchorWithTitleFound = true;
     }
@@ -1931,34 +1908,28 @@ function getClassLinks(classesInnerHTML) {
             var packageNameInHref = matches[1];
             var openingItalicTag = matches[2];
             var className = rightTrim(matches[3]);
+            var type = openingItalicTag ? LinkType.INTERFACE : LinkType.CLASS;
+            type = checkForExceptionOrErrorType(type, className);
 
             var packageName = packageNameInHref.replace(/\/|\\/g, '.');
             cl = new ClassLink(
-                    packageName, className, entireMatch + ' [ ' + packageName + ' ]');
-            var type = openingItalicTag ? LINKTYPE.INTERFACE : LINKTYPE.CLASS;
-            type = checkForExceptionOrErrorType(type, className);
+                    type, packageName, className, entireMatch + ' [ ' + packageName + ' ]');
             classLinksMap[type].push(cl);
         }
     }
 
-    LINKTYPES.forEach(function (type) {
-        var classLinksUnderHeader = classLinksMap[type];
-        if (classLinksUnderHeader.length > 0) {
-            var headerClassLink = new HeaderLink(type);
-            classLinks.push(headerClassLink);
-            classLinks = classLinks.concat(classLinksUnderHeader);
-        }
+    var classLinks = [];
+    LinkType.values().forEach(function (type) {
+        classLinks = classLinks.concat(classLinksMap[type]);
     });
-
     return classLinks;
 }
 
 UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHTML)', function () {
 
     function assert(args, html, description) {
-        var headerLink = new HeaderLink(args.type);
-        var link = new ClassLink(args.package, args.class, html + ' [ ' + args.package + ' ]');
-        assertThat(description, getClassLinks(html), is([headerLink, link]));
+        var link = new ClassLink(args.type, args.package, args.class, html + ' [ ' + args.package + ' ]');
+        assertThat(description, getClassLinks(html), is([link]));
     }
 
     function runClassesHtmlTestCase(args, includeTitle) {
@@ -2014,76 +1985,65 @@ UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHTML)', function () {
 
     // Assert that classes are matched correctly. Classes can be matched with or without a title attribute.
     runTitleAndNoTitleTestCase( {
-            href:'javax/swing/AbstractAction.html', type:LINKTYPE.CLASS,
+            href:'javax/swing/AbstractAction.html', type:LinkType.CLASS,
             package:'javax.swing', class:'AbstractAction', italic:false} );
 
     // Assert that interfaces are matched correctly. Interfaces can be matched with or without a title attribute.
     // If an anchor has no title attribute, the contents of the anchor must in italics to be recognised as an interface.
 
     runTitleAndNoTitleTestCase( {
-            href:'javax/swing/text/AbstractDocument.AttributeContext.html', type:LINKTYPE.INTERFACE,
+            href:'javax/swing/text/AbstractDocument.AttributeContext.html', type:LinkType.INTERFACE,
             package:'javax.swing.text', class:'AbstractDocument.AttributeContext', italic:true} );
     runTitleTestCase( {
-            href:'javax/swing/text/AbstractDocument.AttributeContext.html', type:LINKTYPE.INTERFACE,
+            href:'javax/swing/text/AbstractDocument.AttributeContext.html', type:LinkType.INTERFACE,
             package:'javax.swing.text', class:'AbstractDocument.AttributeContext', italic:false} );
 
     // Assert that enumerations are matched correctly.
     // Anchors must have a title attribute to be recognised as an enumeration.
     runTitleTestCase( {
-            href:'java/net/Authenticator.RequestorType.html', type:LINKTYPE.ENUM,
+            href:'java/net/Authenticator.RequestorType.html', type:LinkType.ENUM,
             package:'java.net', class:'Authenticator.RequestorType', italic:false} );
 
     // Assert that exceptions are matched correctly. Exceptions can be matched with or without a title attribute.
     runTitleAndNoTitleTestCase( {
-            href:'java/security/AccessControlException.html', type:LINKTYPE.EXCEPTION,
+            href:'java/security/AccessControlException.html', type:LinkType.EXCEPTION,
             typeInTitle:'class', package:'java.security', class:'AccessControlException', italic:false} );
 
     // Assert that errors are matched correctly. Errors can be matched with or without a title attribute.
     runTitleAndNoTitleTestCase( {
-            href:'java/lang/AbstractMethodError.html', type:LINKTYPE.ERROR,
+            href:'java/lang/AbstractMethodError.html', type:LinkType.ERROR,
             typeInTitle:'class', package:'java.lang', class:'AbstractMethodError', italic:false} );
 
     // Assert that annotations are matched correctly. Anchors must have a title attribute to be recognised as an annotation.
     runTitleTestCase( {
-            href:'javax/xml/ws/Action.html', type:LINKTYPE.ANNOTATION,
+            href:'javax/xml/ws/Action.html', type:LinkType.ANNOTATION,
             package:'javax.xml.ws', class:'Action', italic:false} );
 });
 
 /**
- * Get the first link found in the given array of links, ignoring {@link HeaderLink} objects.
+ * Get the first link found in the given array of links.
  */
-function getTopClassLink(classLinks) {
-  var i;
-  var link;
-  for (i = 0; i < classLinks.length; i++) {
-    link = classLinks[i];
-    if (!(link instanceof HeaderLink)) {
-      return link;
+function getTopLink(classLinks) {
+    if (classLinks.length > 0) {
+        return classLinks[0];
     }
-  }
-  return null;
+    return null;
 }
 
-UnitTestSuite.testFunctionFor('getTopClassLink(classLinks)', function () {
+UnitTestSuite.testFunctionFor('getTopLink(classLinks)', function () {
 
-    var headerLinkOne = new HeaderLink(LINKTYPE.PACKAGE);
-    var headerLinkTwo = new HeaderLink(LINKTYPE.CLASS);
-    var classLinkOne = new ClassLink('java.lang', 'Object', 'java/lang/Object');
-    var classLinkTwo = new ClassLink('java.awt', 'Component', 'java/awt/Component');
+    var classLinkOne = new ClassLink(LinkType.CLASS, 'java.lang', 'Object', 'java/lang/Object');
+    var classLinkTwo = new ClassLink(LinkType.CLASS, 'java.awt', 'Component', 'java/awt/Component');
 
-    function assertThatGetTopClassLink(functionInput, expected) {
-        var description = 'getTopClassLink(' + functionInput + ')';
-        var actual = getTopClassLink(functionInput);
+    function assertThatGetTopLink(functionInput, expected) {
+        var description = 'getTopLink(' + functionInput + ')';
+        var actual = getTopLink(functionInput);
         assertThat(description, actual, expected);
     }
 
-    assertThatGetTopClassLink([], is(null));
-    assertThatGetTopClassLink([headerLinkOne], is(null));
-    assertThatGetTopClassLink([headerLinkOne, classLinkOne], is(classLinkOne));
-    assertThatGetTopClassLink([headerLinkOne, classLinkOne, classLinkTwo], is(classLinkOne));
-    assertThatGetTopClassLink([headerLinkOne, headerLinkTwo, classLinkOne], is(classLinkOne));
-    assertThatGetTopClassLink([headerLinkOne, headerLinkTwo, classLinkOne, classLinkTwo], is(classLinkOne));
-    assertThatGetTopClassLink([classLinkOne, headerLinkOne], is(classLinkOne));
+    assertThatGetTopLink([], is(null));
+    assertThatGetTopLink([classLinkOne], is(classLinkOne));
+    assertThatGetTopLink([classLinkOne, classLinkTwo], is(classLinkOne));
 });
 
 function selectClasses() {
@@ -2123,18 +2083,28 @@ function appendClasses(condition, parent) {
     } else {
         // Otherwise, start with the complete search list.
 
-        CURRENT_CLASS_LINKS = ALL_CLASS_LINKS.concat();
+        CURRENT_LINKS = ALL_LINKS.concat();
     }
 
-    CURRENT_CLASS_LINKS = CURRENT_CLASS_LINKS.filter(condition);
-    TOP_CLASS_LINK = getTopClassLink(CURRENT_CLASS_LINKS);
+    CURRENT_LINKS = CURRENT_LINKS.filter(condition);
+    TOP_CLASS_LINK = getTopLink(CURRENT_LINKS);
+    parent.innerHTML = constructHTML(CURRENT_LINKS);
+}
 
+function constructHTML(classLinks) {
     var html = '';
-    CURRENT_CLASS_LINKS.forEach(function (cl) {
-        html += cl.getHTML();
+    var type;
+    var newType;
+    CURRENT_LINKS.forEach(function (link) {
+        newType = link.getType();
+        if (type !== newType) {
+            html += '<br/><b>' + newType.getHeader() + '</b><br/>';
+            type = newType;
+        }
+        html += link.getHTML();
         html += '<br/>';
     });
-    parent.innerHTML = html;
+    return html;
 }
 
 function loadAnchors() {
@@ -2182,7 +2152,7 @@ function showMenu() {
     var container = View.getSubContainer();
     var node = container.createContentNode();
     var content;
-    if (TOP_CLASS_LINK instanceof PackageLink) {
+    if (TOP_CLASS_LINK.getType() === LinkType.PACKAGE) {
         content = UserPreference.PACKAGE_MENU.getValue();
     } else {
         content = UserPreference.CLASS_MENU.getValue();
