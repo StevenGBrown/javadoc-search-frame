@@ -248,9 +248,6 @@ UnitTestSuite.run = function () {
         } catch (ex) {
             this.results.push({
                 success:false,
-                description:description,
-                actual:actual,
-                expected:expected,
                 exception:ex});
         }
         resultsByFunctionUnderTest.push({
@@ -393,7 +390,7 @@ UnitTestResult.prototype.getNumberOfFailedAssertions = function () {
  * false otherwise
  */
 UnitTestResult.prototype.wasExceptionThrown = function () {
-    this.exceptionThrown;
+    return this.exceptionThrown;
 };
 
 /**
@@ -721,7 +718,7 @@ WebPage.UNIT_TEST_RESULTS = {
         getResult : function (result) {
             if (result.exception) {
                 return '<p><b>Exception:</b></p>\n' +
-                       '<p>' + ex + '</p>\n';
+                       '<p>' + result.exception + '</p>\n';
             } else {
                 return '<p><b>' + result.description + '</b></p>' +
                        '<p>expected</p><p>' + this.toString(result.expected) + '</p>' +
