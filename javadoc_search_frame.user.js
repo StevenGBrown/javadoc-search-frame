@@ -288,6 +288,9 @@ UnitTestSuite.is = function (value) {
  */
 UnitTestSuite._equals = function (one, two) {
     if (one instanceof Array && two instanceof Array) {
+        if (one.length !== two.length) {
+            return false;
+        }
         var equalsFunction = arguments.callee;
         return one.every(function (oneItem, index) {
             var twoItem = two[index];
