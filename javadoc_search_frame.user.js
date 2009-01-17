@@ -996,9 +996,13 @@ UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
     var javaLangPackage = new PackageLink('java.lang');
     var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
     var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
+    var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
+    var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
 
     var allLinks = [
-        javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass];
+        javaIoPackage, javaLangPackage,
+        javaIoCloseableClass, javaLangObjectClass,
+        javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass];
 
     var assertThatSearchResultFor = function (searchString, searchResult) {
         assertThat('Search for: ' + searchString,
@@ -1023,7 +1027,11 @@ UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
     assertThatSearchResultFor('java.lang.',
             is([javaLangObjectClass]));
     assertThatSearchResultFor('java.*.o*e',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('java.*.*o*e',
             is([javaIoCloseableClass, javaLangObjectClass]));
+    assertThatSearchResultFor('javax.swing.border.A',
+            is([javaxSwingBorderAbstractBorderClass]));
 });
 
 Query.getRegex = function () {
@@ -1055,8 +1063,9 @@ Query._getRegex = function (searchString) {
             // Replace '*' with '.*' to allow the asterisk to be used as a wildcard.
 
             pattern += '.*';
-        } else if (character in ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[']) {
-           // A special regular expression character. Escape this character.
+        } else if (Query._isSpecialRegularExpressionCharacter(character)) {
+           // A special regular expression character, but not an asterisk.
+           // Escape this character.
 
            pattern += '\\' + character;
         } else {
@@ -1065,8 +1074,14 @@ Query._getRegex = function (searchString) {
         }
     }
 
-    pattern += '.*';
+    pattern += '.*$';
     return new RegExp(pattern);
+};
+
+Query._isSpecialRegularExpressionCharacter = function (character) {
+    return ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*'].some(function (specialCharacter) {
+        return character === specialCharacter;
+    });
 };
 
 Query.input = function (input) {
