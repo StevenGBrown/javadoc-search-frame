@@ -789,6 +789,10 @@ LinkType = function(name, header) {
     this.header = header;
 };
 
+LinkType.prototype.getName = function () {
+    return this.name;
+};
+
 LinkType.prototype.getHeader = function () {
     return this.header;
 };
@@ -904,6 +908,10 @@ ClassLink.prototype.getPackageName = function () {
     return this.canonicalName.substring(0, this.canonicalName.length - this.className.length - 1);
 };
 
+ClassLink.prototype.getCanonicalName = function () {
+    return this.canonicalName;
+};
+
 ClassLink.prototype.getUrl = function () {
     if (!this.url) {
         this.url = parseURL(this.html);
@@ -974,7 +982,7 @@ Query.isAnchorSearchStarted = function () {
 };
 
 Query.createCondition = function () {
-    return Query._createCondition(this.search);
+    return Query._createCondition(this.search, false);
 };
 
 Query._createCondition = function (searchString) {
@@ -984,7 +992,7 @@ Query._createCondition = function (searchString) {
         };
     }
 
-    var pattern = this._getRegex(searchString);
+    var pattern = Query._getRegex(searchString);
 
     return function (link) {
         return link.matches(pattern);
@@ -998,11 +1006,11 @@ UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
     var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
     var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
     var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
+    var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
 
-    var allLinks = [
-        javaIoPackage, javaLangPackage,
-        javaIoCloseableClass, javaLangObjectClass,
-        javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass];
+    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
+        javaLangObjectClass, javaxSwingBorderFactoryClass,
+        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
 
     var assertThatSearchResultFor = function (searchString, searchResult) {
         assertThat('Search for: ' + searchString,
@@ -1013,14 +1021,18 @@ UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
     assertThatSearchResultFor('java.io',
             is([javaIoPackage, javaIoCloseableClass]));
     assertThatSearchResultFor('j',
-            is(allLinks));
+            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
+                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
     assertThatSearchResultFor('J',
-            is(allLinks));
+            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
+                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
     assertThatSearchResultFor('Object',
-            is([javaLangObjectClass]));
+            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
     assertThatSearchResultFor('O',
-            is([javaLangObjectClass]));
+            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
     assertThatSearchResultFor('java.lang.Object',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('JAVA.LANG.OBJECT',
             is([javaLangObjectClass]));
     assertThatSearchResultFor('java.lang',
             is([javaLangPackage, javaLangObjectClass]));
@@ -1033,6 +1045,24 @@ UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
     assertThatSearchResultFor('javax.swing.border.A',
             is([javaxSwingBorderAbstractBorderClass]));
 });
+
+Query.createExactMatchCondition = function () {
+    return Query._createExactMatchCondition(this.search);
+};
+
+Query._createExactMatchCondition = function (searchString) {
+    if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
+        return function (link) {
+            return false;
+        };
+    }
+
+    var pattern = Query._getExactMatchRegex(searchString);
+
+    return function (link) {
+        return link.matches(pattern);
+    };
+};
 
 Query.getRegex = function () {
     return Query._getRegex(this.search);
@@ -1076,6 +1106,22 @@ Query._getRegex = function (searchString) {
 
     pattern += '.*$';
     return new RegExp(pattern);
+};
+
+Query._getExactMatchRegex = function (searchString) {
+    var pattern = '^';
+
+    for (i = 0; i < searchString.length; i++) {
+        var character = searchString.charAt(i);
+        if (Query._isSpecialRegularExpressionCharacter(character)) {
+           pattern += '\\' + character;
+        } else {
+            pattern += character;
+        }
+    }
+
+    pattern += '$';
+    return new RegExp(pattern, "i");
 };
 
 Query._isSpecialRegularExpressionCharacter = function (character) {
@@ -2041,27 +2087,85 @@ UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHTML)', function () {
 /**
  * Get the first link found in the given array of links.
  */
-function getTopLink(classLinks) {
-    if (classLinks.length > 0) {
-        return classLinks[0];
+function getTopLink(links, bestMatch) {
+    if (bestMatch) {
+        return bestMatch;
+    }
+    if (links.length > 0) {
+        return links[0];
     }
     return null;
 }
 
-UnitTestSuite.testFunctionFor('getTopLink(classLinks)', function () {
+UnitTestSuite.testFunctionFor('getTopLink(classLinks, bestMatch)', function () {
+    var classLinkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component', 'java/awt/Component');
+    var classLinkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object', 'java/lang/Object');
 
-    var classLinkOne = new ClassLink(LinkType.CLASS, 'java.lang', 'Object', 'java/lang/Object');
-    var classLinkTwo = new ClassLink(LinkType.CLASS, 'java.awt', 'Component', 'java/awt/Component');
+    assertThat('no links, best match undefined', getTopLink([]), is(null));
+    assertThat('one link, best match undefined', getTopLink([classLinkOne]), is(classLinkOne));
+    assertThat('two links, best match undefined', getTopLink([classLinkOne, classLinkTwo]), is(classLinkOne));
+    assertThat('no links, best match defined', getTopLink([], classLinkOne), is(classLinkOne));
+    assertThat('one link, best match defined', getTopLink([classLinkOne], classLinkTwo), is(classLinkTwo));
+});
 
-    function assertThatGetTopLink(functionInput, expected) {
-        var description = 'getTopLink(' + functionInput + ')';
-        var actual = getTopLink(functionInput);
-        assertThat(description, actual, expected);
+/**
+ * Get the best match (if any) from the given array of links.
+ */
+function getBestMatch(exactMatchCondition, links) {
+    var exactMatchLinks = links.filter(exactMatchCondition);
+    // If all of the links displayed in the search list are exact matches, do
+    // not display a best match.
+    if (exactMatchLinks.length === links.length) {
+        return null;
     }
+    // If there is more than one exact match, choose the link with the shortest
+    // name to be the best match.
+    var bestMatch = null;
+    var bestMatchNameLength;
+    var name;
+    exactMatchLinks.forEach(function (link) {
+        name = (link.getType() === LinkType.PACKAGE ? link.getPackageName() : link.getCanonicalName());
+        if (!bestMatch || name.length < bestMatchNameLength) {
+            bestMatch = link;
+            bestMatchNameLength = name.length;
+        }
+    });
+    return bestMatch;
+}
 
-    assertThatGetTopLink([], is(null));
-    assertThatGetTopLink([classLinkOne], is(classLinkOne));
-    assertThatGetTopLink([classLinkOne, classLinkTwo], is(classLinkOne));
+UnitTestSuite.testFunctionFor('getBestMatch(exactMatchCondition, links)', function () {
+    var javaIoPackage = new PackageLink('java.io');
+    var javaLangPackage = new PackageLink('java.lang');
+    var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
+    var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
+    var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
+    var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
+    var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
+
+    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
+        javaLangObjectClass, javaxSwingBorderFactoryClass,
+        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
+
+    var assertThatBestMatchFor = function (searchString, searchResult) {
+        var exactMatchCondition = Query._createExactMatchCondition(searchString);
+        assertThat('Best match for: ' + searchString,
+                   getBestMatch(exactMatchCondition, allLinks),
+                   is(searchResult));
+    };
+
+    assertThatBestMatchFor('java.io', is(javaIoPackage));
+    assertThatBestMatchFor('j', is(null));
+    assertThatBestMatchFor('J', is(null));
+    assertThatBestMatchFor('Object', is(javaLangObjectClass));
+    assertThatBestMatchFor('O', is(null));
+    assertThatBestMatchFor('java.lang.Object', is(javaLangObjectClass));
+    assertThatBestMatchFor('JAVA.LANG.OBJECT', is(javaLangObjectClass));
+    assertThatBestMatchFor('org.omg.CORBA.Object', is(orgOmgCorbaObjectClass));
+    assertThatBestMatchFor('java.lang', is(javaLangPackage));
+    assertThatBestMatchFor('java.lang.', is(null));
+    assertThatBestMatchFor('java.*.o*e', is(null));
+    assertThatBestMatchFor('java.*.*o*e', is(null));
+    assertThatBestMatchFor('javax.swing.border.A', is(null));
 });
 
 function selectClasses() {
@@ -2074,7 +2178,8 @@ function selectClasses() {
     var container = View.getContainer();
     var node = container.createContentNode();
     var condition = Query.createCondition();
-    appendClasses(condition, node);
+    var exactMatchCondition = Query.createExactMatchCondition();
+    appendClasses(condition, exactMatchCondition, node);
     container.setContentNode(node);
 
     Log.message('\n' +
@@ -2093,7 +2198,7 @@ function selectClasses() {
     PREVIOUS_CLASS_LINKS_QUERY = Query.getSearchString();
 }
 
-function appendClasses(condition, parent) {
+function appendClasses(condition, exactMatchCondition, parent) {
     if (PREVIOUS_CLASS_LINKS_QUERY && Query.getSearchString().indexOf(PREVIOUS_CLASS_LINKS_QUERY) === 0) {
         // Characters have been added to the end of the previous query. Start
         // with the current search list and filter out any links that do not match.
@@ -2105,15 +2210,23 @@ function appendClasses(condition, parent) {
     }
 
     CURRENT_LINKS = CURRENT_LINKS.filter(condition);
-    TOP_CLASS_LINK = getTopLink(CURRENT_LINKS);
-    parent.innerHTML = constructHTML(CURRENT_LINKS);
+    var bestMatch = getBestMatch(exactMatchCondition, CURRENT_LINKS);
+    TOP_CLASS_LINK = getTopLink(CURRENT_LINKS, bestMatch);
+    parent.innerHTML = constructHTML(CURRENT_LINKS, bestMatch);
 }
 
-function constructHTML(classLinks) {
+function constructHTML(classLinks, bestMatch) {
     var html = '';
+    if (bestMatch && classLinks.length > 1) {
+        html += '<br/><b><i>Best Match</i></b><br/>';
+        html += bestMatch.getType().getName();
+        html += '<br/>';
+        html += bestMatch.getHTML();
+        html += '<br/>';
+    }
     var type;
     var newType;
-    CURRENT_LINKS.forEach(function (link) {
+    classLinks.forEach(function (link) {
         newType = link.getType();
         if (type !== newType) {
             html += '<br/><b>' + newType.getHeader() + '</b><br/>';
