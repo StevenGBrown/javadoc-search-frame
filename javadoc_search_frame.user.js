@@ -405,10 +405,10 @@ UnitTestResult.prototype.getResultsByFunctionUnderTest = function () {
  * @param defaultValue the default value used when the value cannot be
  *                     retrieved or has not yet been configured
  */
-function UserPreference(key, defaultValue) {
+UserPreference = function (key, defaultValue) {
     this.key = key;
     this.defaultValue = defaultValue;
-}
+};
 
 /**
  * @returns {Boolean} true if user preference values can be retrieved, false otherwise
