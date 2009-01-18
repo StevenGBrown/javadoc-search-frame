@@ -982,7 +982,7 @@ Query.isAnchorSearchStarted = function () {
 };
 
 Query.createCondition = function () {
-    return Query._createCondition(this.search, false);
+    return Query._createCondition(this.search);
 };
 
 Query._createCondition = function (searchString) {
