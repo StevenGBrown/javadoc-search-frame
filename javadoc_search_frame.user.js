@@ -2395,6 +2395,10 @@ function searchFieldChanged(input) {
 }
 
 function returnKeyPressed(controlModifier) {
+    var searchFieldValue = View.getFieldValue();
+    Query.input(searchFieldValue);
+    search();
+
     var url = null;
     if (Query.isClassMode() && TOP_CLASS_LINK) {
         url = TOP_CLASS_LINK.getUrl();
