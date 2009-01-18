@@ -1042,6 +1042,8 @@ UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
             is([javaLangObjectClass]));
     assertThatSearchResultFor('java.*.*o*e',
             is([javaIoCloseableClass, javaLangObjectClass]));
+    assertThatSearchResultFor('java.**.***o**e*',
+            is([javaIoCloseableClass, javaLangObjectClass]));
     assertThatSearchResultFor('javax.swing.border.A',
             is([javaxSwingBorderAbstractBorderClass]));
 });
@@ -1069,6 +1071,8 @@ Query.getRegex = function () {
 };
 
 Query._getRegex = function (searchString) {
+    searchString = searchString.replace(/\*+/, '*');
+
     var pattern = '^';
 
     for (i = 0; i < searchString.length; i++) {
@@ -1104,7 +1108,10 @@ Query._getRegex = function (searchString) {
         }
     }
 
-    pattern += '.*$';
+    if (!endsWith(pattern, '.*')) {
+        pattern += '.*';
+    }
+    pattern += '$';
     return new RegExp(pattern);
 };
 
@@ -1163,19 +1170,13 @@ Query._getSearchStringFromInput = function (input) {
             return '';
         } else {
             input = input.substring(1);
-            return this._normalize(input);
+            return input;
         }
     } else if (this.isClassMode()) {
-        return this._normalize(input);
+        return input;
     } else {
         return '';
     }
-};
-
-Query._normalize = function (input) {
-    input = this._concatStars(input);
-    input = this._removeLastStar(input);
-    return input;
 };
 
 Query._shiftMode = function (input) {
@@ -1228,17 +1229,6 @@ Query._memoryLastSearch = function (lastSearch) {
         this.lastAnchorSearch = lastSearch;
         this.search = '';
     }
-};
-
-Query._removeLastStar = function (s) {
-    if (s.lastIndexOf('*') === s.length - 1) {
-        s = s.substring(0, s.length - 1);
-    }
-    return s;
-};
-
-Query._concatStars = function (s) {
-    return s.replace(/\*+/, '*');
 };
 
 
