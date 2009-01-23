@@ -932,6 +932,172 @@ ClassLink.prototype.toString = function () {
 
 /*
  * ----------------------------------------------------------------------------
+ * VIEW
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class View (undocumented).
+ */
+View = {
+    field : null,
+    container : null,
+    subContainer : null
+};
+
+View.getContainer = function () {
+    return this.container;
+};
+
+View.getSubContainer = function () {
+    return this.subContainer;
+};
+
+View.setFieldValue = function (v) {
+    this.field.value = v;
+};
+
+View.getFieldValue = function () {
+    return this.field.value;
+};
+
+View.getFieldElement = function () {
+    return this.field;
+};
+
+View.focusField = function () {
+    if (this.field) {
+        this.field.focus();
+    }
+};
+
+View.selectClass = function (classLink) {
+    var node = this.container.createContentNode();
+    
+    node.innerHTML = classLink.getHTML();
+    node.appendChild(this.subContainer.getParent());
+    this.container.setContentNode(node);
+};
+
+View.initSearchField = function () {
+  var node = this._getHeadingNode();
+  if (!node) {
+    return;
+  }
+
+  while (node.firstChild) {
+    node.removeChild(node.firstChild);
+  }
+
+  this.field = this._createSearchField();
+  node.appendChild(this.field);
+
+  var eraseButton = this._createEraseButton();
+  node.appendChild(eraseButton);
+
+  node.appendChild(document.createElement('br'));
+
+  var settingsLink = this._createSettingsLink();
+  node.appendChild(settingsLink);
+};
+
+View.warnOfFailedUnitTest = function () {
+    var node = this._getHeadingNode();
+    if (!node) {
+        return;
+    }
+
+    var unitTestFailedWarning = this._createUnitTestFailedWarning();
+    node.appendChild(document.createElement('p'));
+    node.appendChild(unitTestFailedWarning);
+};
+
+View.initContainer = function () {
+    var xpathResult = document.evaluate('//font[@class="FrameItemFont"]',
+            document, null, XPathResult.ANY_TYPE, null);
+    var node = xpathResult.iterateNext();
+    if (!node) {
+        return false;
+    }
+    this.container = new Container(node);
+
+    node = this._createSubContainerNode();
+    this.subContainer = new Container(node);
+};
+
+View._getHeadingNode = function () {
+    var xpathResult = document.evaluate('//font[@class="FrameHeadingFont"]/b',
+            document, null, XPathResult.ANY_TYPE, null);
+    return xpathResult.iterateNext();
+};
+
+View._createSearchField = function () {
+    var s = document.createElement('input');
+    s.setAttribute('type', 'text');
+    s.addEventListener('keyup', searchFieldKeyup, false);
+    s.addEventListener('onchange', searchFieldChanged, false);
+    s.addEventListener('focus', searchFieldFocus, false);
+    if (SEARCH_ACCESS_KEY) {
+        s.setAttribute('accesskey', SEARCH_ACCESS_KEY);
+    }
+    return s;
+};
+
+View._createEraseButton = function () {
+    var iconErase = 'data:image/gif;base64,R0lGODlhDQANAJEDAM%2FPz%2F%2F%2F%2F93d3UpihSH5BAEAAAMALAAAAAANAA0AAAIwnCegcpcg4nIw2sRGDZYnBAWiIHJQRZbec5XXEqnrmXIupMWdZGCXlAGhJg0h7lAAADs%3D';
+
+    var e = document.createElement('input');
+    e.setAttribute('type', 'image');
+    e.setAttribute('src', iconErase);
+    e.setAttribute('style', 'margin-left: 2px');
+    e.addEventListener('click', eraseButtonClick, false);
+    if (ERASE_ACCESS_KEY) {
+        e.setAttribute('accesskey', ERASE_ACCESS_KEY);
+    }
+    return e;
+};
+
+View._createSettingsLink = function () {
+  var anchorElement = document.createElement('a');
+  anchorElement.setAttribute('href', 'javascript:void(0);');
+  anchorElement.appendChild(document.createTextNode(WebPage.SETTINGS.title));
+  anchorElement.addEventListener('click', function (event) {
+      WebPage.SETTINGS.open();
+      event.preventDefault();
+  }, false);
+  var fontElement = document.createElement('font');
+  fontElement.setAttribute('size', '-2');
+  fontElement.appendChild(anchorElement);
+  return fontElement;
+};
+
+View._createUnitTestFailedWarning = function () {
+  var anchorElement = document.createElement('a');
+  anchorElement.setAttribute('href', 'javascript:void(0);');
+  anchorElement.appendChild(document.createTextNode('Unit test failed. Click here for details.'));
+  anchorElement.addEventListener('click', function (event) {
+      WebPage.UNIT_TEST_RESULTS.open();
+      event.preventDefault();
+  }, false);
+  var fontElement = document.createElement('font');
+  fontElement.setAttribute('size', '-2');
+  fontElement.appendChild(anchorElement);
+  var italicElement = document.createElement('i');
+  italicElement.appendChild(fontElement);
+  return italicElement;
+};
+
+View._createSubContainerNode = function () {
+    var parent = document.createElement('span');
+    var node = document.createElement('ul');
+    node.setAttribute('style', 'list-style-type:none; padding:0');
+    parent.appendChild(node);
+    return node;
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
  * QUERY
  * ----------------------------------------------------------------------------
  */
@@ -1233,172 +1399,6 @@ Query._memoryLastSearch = function (lastSearch) {
         this.lastAnchorSearch = lastSearch;
         this.search = '';
     }
-};
-
-
-/*
- * ----------------------------------------------------------------------------
- * VIEW
- * ----------------------------------------------------------------------------
- */
-
-/**
- * @class View (undocumented).
- */
-View = {
-    field : null,
-    container : null,
-    subContainer : null
-};
-
-View.getContainer = function () {
-    return this.container;
-};
-
-View.getSubContainer = function () {
-    return this.subContainer;
-};
-
-View.setFieldValue = function (v) {
-    this.field.value = v;
-};
-
-View.getFieldValue = function () {
-    return this.field.value;
-};
-
-View.getFieldElement = function () {
-    return this.field;
-};
-
-View.focusField = function () {
-    if (this.field) {
-        this.field.focus();
-    }
-};
-
-View.selectClass = function (classLink) {
-    var node = this.container.createContentNode();
-    
-    node.innerHTML = classLink.getHTML();
-    node.appendChild(this.subContainer.getParent());
-    this.container.setContentNode(node);
-};
-
-View.initSearchField = function () {
-  var node = this._getHeadingNode();
-  if (!node) {
-    return;
-  }
-
-  while (node.firstChild) {
-    node.removeChild(node.firstChild);
-  }
-
-  this.field = this._createSearchField();
-  node.appendChild(this.field);
-
-  var eraseButton = this._createEraseButton();
-  node.appendChild(eraseButton);
-
-  node.appendChild(document.createElement('br'));
-
-  var settingsLink = this._createSettingsLink();
-  node.appendChild(settingsLink);
-};
-
-View.warnOfFailedUnitTest = function () {
-    var node = this._getHeadingNode();
-    if (!node) {
-        return;
-    }
-
-    var unitTestFailedWarning = this._createUnitTestFailedWarning();
-    node.appendChild(document.createElement('p'));
-    node.appendChild(unitTestFailedWarning);
-};
-
-View.initContainer = function () {
-    var xpathResult = document.evaluate('//font[@class="FrameItemFont"]',
-            document, null, XPathResult.ANY_TYPE, null);
-    var node = xpathResult.iterateNext();
-    if (!node) {
-        return false;
-    }
-    this.container = new Container(node);
-
-    node = this._createSubContainerNode();
-    this.subContainer = new Container(node);
-};
-
-View._getHeadingNode = function () {
-    var xpathResult = document.evaluate('//font[@class="FrameHeadingFont"]/b',
-            document, null, XPathResult.ANY_TYPE, null);
-    return xpathResult.iterateNext();
-};
-
-View._createSearchField = function () {
-    var s = document.createElement('input');
-    s.setAttribute('type', 'text');
-    s.addEventListener('keyup', searchFieldKeyup, false);
-    s.addEventListener('onchange', searchFieldChanged, false);
-    s.addEventListener('focus', searchFieldFocus, false);
-    if (SEARCH_ACCESS_KEY) {
-        s.setAttribute('accesskey', SEARCH_ACCESS_KEY);
-    }
-    return s;
-};
-
-View._createEraseButton = function () {
-    var iconErase = 'data:image/gif;base64,R0lGODlhDQANAJEDAM%2FPz%2F%2F%2F%2F93d3UpihSH5BAEAAAMALAAAAAANAA0AAAIwnCegcpcg4nIw2sRGDZYnBAWiIHJQRZbec5XXEqnrmXIupMWdZGCXlAGhJg0h7lAAADs%3D';
-
-    var e = document.createElement('input');
-    e.setAttribute('type', 'image');
-    e.setAttribute('src', iconErase);
-    e.setAttribute('style', 'margin-left: 2px');
-    e.addEventListener('click', eraseButtonClick, false);
-    if (ERASE_ACCESS_KEY) {
-        e.setAttribute('accesskey', ERASE_ACCESS_KEY);
-    }
-    return e;
-};
-
-View._createSettingsLink = function () {
-  var anchorElement = document.createElement('a');
-  anchorElement.setAttribute('href', 'javascript:void(0);');
-  anchorElement.appendChild(document.createTextNode(WebPage.SETTINGS.title));
-  anchorElement.addEventListener('click', function (event) {
-      WebPage.SETTINGS.open();
-      event.preventDefault();
-  }, false);
-  var fontElement = document.createElement('font');
-  fontElement.setAttribute('size', '-2');
-  fontElement.appendChild(anchorElement);
-  return fontElement;
-};
-
-View._createUnitTestFailedWarning = function () {
-  var anchorElement = document.createElement('a');
-  anchorElement.setAttribute('href', 'javascript:void(0);');
-  anchorElement.appendChild(document.createTextNode('Unit test failed. Click here for details.'));
-  anchorElement.addEventListener('click', function (event) {
-      WebPage.UNIT_TEST_RESULTS.open();
-      event.preventDefault();
-  }, false);
-  var fontElement = document.createElement('font');
-  fontElement.setAttribute('size', '-2');
-  fontElement.appendChild(anchorElement);
-  var italicElement = document.createElement('i');
-  italicElement.appendChild(fontElement);
-  return italicElement;
-};
-
-View._createSubContainerNode = function () {
-    var parent = document.createElement('span');
-    var node = document.createElement('ul');
-    node.setAttribute('style', 'list-style-type:none; padding:0');
-    parent.appendChild(node);
-    return node;
 };
 
 
