@@ -1071,7 +1071,7 @@ Query.getRegex = function () {
 };
 
 Query._getRegex = function (searchString) {
-    searchString = searchString.replace(/\*+/, '*');
+    searchString = searchString.replace(/\*{2,}/g, '*');
 
     var pattern = '^';
 
@@ -1114,6 +1114,11 @@ Query._getRegex = function (searchString) {
     pattern += '$';
     return new RegExp(pattern);
 };
+
+UnitTestSuite.testFunctionFor('Query.getRegex()', function () {
+    assertThat('excess asterisk characters are removed',
+               Query._getRegex('java.**.***o**e*').pattern, is(Query._getRegex('java.*.*o*e').pattern));
+});
 
 Query._getExactMatchRegex = function (searchString) {
     var pattern = '^';
