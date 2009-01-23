@@ -1681,13 +1681,13 @@ AnchorsCache.appendAnchors = function (parent, classLink, condition) {
  * Entry point of this script; called when the script has loaded.
  */
 function init() {
+    var initStopWatch = new StopWatch();
+
     // Ensure that this is the correct document. This is necessary for
     // Google Chrome, which currently ignores the @include metadata tag.
     if (!endsWith(document.location.toString(), '/allclasses-frame.html')) {
         return;
     }
-
-    var initStopWatch = new StopWatch();
 
     // Retrieve the innerHTML of the package and class frames.
     var retrieveInnerHtmlStopWatch = new StopWatch();
