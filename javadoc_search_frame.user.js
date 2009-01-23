@@ -762,7 +762,6 @@ WebPage._open = function (page) {
             '<hr/>\n' +
             '<p><h2>' + page.title + '</h2></p>\n' +
             '<hr/>\n';
-
     pageBodyInnerHTML += page.getContents();
 
     var classFrame = top.frames[2];
@@ -1765,7 +1764,7 @@ function init() {
         '- search field initialised in ' + initSearchFieldStopWatch.timeElapsed() + '\n' +
         '- unit test run in ' + unitTestStopWatch.timeElapsed() + '\n' +
         '- package frame hidden in ' + hidePackageFrameStopWatch.timeElapsed() + '\n' +
-        '- search field given focus in ' + focusSearchFieldStopWatch.timeElapsed()
+        '- search field given focus in ' + focusSearchFieldStopWatch.timeElapsed() + '\n'
     );
 }
 
@@ -2179,7 +2178,7 @@ function selectClasses() {
 
     Log.message('\n' +
         '\'' + Query.getSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n' +
-        Query.getRegex()
+        Query.getRegex() + '\n'
     );
 
     if (TOP_CLASS_LINK && UserPreference.AUTO_OPEN.getValue()) {
