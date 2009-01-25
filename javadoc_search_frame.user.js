@@ -2090,7 +2090,7 @@ UnitTestSuite.testFunctionFor('getBestMatch(exactMatchCondition, links)', functi
 });
 
 function selectClasses() {
-    if (PREVIOUS_CLASS_LINKS_QUERY && PREVIOUS_CLASS_LINKS_QUERY === Query.getSearchString()) {
+    if (PREVIOUS_CLASS_LINKS_QUERY !== null && PREVIOUS_CLASS_LINKS_QUERY === Query.getSearchString()) {
         return;
     }
 
@@ -2117,7 +2117,7 @@ function selectClasses() {
 }
 
 function appendClasses(condition, exactMatchCondition) {
-    if (PREVIOUS_CLASS_LINKS_QUERY && Query.getSearchString().indexOf(PREVIOUS_CLASS_LINKS_QUERY) === 0) {
+    if (PREVIOUS_CLASS_LINKS_QUERY !== null && Query.getSearchString().indexOf(PREVIOUS_CLASS_LINKS_QUERY) === 0) {
         // Characters have been added to the end of the previous query. Start
         // with the current search list and filter out any links that do not match.
 
