@@ -511,6 +511,46 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
 
 /*
  * ----------------------------------------------------------------------------
+ * FRAMES
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Frames (undocumented).
+ */
+Frames = {
+    initialised : false,
+};
+
+Frames.getAllPackagesFrame = function () {
+    this._initialise();
+    return this['packageListFrame'];
+};
+
+Frames.getSummaryFrame = function () {
+    this._initialise();
+    return this['classFrame'];
+};
+
+Frames._initialise = function () {
+    var frameIndex;
+    var frame;
+    if (!this.initialised) {
+        if (top.frames) {
+            for (frameIndex = 0; frameIndex < top.frames.length; frameIndex++) {
+                frame = top.frames[frameIndex];
+                if (frame.name && frame.document) {
+                    this[frame.name] = frame;
+                }
+            }
+        }
+        this.initialised = true;
+    }
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
  * INTERNAL WEB PAGES
  * ----------------------------------------------------------------------------
  */
@@ -764,8 +804,8 @@ WebPage._open = function (page) {
             '<hr/>\n';
     pageBodyInnerHTML += page.getContents();
 
-    var classFrame = top.frames[2];
-    var pageDocument = classFrame.document;
+    var summaryFrame = Frames.getSummaryFrame();
+    var pageDocument = summaryFrame.document;
     pageDocument.body.innerHTML = pageBodyInnerHTML;
 
     if (page.registerEventListeners) {
@@ -976,7 +1016,9 @@ View.focusOnSearchField = function () {
 };
 
 View.warnOfFailedUnitTest = function () {
-    document.body.insertBefore(this.unitTestFailedWarning, this.contentNode);
+    if (Frames.getSummaryFrame()) {
+        document.body.insertBefore(this.unitTestFailedWarning, this.contentNode);
+    }
 };
 
 View._create = function (eventHandlers) {
@@ -991,8 +1033,10 @@ View._create = function (eventHandlers) {
     document.body.appendChild(eraseButton);
     document.body.appendChild(document.createElement('br'));
 
-    var settingsLink = this._createSettingsLink(eventHandlers);
-    document.body.appendChild(settingsLink);
+    if (Frames.getSummaryFrame()) {
+        var settingsLink = this._createSettingsLink(eventHandlers);
+        document.body.appendChild(settingsLink);
+    }
 
     var tableElement = document.createElement('table');
     this.contentNodeParent = document.createElement('tr');
@@ -1006,7 +1050,9 @@ View._create = function (eventHandlers) {
         parentElement = element;
     });
 
-    this.unitTestFailedWarning = this._createUnitTestFailedWarning(eventHandlers);
+    if (Frames.getSummaryFrame()) {
+        this.unitTestFailedWarning = this._createUnitTestFailedWarning(eventHandlers);
+    }
 };
 
 View._createSearchField = function (eventHandlers) {
@@ -1603,7 +1649,7 @@ AnchorsCache.appendAnchors = function (classLink, condition) {
         var url = TOP_ANCHOR_LINK.getUrl();
         if (url !== LAST_AUTO_OPEN_URL) {
             LAST_AUTO_OPEN_URL = url;
-            openInClassFrame(url);
+            openInSummaryFrame(url);
         }
     }
  
@@ -1665,16 +1711,18 @@ function init() {
     unitTestStopWatch.stop();
 
     // Hide the package list frame.
-    var hidePackageFrameStopWatch = new StopWatch();
-    var frameset = top.document.getElementsByTagName('frameset')[1];
-    if (frameset) {
-        frameset.setAttribute('rows', '0,*');
-        frameset.setAttribute('border', 0);
-        frameset.setAttribute('frameborder', 0);
-        frameset.setAttribute('framespacing', 0);
-        scroll(0, 0);
+    if (Frames.getAllPackagesFrame()) {
+        var hidePackageFrameStopWatch = new StopWatch();
+        var frameset = top.document.getElementsByTagName('frameset')[1];
+        if (frameset) {
+            frameset.setAttribute('rows', '0,*');
+            frameset.setAttribute('border', 0);
+            frameset.setAttribute('frameborder', 0);
+            frameset.setAttribute('framespacing', 0);
+            scroll(0, 0);
+        }
+        hidePackageFrameStopWatch.stop();
     }
-    hidePackageFrameStopWatch.stop();
 
     // Give focus to the search field.
     var focusSearchFieldStopWatch = new StopWatch();
@@ -1689,7 +1737,8 @@ function init() {
         '- container initialised in ' + initContainerStopWatch.timeElapsed() + '\n' +
         '- initial search performed in ' + initialSearchStopWatch.timeElapsed() + '\n' +
         '- unit test run in ' + unitTestStopWatch.timeElapsed() + '\n' +
-        '- package frame hidden in ' + hidePackageFrameStopWatch.timeElapsed() + '\n' +
+        (hidePackageFrameStopWatch ?
+            '- package frame hidden in ' + hidePackageFrameStopWatch.timeElapsed() + '\n' : '') +
         '- search field given focus in ' + focusSearchFieldStopWatch.timeElapsed() + '\n'
     );
 }
@@ -1719,10 +1768,10 @@ function search() {
  * @return the inner HTML of the body element of the package list frame, or undefined if the element does not exist
  */
 function getPackagesInnerHtml() {
-    var packageFrame = top.frames[0];
+    var allPackagesFrame = Frames.getAllPackagesFrame();
     var packagesInnerHTML;
-    if (packageFrame && packageFrame.name === 'packageListFrame' && packageFrame.document && packageFrame.document.body) {
-        packagesInnerHTML = packageFrame.document.body.innerHTML;
+    if (allPackagesFrame && allPackagesFrame.document.body) {
+        packagesInnerHTML = allPackagesFrame.document.body.innerHTML;
     }
     return packagesInnerHTML;
 }
@@ -2109,7 +2158,7 @@ function selectClasses() {
         var url = TOP_CLASS_LINK.getUrl();
         if (url !== LAST_AUTO_OPEN_URL) {
             LAST_AUTO_OPEN_URL = url;
-            openInClassFrame(url);
+            openInSummaryFrame(url);
         }
     }
 
@@ -2184,10 +2233,10 @@ function openInNewTab(url) {
     window.open(url);
 }
 
-function openInClassFrame(url) {
-    if (window.parent.frames[2]) {
-        window.parent.frames[2].location.href = url;
-        return true;
+function openInSummaryFrame(url) {
+    var summaryFrame = Frames.getSummaryFrame();
+    if (summaryFrame) {
+        summaryFrame.location.href = url;
     }
 }
 
@@ -2244,7 +2293,7 @@ function selectMenu() {
 
 function openMenu(node) {
     var href = node.getAttribute('href');
-    openInClassFrame(href);
+    openInSummaryFrame(href);
 }
 
 function endsWith(stringOne, stringTwo) {
@@ -2334,7 +2383,7 @@ EventHandlers._returnKeyPressed = function (controlModifier) {
         if (controlModifier) {
             openInNewTab(url);
         } else {
-            openInClassFrame(url);
+            openInSummaryFrame(url);
         }
     }
 };
