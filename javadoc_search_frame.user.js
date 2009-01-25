@@ -940,159 +940,141 @@ ClassLink.prototype.toString = function () {
  * @class View (undocumented).
  */
 View = {
-    field : null,
-    container : null,
-    subContainer : null
+    searchField : null,
+    unitTestFailedWarning : null,
+    contentNodeParent : null,
+    contentNode : null
 };
 
-View.getContainer = function () {
-    return this.container;
+View.initialise = function (eventHandlers) {
+    this._create(eventHandlers);
 };
 
-View.getSubContainer = function () {
-    return this.subContainer;
+View.setContentNodeHTML = function (contents) {
+    var newNode = this.contentNode.cloneNode(false);
+    newNode.innerHTML = contents;
+    this.contentNodeParent.replaceChild(newNode, this.contentNode);
+    this.contentNode = newNode;
 };
 
-View.setFieldValue = function (v) {
-    this.field.value = v;
+View.getContentNode = function () {
+    return this.contentNode;
 };
 
-View.getFieldValue = function () {
-    return this.field.value;
+View.setSearchFieldValue = function (v) {
+    this.searchField.value = v;
 };
 
-View.getFieldElement = function () {
-    return this.field;
+View.getSearchFieldValue = function () {
+    return this.searchField.value;
 };
 
-View.focusField = function () {
-    if (this.field) {
-        this.field.focus();
+View.focusOnSearchField = function () {
+    if (this.searchField) {
+        this.searchField.focus();
     }
-};
-
-View.selectClass = function (classLink) {
-    var node = this.container.createContentNode();
-    
-    node.innerHTML = classLink.getHTML();
-    node.appendChild(this.subContainer.getParent());
-    this.container.setContentNode(node);
-};
-
-View.initSearchField = function () {
-  var node = this._getHeadingNode();
-  if (!node) {
-    return;
-  }
-
-  while (node.firstChild) {
-    node.removeChild(node.firstChild);
-  }
-
-  this.field = this._createSearchField();
-  node.appendChild(this.field);
-
-  var eraseButton = this._createEraseButton();
-  node.appendChild(eraseButton);
-
-  node.appendChild(document.createElement('br'));
-
-  var settingsLink = this._createSettingsLink();
-  node.appendChild(settingsLink);
 };
 
 View.warnOfFailedUnitTest = function () {
-    var node = this._getHeadingNode();
-    if (!node) {
-        return;
+    document.body.insertBefore(this.unitTestFailedWarning, this.contentNode);
+};
+
+View._create = function (eventHandlers) {
+    while (document.body.firstChild) {
+        document.body.removeChild(document.body.firstChild);
     }
 
-    var unitTestFailedWarning = this._createUnitTestFailedWarning();
-    node.appendChild(document.createElement('p'));
-    node.appendChild(unitTestFailedWarning);
+    this.searchField = this._createSearchField(eventHandlers);
+    document.body.appendChild(this.searchField);
+
+    var eraseButton = this._createEraseButton(eventHandlers);
+    document.body.appendChild(eraseButton);
+    document.body.appendChild(document.createElement('br'));
+
+    var settingsLink = this._createSettingsLink(eventHandlers);
+    document.body.appendChild(settingsLink);
+
+    var tableElement = document.createElement('table');
+    this.contentNodeParent = document.createElement('tr');
+    this.contentNode = document.createElement('td');
+
+    var parentElement = document.body;
+    [tableElement, this.contentNodeParent, this.contentNode].forEach(function (element) {
+        element.style.border = '0';
+        element.style.width = '100%';
+        parentElement.appendChild(element);
+        parentElement = element;
+    });
+
+    this.unitTestFailedWarning = this._createUnitTestFailedWarning(eventHandlers);
 };
 
-View.initContainer = function () {
-    var xpathResult = document.evaluate('//font[@class="FrameItemFont"]',
-            document, null, XPathResult.ANY_TYPE, null);
-    var node = xpathResult.iterateNext();
-    if (!node) {
-        return false;
-    }
-    this.container = new Container(node);
-
-    node = this._createSubContainerNode();
-    this.subContainer = new Container(node);
-};
-
-View._getHeadingNode = function () {
-    var xpathResult = document.evaluate('//font[@class="FrameHeadingFont"]/b',
-            document, null, XPathResult.ANY_TYPE, null);
-    return xpathResult.iterateNext();
-};
-
-View._createSearchField = function () {
+View._createSearchField = function (eventHandlers) {
     var s = document.createElement('input');
     s.setAttribute('type', 'text');
-    s.addEventListener('keyup', searchFieldKeyup, false);
-    s.addEventListener('onchange', searchFieldChanged, false);
-    s.addEventListener('focus', searchFieldFocus, false);
+    s.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
+    s.addEventListener('onchange', eventHandlers.searchFieldChanged, false);
+    s.addEventListener('focus', eventHandlers.searchFieldFocus, false);
     if (SEARCH_ACCESS_KEY) {
         s.setAttribute('accesskey', SEARCH_ACCESS_KEY);
     }
+    this._watch(s, eventHandlers.searchFieldChanged, 200);
     return s;
 };
 
-View._createEraseButton = function () {
+View._createEraseButton = function (eventHandlers) {
     var iconErase = 'data:image/gif;base64,R0lGODlhDQANAJEDAM%2FPz%2F%2F%2F%2F93d3UpihSH5BAEAAAMALAAAAAANAA0AAAIwnCegcpcg4nIw2sRGDZYnBAWiIHJQRZbec5XXEqnrmXIupMWdZGCXlAGhJg0h7lAAADs%3D';
 
     var e = document.createElement('input');
     e.setAttribute('type', 'image');
     e.setAttribute('src', iconErase);
     e.setAttribute('style', 'margin-left: 2px');
-    e.addEventListener('click', eraseButtonClick, false);
+    e.addEventListener('click', eventHandlers.eraseButtonClick, false);
     if (ERASE_ACCESS_KEY) {
         e.setAttribute('accesskey', ERASE_ACCESS_KEY);
     }
     return e;
 };
 
-View._createSettingsLink = function () {
-  var anchorElement = document.createElement('a');
-  anchorElement.setAttribute('href', 'javascript:void(0);');
-  anchorElement.appendChild(document.createTextNode(WebPage.SETTINGS.title));
-  anchorElement.addEventListener('click', function (event) {
-      WebPage.SETTINGS.open();
-      event.preventDefault();
-  }, false);
-  var fontElement = document.createElement('font');
-  fontElement.setAttribute('size', '-2');
-  fontElement.appendChild(anchorElement);
-  return fontElement;
+View._createSettingsLink = function (eventHandlers) {
+    var anchorElement = document.createElement('a');
+    anchorElement.setAttribute('href', 'javascript:void(0);');
+    anchorElement.appendChild(document.createTextNode(WebPage.SETTINGS.title));
+    anchorElement.addEventListener('click', eventHandlers.settingsLinkClicked, false);
+    var fontElement = document.createElement('font');
+    fontElement.setAttribute('size', '-2');
+    fontElement.appendChild(anchorElement);
+    return fontElement;
 };
 
-View._createUnitTestFailedWarning = function () {
-  var anchorElement = document.createElement('a');
-  anchorElement.setAttribute('href', 'javascript:void(0);');
-  anchorElement.appendChild(document.createTextNode('Unit test failed. Click here for details.'));
-  anchorElement.addEventListener('click', function (event) {
-      WebPage.UNIT_TEST_RESULTS.open();
-      event.preventDefault();
-  }, false);
-  var fontElement = document.createElement('font');
-  fontElement.setAttribute('size', '-2');
-  fontElement.appendChild(anchorElement);
-  var italicElement = document.createElement('i');
-  italicElement.appendChild(fontElement);
-  return italicElement;
+View._createUnitTestFailedWarning = function (eventHandlers) {
+    var anchorElement = document.createElement('a');
+    anchorElement.setAttribute('href', 'javascript:void(0);');
+    anchorElement.appendChild(document.createTextNode('Unit test failed. Click here for details.'));
+    anchorElement.addEventListener('click', eventHandlers.unitTestResultsLinkClicked, false);
+    var fontElement = document.createElement('font');
+    fontElement.setAttribute('size', '-2');
+    fontElement.appendChild(anchorElement);
+    var italicElement = document.createElement('i');
+    italicElement.appendChild(fontElement);
+    var paragraphElement = document.createElement('p');
+    paragraphElement.appendChild(italicElement);
+    return paragraphElement;
 };
 
-View._createSubContainerNode = function () {
-    var parent = document.createElement('span');
-    var node = document.createElement('ul');
-    node.setAttribute('style', 'list-style-type:none; padding:0');
-    parent.appendChild(node);
-    return node;
+View._watch = function (element, callback, msec) {
+    var elementChanged = false;
+    var old = element.value;
+    setInterval(function () {
+        var q = element.value;
+        if (elementChanged && old === q) {
+            elementChanged = false;
+            callback(q);
+        } else if (old !== q) {
+            elementChanged = true;
+        }
+        old = q;
+    }, msec)
 };
 
 
@@ -1315,7 +1297,7 @@ Query.input = function (input) {
 };
 
 Query.update = function (input) {
-    View.setFieldValue(input);
+    View.setSearchFieldValue(input);
     this.input(input);
 };
 
@@ -1336,7 +1318,7 @@ Query._getSearchStringFromInput = function (input) {
         }
     } else if (this.isAnchorMode()) {
         if (0 < input.lastIndexOf('#')) {
-            View.setFieldValue('#');
+            View.setSearchFieldValue('#');
             return '';
         } else {
             input = input.substring(1);
@@ -1358,7 +1340,7 @@ Query._shiftMode = function (input) {
         // * -> menuMode
         lastSearch = input.replace(/@/g, '');
         this._memoryLastSearch(lastSearch);
-        View.setFieldValue('@');
+        View.setSearchFieldValue('@');
         this.mode = Query.MENU_MODE;
         return '@';
     } else if (input.indexOf('#') !== -1) {
@@ -1368,19 +1350,19 @@ Query._shiftMode = function (input) {
         // * -> anchorMode
         lastSearch = input.replace(/#/g, '');
         this._memoryLastSearch(lastSearch);
-        View.setFieldValue('#');
+        View.setSearchFieldValue('#');
         this.mode = Query.ANCHOR_MODE;
         return '#';
     } else if (this.isMenuMode() && this.lastAnchorSearch !== '') {
         // menuMode -> anchorMode
-        View.setFieldValue(this.lastAnchorSearch);
+        View.setSearchFieldValue(this.lastAnchorSearch);
         input = this.lastAnchorSearch;
         this.lastAnchorSearch = '';
         this.mode = Query.ANCHOR_MODE;
         return input;
     } else if (! this.isClassMode()) {
         // * -> classMode
-        View.setFieldValue(this.lastClassSearch);
+        View.setSearchFieldValue(this.lastClassSearch);
         input = this.lastClassSearch;
         this.lastAnchorSearch = '';
         this.lastClassSearch = '';
@@ -1399,48 +1381,6 @@ Query._memoryLastSearch = function (lastSearch) {
         this.lastAnchorSearch = lastSearch;
         this.search = '';
     }
-};
-
-
-/*
- * ----------------------------------------------------------------------------
- * CONTAINER
- * ----------------------------------------------------------------------------
- */
-
-/**
- * @class Container (undocumented).
- */
-Container = function (masterNode) {
-    this.parent = masterNode.parentNode;
-    this.master = masterNode;
-    this.current = null;
-};
-
-Container.prototype.createContentNode = function () {
-    return this.master.cloneNode(false);
-};
-
-Container.prototype.setContentNode = function (node) {
-    if (this.parent.hasChildNodes()) {
-        this.parent.replaceChild(node, this.parent.firstChild);
-    } else {
-        this.parent.appendChild(node);
-    }
-    this.current = node;
-};
-
-Container.prototype.getNode = function () {
-    return this.current;
-};
-
-Container.prototype.getParent = function () {
-    return this.parent;
-};
-
-Container.prototype.print = function (msg) {
-    var node = document.createTextNode(msg);
-    this.setContentNode(node);
 };
 
 
@@ -1495,7 +1435,7 @@ AnchorsRequestHandler = function () {
 };
 
 AnchorsRequestHandler.prototype.loaded = function (req, classLink) {
-    View.getSubContainer().print('parsing...');
+    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>parsing...</p>');
 };
 
 AnchorsRequestHandler.prototype.completed = function (req, classLink) {
@@ -1638,12 +1578,12 @@ AnchorsCache.contains = function (classLink) {
     return this.cache[classLink.getUrl()];
 };
 
-AnchorsCache.appendAnchors = function (parent, classLink, condition) {
+AnchorsCache.appendAnchors = function (classLink, condition) {
     var anchorLinks = this.cache[classLink.getUrl()];
     if (!anchorLinks) {
         return;
     }
-    
+
     TOP_ANCHOR_LINK = null;
     var html = '';
     var count = 0;
@@ -1658,7 +1598,7 @@ AnchorsCache.appendAnchors = function (parent, classLink, condition) {
             }
         }
     }
-    
+ 
     if (TOP_ANCHOR_LINK !== null && UserPreference.AUTO_OPEN.getValue() && ! Query.isModeChanged()) {
         var url = TOP_ANCHOR_LINK.getUrl();
         if (url !== LAST_AUTO_OPEN_URL) {
@@ -1666,8 +1606,8 @@ AnchorsCache.appendAnchors = function (parent, classLink, condition) {
             openInClassFrame(url);
         }
     }
-    
-    parent.innerHTML = html;
+ 
+    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>' + html + '</p>');
 };
 
 
@@ -1707,11 +1647,7 @@ function init() {
 
     // Initialise class frame.
     var initContainerStopWatch = new StopWatch();
-    View.initContainer();
-    var container = View.getContainer();
-    if (!container) {
-        return;
-    }
+    View.initialise(EventHandlers);
     initContainerStopWatch.stop();
 
     // Perform an initial search. This will populate the class frame with the
@@ -1719,15 +1655,6 @@ function init() {
     var initialSearchStopWatch = new StopWatch();
     search();
     initialSearchStopWatch.stop();
-
-    // Initialise the search field.
-    var initSearchFieldStopWatch = new StopWatch();
-    View.initSearchField();
-    var searchField = View.getFieldElement();
-    if (searchField) {
-        watch(searchField, searchFieldChanged, 200);
-    }
-    initSearchFieldStopWatch.stop();
 
     // Run the unit test.
     var unitTestStopWatch = new StopWatch();
@@ -1751,7 +1678,7 @@ function init() {
 
     // Give focus to the search field.
     var focusSearchFieldStopWatch = new StopWatch();
-    View.focusField();
+    View.focusOnSearchField();
     focusSearchFieldStopWatch.stop();
 
     Log.enable();
@@ -1761,7 +1688,6 @@ function init() {
         '- search list constructed in ' + searchListStopWatch.timeElapsed() + '\n' +
         '- container initialised in ' + initContainerStopWatch.timeElapsed() + '\n' +
         '- initial search performed in ' + initialSearchStopWatch.timeElapsed() + '\n' +
-        '- search field initialised in ' + initSearchFieldStopWatch.timeElapsed() + '\n' +
         '- unit test run in ' + unitTestStopWatch.timeElapsed() + '\n' +
         '- package frame hidden in ' + hidePackageFrameStopWatch.timeElapsed() + '\n' +
         '- search field given focus in ' + focusSearchFieldStopWatch.timeElapsed() + '\n'
@@ -1953,7 +1879,7 @@ function getClassLinks(classesInnerHTML) {
         type = checkForExceptionOrErrorType(type, className);
 
         cl = new ClassLink(
-                type, packageName, className, entireMatch + ' [ ' + packageName + ' ]');
+                type, packageName, className, entireMatch + '&nbsp;[&nbsp;' + packageName + '&nbsp;]');
         classLinksMap[type].push(cl);
         anchorWithTitleFound = true;
     }
@@ -1971,7 +1897,7 @@ function getClassLinks(classesInnerHTML) {
 
             var packageName = packageNameInHref.replace(/\/|\\/g, '.');
             cl = new ClassLink(
-                    type, packageName, className, entireMatch + ' [ ' + packageName + ' ]');
+                    type, packageName, className, entireMatch + '&nbsp;[&nbsp;' + packageName + '&nbsp;]');
             classLinksMap[type].push(cl);
         }
     }
@@ -1986,7 +1912,8 @@ function getClassLinks(classesInnerHTML) {
 UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHTML)', function () {
 
     function assert(args, html, description) {
-        var link = new ClassLink(args.type, args.package, args.class, html + ' [ ' + args.package + ' ]');
+        var link = new ClassLink(
+            args.type, args.package, args.class, html + '&nbsp;[&nbsp;' + args.package + '&nbsp;]');
         assertThat(description, getClassLinks(html), is([link]));
     }
 
@@ -2169,12 +2096,9 @@ function selectClasses() {
 
     var stopWatch = new StopWatch();
 
-    var container = View.getContainer();
-    var node = container.createContentNode();
     var condition = Query.createCondition();
     var exactMatchCondition = Query.createExactMatchCondition();
-    appendClasses(condition, exactMatchCondition, node);
-    container.setContentNode(node);
+    appendClasses(condition, exactMatchCondition);
 
     Log.message('\n' +
         '\'' + Query.getSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n' +
@@ -2192,7 +2116,7 @@ function selectClasses() {
     PREVIOUS_CLASS_LINKS_QUERY = Query.getSearchString();
 }
 
-function appendClasses(condition, exactMatchCondition, parent) {
+function appendClasses(condition, exactMatchCondition) {
     if (PREVIOUS_CLASS_LINKS_QUERY && Query.getSearchString().indexOf(PREVIOUS_CLASS_LINKS_QUERY) === 0) {
         // Characters have been added to the end of the previous query. Start
         // with the current search list and filter out any links that do not match.
@@ -2206,7 +2130,9 @@ function appendClasses(condition, exactMatchCondition, parent) {
     CURRENT_LINKS = CURRENT_LINKS.filter(condition);
     var bestMatch = getBestMatch(exactMatchCondition, CURRENT_LINKS);
     TOP_CLASS_LINK = getTopLink(CURRENT_LINKS, bestMatch);
-    parent.innerHTML = constructHTML(CURRENT_LINKS, bestMatch);
+
+    var html = constructHTML(CURRENT_LINKS, bestMatch);
+    View.setContentNodeHTML(html);
 }
 
 function constructHTML(classLinks, bestMatch) {
@@ -2234,8 +2160,7 @@ function constructHTML(classLinks, bestMatch) {
 
 function loadAnchors() {
     if (TOP_CLASS_LINK) {
-      View.selectClass(TOP_CLASS_LINK);
-      View.getSubContainer().print('loading...');
+      View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>loading...</p>');
       AnchorsLoader.load(TOP_CLASS_LINK);
     }
 }
@@ -2246,10 +2171,7 @@ function selectAnchors() {
     }
     PREVIOUS_CLASS_LINKS_QUERY = null;
     var condition = Query.createCondition();
-    var container = View.getSubContainer();
-    var node = container.createContentNode();
-    AnchorsCache.appendAnchors(node, TOP_CLASS_LINK, condition);
-    container.setContentNode(node);
+    AnchorsCache.appendAnchors(TOP_CLASS_LINK, condition);
 }
 
 function updateAnchors() {
@@ -2273,9 +2195,6 @@ function showMenu() {
     if (!TOP_CLASS_LINK) {
       return;
     }
-    View.selectClass(TOP_CLASS_LINK);
-    var container = View.getSubContainer();
-    var node = container.createContentNode();
     var content;
     if (TOP_CLASS_LINK.getType() === LinkType.PACKAGE) {
         content = UserPreference.PACKAGE_MENU.getValue();
@@ -2297,8 +2216,7 @@ function showMenu() {
             content = content.replace(rx2, f(TOP_CLASS_LINK, anchorLink));
         }
     }
-    node.innerHTML = content;
-    container.setContentNode(node);
+    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>' + content + '</p>');
 }
 
 function selectMenu() {
@@ -2306,7 +2224,7 @@ function selectMenu() {
         return;
     }
 
-    var node = View.getSubContainer().getNode();
+    var node = View.getContentNode();
     var xpathResult = document.evaluate('//a', node, null, 
                                         XPathResult.ANY_TYPE, null);
     var node;
@@ -2327,21 +2245,6 @@ function selectMenu() {
 function openMenu(node) {
     var href = node.getAttribute('href');
     openInClassFrame(href);
-}
-
-function watch(element, callback, msec) {
-    var elementChanged = false;
-    var old = element.value;
-    setInterval(function () {
-        var q = element.value;
-        if (elementChanged && old === q) {
-            elementChanged = false;
-            callback(q);
-        } else if (old !== q) {
-            elementChanged = true;
-        }
-        old = q;
-    }, msec)
 }
 
 function endsWith(stringOne, stringTwo) {
@@ -2371,25 +2274,52 @@ UnitTestSuite.testFunctionFor('rightTrim(stringToTrim)', function () {
 
 
 /*
- * event handlers
+ * ----------------------------------------------------------------------------
+ * EVENT HANDLERS
+ * ----------------------------------------------------------------------------
  */
 
-function searchFieldKeyup(e) {
+/**
+ * @class EventHandlers (undocumented).
+ */
+EventHandlers = {};
+
+EventHandlers.searchFieldKeyup = function (e) {
     var code = e.keyCode;
     if (code === 13) {
-        returnKeyPressed(e.ctrlKey);
+        EventHandlers._returnKeyPressed(e.ctrlKey);
     } else if (code === 27) {
-        escapeKeyPressed();
+        EventHandlers._escapeKeyPressed();
     }
-}
+};
 
-function searchFieldChanged(input) {
+EventHandlers.searchFieldChanged = function (input) {
     Query.input(input);
     search();
-}
+};
 
-function returnKeyPressed(controlModifier) {
-    var searchFieldValue = View.getFieldValue();
+EventHandlers.searchFieldFocus = function (e) {
+    document.body.scrollLeft = 0;
+};
+
+EventHandlers.eraseButtonClick = function () {
+    Query.erase();
+    View.focusOnSearchField();
+    search();
+};
+
+EventHandlers.settingsLinkClicked = function () {
+    WebPage.SETTINGS.open();
+    event.preventDefault();
+};
+
+EventHandlers.unitTestResultsLinkClicked = function () {
+    WebPage.UNIT_TEST_RESULTS.open();
+    event.preventDefault();
+};
+
+EventHandlers._returnKeyPressed = function (controlModifier) {
+    var searchFieldValue = View.getSearchFieldValue();
     Query.input(searchFieldValue);
     search();
 
@@ -2407,22 +2337,15 @@ function returnKeyPressed(controlModifier) {
             openInClassFrame(url);
         }
     }
-}
+};
 
-function searchFieldFocus(e) {
-    document.body.scrollLeft = 0;
-}
-
-function eraseButtonClick() {
-    Query.erase();
-    View.focusField();
-    search();
-}
-
-function escapeKeyPressed() {
-    Query.erase();
-    search();
-}
+EventHandlers._escapeKeyPressed = function () {
+    var searchFieldValue = View.getSearchFieldValue();
+    if (searchFieldValue) {
+        Query.erase();
+        search();
+    }
+};
 
 
 /*
