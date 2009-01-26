@@ -1272,6 +1272,96 @@ Query._memoryLastSearch = function (lastSearch) {
 
 /*
  * ----------------------------------------------------------------------------
+ * ANCHORLINK
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class AnchorLink (undocumented).
+ */
+AnchorLink = function (baseurl, name) {
+    this.name = name;
+    this.lowerName = name.toLowerCase();
+    this.url = baseurl + '#' + name;
+    this.keywordOrNot = this._getKeywordOrNot(name);
+    this.html = this._getHtml(name, this.url, this.keywordOrNot);
+};
+
+AnchorLink.prototype.matches = function (regex) {
+    return regex.test(this.name);
+};
+
+AnchorLink.prototype.getHTML = function () {
+    return this.html;
+};
+
+AnchorLink.prototype.getLowerName = function () {
+    return this.lowerName;
+};
+
+AnchorLink.prototype.getUrl = function () {
+    return this.url;
+};
+
+AnchorLink.prototype.isKeyword = function () {
+    return this.keywordOrNot;
+};
+
+AnchorLink.prototype.getNameWithoutParameter = function () {
+    if (this.name.indexOf('(') !== -1) {
+        return this.name.substring(0, this.name.indexOf('('));
+    } else {
+        return this.name;
+    }
+};
+
+AnchorLink.keywords = {
+    'navbar_top':1,
+    'navbar_top_firstrow':1,
+    'skip-navbar_top':1,
+    'field_summary':1,
+    'nested_class_summary':1,
+    'constructor_summary':1,
+    'constructor_detail':1,
+    'method_summary':1,
+    'method_detail':1,
+    'field_detail':1,
+    'navbar_bottom':1,
+    'navbar_bottom_firstrow':1,
+    'skip-navbar_bottom':1
+};
+
+AnchorLink.keywordPrefixes = [
+    'methods_inherited_from_',
+    'fields_inherited_from_',
+    'nested_classes_inherited_from_'
+];
+
+AnchorLink.prototype._getKeywordOrNot = function (name) {
+    if (AnchorLink.keywords[name] === 1) {
+        return true;
+    }
+    var i;
+    for (i = 0; i < AnchorLink.keywordPrefixes.length; i++) {
+        if (name.indexOf(AnchorLink.keywordPrefixes[i]) === 0) {
+            return true;
+        }
+    }
+    return false;
+};
+
+AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
+    var html = '<a href="' + url + '" target="classFrame" class="anchorLink"';
+    if (keywordOrNot) {
+        html += ' style="color:#666"';
+    }
+    html += '>' + name.replace(/ /g, '&nbsp;') + '</a><br/>';
+    return html;
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
  * ANCHORS LOADER
  * ----------------------------------------------------------------------------
  */
@@ -1367,91 +1457,393 @@ AnchorsLoader._getAnchorNames = function (doc) {
 
 /*
  * ----------------------------------------------------------------------------
- * ANCHORLINK
+ * REGEX LIBRARY
  * ----------------------------------------------------------------------------
  */
 
 /**
- * @class AnchorLink (undocumented).
+ * @class RegexLibrary (undocumented).
  */
-AnchorLink = function (baseurl, name) {
-    this.name = name;
-    this.lowerName = name.toLowerCase();
-    this.url = baseurl + '#' + name;
-    this.keywordOrNot = this._getKeywordOrNot(name);
-    this.html = this._getHtml(name, this.url, this.keywordOrNot);
-};
+RegexLibrary = {};
 
-AnchorLink.prototype.matches = function (regex) {
-    return regex.test(this.name);
-};
-
-AnchorLink.prototype.getHTML = function () {
-    return this.html;
-};
-
-AnchorLink.prototype.getLowerName = function () {
-    return this.lowerName;
-};
-
-AnchorLink.prototype.getUrl = function () {
-    return this.url;
-};
-
-AnchorLink.prototype.isKeyword = function () {
-    return this.keywordOrNot;
-};
-
-AnchorLink.prototype.getNameWithoutParameter = function () {
-    if (this.name.indexOf('(') !== -1) {
-        return this.name.substring(0, this.name.indexOf('('));
-    } else {
-        return this.name;
-    }
-};
-
-AnchorLink.keywords = {
-    'navbar_top':1,
-    'navbar_top_firstrow':1,
-    'skip-navbar_top':1,
-    'field_summary':1,
-    'nested_class_summary':1,
-    'constructor_summary':1,
-    'constructor_detail':1,
-    'method_summary':1,
-    'method_detail':1,
-    'field_detail':1,
-    'navbar_bottom':1,
-    'navbar_bottom_firstrow':1,
-    'skip-navbar_bottom':1
-};
-
-AnchorLink.keywordPrefixes = [
-    'methods_inherited_from_',
-    'fields_inherited_from_',
-    'nested_classes_inherited_from_'
-];
-
-AnchorLink.prototype._getKeywordOrNot = function (name) {
-    if (AnchorLink.keywords[name] === 1) {
-        return true;
-    }
-    var i;
-    for (i = 0; i < AnchorLink.keywordPrefixes.length; i++) {
-        if (name.indexOf(AnchorLink.keywordPrefixes[i]) === 0) {
+RegexLibrary.createCondition = function (searchString) {
+    if (searchString.length === 0 || searchString === '*') {
+        return function (link) {
             return true;
+        };
+    }
+
+    var pattern = this.getRegex(searchString);
+
+    return function (link) {
+        return link.matches(pattern);
+    };
+};
+
+UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
+    var javaIoPackage = new PackageLink('java.io');
+    var javaLangPackage = new PackageLink('java.lang');
+    var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
+    var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
+    var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
+    var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
+    var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
+
+    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
+        javaLangObjectClass, javaxSwingBorderFactoryClass,
+        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
+
+    var assertThatSearchResultFor = function (searchString, searchResult) {
+        assertThat('Search for: ' + searchString,
+                   allLinks.filter(RegexLibrary.createCondition(searchString)),
+                   is(searchResult));
+    };
+
+    assertThatSearchResultFor('java.io',
+            is([javaIoPackage, javaIoCloseableClass]));
+    assertThatSearchResultFor('j',
+            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
+                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
+    assertThatSearchResultFor('J',
+            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
+                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
+    assertThatSearchResultFor('Object',
+            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
+    assertThatSearchResultFor('O',
+            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
+    assertThatSearchResultFor('java.lang.Object',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('JAVA.LANG.OBJECT',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('java.lang',
+            is([javaLangPackage, javaLangObjectClass]));
+    assertThatSearchResultFor('java.lang.',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('java.*.o*e',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('java.*.*o*e',
+            is([javaIoCloseableClass, javaLangObjectClass]));
+    assertThatSearchResultFor('java.**.***o**e*',
+            is([javaIoCloseableClass, javaLangObjectClass]));
+    assertThatSearchResultFor('javax.swing.border.A',
+            is([javaxSwingBorderAbstractBorderClass]));
+});
+
+RegexLibrary.createExactMatchCondition = function (searchString) {
+    if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
+        return function (link) {
+            return false;
+        };
+    }
+
+    var pattern = this.getExactMatchRegex(searchString);
+
+    return function (link) {
+        return link.matches(pattern);
+    };
+};
+
+RegexLibrary.getRegex = function (searchString) {
+    searchString = searchString.replace(/\*{2,}/g, '*');
+
+    var pattern = '^';
+
+    for (i = 0; i < searchString.length; i++) {
+        var character = searchString.charAt(i);
+        if (/[A-Z]/.test(character) && i > 0) {
+            // An uppercase character which is not at the beginning of the
+            // search input string. Perform a case-insensitive match of this
+            // character. If the matched character is uppercase, allow any
+            // number of lowercase characters to be matched before it. This
+            // allows for Camel Case searching.
+
+            // The \.? term allows a Camel Case search to match an inner class.
+
+            pattern += '(([a-z]*\.?' + character + ')|' + character.toLowerCase() + ')';
+        } else if (/[a-zA-Z]/.test(character)) {
+            // A lowercase character, or an uppercase character at the
+            // beginning of the search input string. Perform a case-insensitive
+            // match of this character.
+
+            pattern += '(' + character.toUpperCase() + '|' + character.toLowerCase() + ')';
+        } else if (character === '*') {
+            // Replace '*' with '.*' to allow the asterisk to be used as a wildcard.
+
+            pattern += '.*';
+        } else if (RegexLibrary._isSpecialRegularExpressionCharacter(character)) {
+           // A special regular expression character, but not an asterisk.
+           // Escape this character.
+
+           pattern += '\\' + character;
+        } else {
+
+            pattern += character;
         }
     }
-    return false;
+
+    if (!endsWith(pattern, '.*')) {
+        pattern += '.*';
+    }
+    pattern += '$';
+    return new RegExp(pattern);
 };
 
-AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
-    var html = '<a href="' + url + '" target="classFrame" class="anchorLink"';
-    if (keywordOrNot) {
-        html += ' style="color:#666"';
+UnitTestSuite.testFunctionFor('RegexLibrary.getRegex()', function () {
+    assertThat('excess asterisk characters are removed',
+               RegexLibrary.getRegex('java.**.***o**e*').pattern, is(RegexLibrary.getRegex('java.*.*o*e').pattern));
+});
+
+RegexLibrary.getExactMatchRegex = function (searchString) {
+    var pattern = '^';
+
+    for (i = 0; i < searchString.length; i++) {
+        var character = searchString.charAt(i);
+        if (this._isSpecialRegularExpressionCharacter(character)) {
+           pattern += '\\' + character;
+        } else {
+            pattern += character;
+        }
     }
-    html += '>' + name.replace(/ /g, '&nbsp;') + '</a><br/>';
+
+    pattern += '$';
+    return new RegExp(pattern, "i");
+};
+
+RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
+    return ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*'].some(function (specialCharacter) {
+        return character === specialCharacter;
+    });
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * SEARCH
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Search (undocumented).
+ */
+Search = {
+    lastAutoOpenURL : null
+};
+
+Search.update = function () {
+    if (Query.isMenuMode()) {
+        this.Menu.update();
+    } else if (Query.isAnchorMode()) {
+        this.Anchors.update();
+        this._autoOpen(this.Anchors.getTopLink());
+    } else {
+        this.PackagesAndClasses.update();
+        this._autoOpen(this.PackagesAndClasses.getTopLink());
+    }
+};
+
+Search._autoOpen = function (link) {
+    if (link && UserPreference.AUTO_OPEN.getValue()) {
+        var url = link.getUrl();
+        if (url !== lastAutoOpenURL) {
+            lastAutoOpenURL = url;
+            openInSummaryFrame(url);
+        }
+    }
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * SEARCH.PACKAGESANDCLASSES
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Search.PackagesAndClasses (undocumented).
+ */
+Search.PackagesAndClasses = {
+    previousQuery : null,
+    currentLinks : null,
+    topLink : null
+};
+
+Search.PackagesAndClasses.update = function () {
+    this._update();
+};
+
+Search.PackagesAndClasses.getTopLink = function () {
+    return this.topLink;
+};
+
+Search.PackagesAndClasses._update = function () {
+    if (this.previousQuery !== null && this.previousQuery === Query.getSearchString()) {
+        return;
+    }
+
+    var stopWatch = new StopWatch();
+
+    var condition = RegexLibrary.createCondition(Query.getSearchString());
+    var exactMatchCondition = RegexLibrary.createExactMatchCondition(Query.getSearchString());
+    this._append(condition, exactMatchCondition);
+
+    Log.message('\n' +
+        '\'' + Query.getSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n' +
+        RegexLibrary.getRegex(Query.getSearchString()) + '\n'
+    );
+
+    this.previousQuery = Query.getSearchString();
+};
+
+Search.PackagesAndClasses._append = function (condition, exactMatchCondition) {
+    if (this.previousQuery !== null && Query.getSearchString().indexOf(this.previousQuery) === 0) {
+        // Characters have been added to the end of the previous query. Start
+        // with the current search list and filter out any links that do not match.
+
+    } else {
+        // Otherwise, start with the complete search list.
+
+        this.currentLinks = ALL_LINKS.concat();
+    }
+
+    this.currentLinks = this.currentLinks.filter(condition);
+    var bestMatch = getBestMatch(exactMatchCondition, this.currentLinks);
+    this.topLink = getTopLink(this.currentLinks, bestMatch);
+
+    if (Query.isClassMode()) {
+        var html = this._constructHTML(this.currentLinks, bestMatch);
+        View.setContentNodeHTML(html);
+    }
+};
+
+Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
+    var html = '';
+    if (bestMatch && classLinks.length > 1) {
+        html += '<br/><b><i>Best Match</i></b><br/>';
+        html += bestMatch.getType().getName();
+        html += '<br/>';
+        html += bestMatch.getHTML();
+        html += '<br/>';
+    }
+    var type;
+    var newType;
+    classLinks.forEach(function (link) {
+        newType = link.getType();
+        if (type !== newType) {
+            html += '<br/><b>' + newType.getHeader() + '</b><br/>';
+            type = newType;
+        }
+        html += link.getHTML();
+        html += '<br/>';
+    });
     return html;
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * SEARCH.ANCHORS
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Search.Anchors (undocumented).
+ */
+Search.Anchors = {
+    topLink : null
+};
+
+Search.Anchors.update = function () {
+    var searchAnchors = this;
+    AnchorsLoader.load(Search.PackagesAndClasses.getTopLink(), function (anchorLinks) {
+        var condition = RegexLibrary.createCondition(Query.getSearchString());
+        searchAnchors._append(Search.PackagesAndClasses.getTopLink(), anchorLinks, condition);
+    });
+};
+
+Search.Anchors.getTopLink = function () {
+    return this.topLink;
+};
+
+Search.Anchors._append = function (classLink, anchorLinks, condition) {
+    this.topLink = null;
+    var html = '';
+    var i;
+    for (i = 0; i < anchorLinks.length; i++) {
+        var al = anchorLinks[i];
+        if (condition(al)) {
+            html += al.getHTML();
+            if (!this.topLink) {
+                this.topLink = al;
+            }
+        }
+    }
+ 
+    if (Query.isAnchorMode()) {
+        View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + html + '</p>');
+    }
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * SEARCH.MENU
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Search.Menu (undocumented).
+ */
+Search.Menu = {};
+
+Search.Menu.update = function () {
+    var menu = this._createMenu();
+    View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
+
+    if (!Query.getSearchString()) {
+        return;
+    }
+
+    var node = View.getContentNode();
+    var xpathResult = document.evaluate('//a', node, null, 
+                                        XPathResult.ANY_TYPE, null);
+    var node;
+    while ((node = xpathResult.iterateNext()) !== null) {
+        var textNode = node.firstChild;
+        if (textNode
+                && textNode.nodeType === 3 /* Node.TEXT_NODE */
+                && textNode.nodeValue.indexOf('@' + Query.getSearchString()) === 0) {
+            openInSummaryFrame(node.getAttribute('href'));
+            Query.input('');
+            search();
+            return;
+        }
+    }
+    Query.update('@');
+};
+
+Search.Menu._createMenu = function () {
+    var menu;
+    if (Search.PackagesAndClasses.getTopLink().getType() === LinkType.PACKAGE) {
+        menu = UserPreference.PACKAGE_MENU.getValue();
+    } else {
+        menu = UserPreference.CLASS_MENU.getValue();
+    }
+    var rx = /##(\w+)##/;
+    var matches;
+    while ((matches = rx.exec(menu)) !== null) {
+        var f = MENU_REPLACEMENT[matches[1]];
+        var rx2 = new RegExp(matches[0], 'g');
+        if (!f) {
+            menu = menu.replace(rx2, '');
+        } else {
+            var anchorLink = null;
+            if (Query.isAnchorSearchStarted()) {
+                anchorLink = Search.Anchors.getTopLink();
+            }
+            menu = menu.replace(rx2, f(Search.PackagesAndClasses.getTopLink(), anchorLink));
+        }
+    }
+    return menu;
 };
 
 
@@ -1914,399 +2306,6 @@ UnitTestSuite.testFunctionFor('getBestMatch(exactMatchCondition, links)', functi
     assertThatBestMatchFor('java.*.*o*e', is(null));
     assertThatBestMatchFor('javax.swing.border.A', is(null));
 });
-
-
-/*
- * ----------------------------------------------------------------------------
- * REGEX LIBRARY
- * ----------------------------------------------------------------------------
- */
-
-/**
- * @class RegexLibrary (undocumented).
- */
-RegexLibrary = {};
-
-RegexLibrary.createCondition = function (searchString) {
-    if (searchString.length === 0 || searchString === '*') {
-        return function (link) {
-            return true;
-        };
-    }
-
-    var pattern = this.getRegex(searchString);
-
-    return function (link) {
-        return link.matches(pattern);
-    };
-};
-
-UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
-    var javaIoPackage = new PackageLink('java.io');
-    var javaLangPackage = new PackageLink('java.lang');
-    var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
-    var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
-    var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
-    var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
-    var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
-
-    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
-        javaLangObjectClass, javaxSwingBorderFactoryClass,
-        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
-
-    var assertThatSearchResultFor = function (searchString, searchResult) {
-        assertThat('Search for: ' + searchString,
-                   allLinks.filter(RegexLibrary.createCondition(searchString)),
-                   is(searchResult));
-    };
-
-    assertThatSearchResultFor('java.io',
-            is([javaIoPackage, javaIoCloseableClass]));
-    assertThatSearchResultFor('j',
-            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
-                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
-    assertThatSearchResultFor('J',
-            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
-                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
-    assertThatSearchResultFor('Object',
-            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
-    assertThatSearchResultFor('O',
-            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
-    assertThatSearchResultFor('java.lang.Object',
-            is([javaLangObjectClass]));
-    assertThatSearchResultFor('JAVA.LANG.OBJECT',
-            is([javaLangObjectClass]));
-    assertThatSearchResultFor('java.lang',
-            is([javaLangPackage, javaLangObjectClass]));
-    assertThatSearchResultFor('java.lang.',
-            is([javaLangObjectClass]));
-    assertThatSearchResultFor('java.*.o*e',
-            is([javaLangObjectClass]));
-    assertThatSearchResultFor('java.*.*o*e',
-            is([javaIoCloseableClass, javaLangObjectClass]));
-    assertThatSearchResultFor('java.**.***o**e*',
-            is([javaIoCloseableClass, javaLangObjectClass]));
-    assertThatSearchResultFor('javax.swing.border.A',
-            is([javaxSwingBorderAbstractBorderClass]));
-});
-
-RegexLibrary.createExactMatchCondition = function (searchString) {
-    if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
-        return function (link) {
-            return false;
-        };
-    }
-
-    var pattern = this.getExactMatchRegex(searchString);
-
-    return function (link) {
-        return link.matches(pattern);
-    };
-};
-
-RegexLibrary.getRegex = function (searchString) {
-    searchString = searchString.replace(/\*{2,}/g, '*');
-
-    var pattern = '^';
-
-    for (i = 0; i < searchString.length; i++) {
-        var character = searchString.charAt(i);
-        if (/[A-Z]/.test(character) && i > 0) {
-            // An uppercase character which is not at the beginning of the
-            // search input string. Perform a case-insensitive match of this
-            // character. If the matched character is uppercase, allow any
-            // number of lowercase characters to be matched before it. This
-            // allows for Camel Case searching.
-
-            // The \.? term allows a Camel Case search to match an inner class.
-
-            pattern += '(([a-z]*\.?' + character + ')|' + character.toLowerCase() + ')';
-        } else if (/[a-zA-Z]/.test(character)) {
-            // A lowercase character, or an uppercase character at the
-            // beginning of the search input string. Perform a case-insensitive
-            // match of this character.
-
-            pattern += '(' + character.toUpperCase() + '|' + character.toLowerCase() + ')';
-        } else if (character === '*') {
-            // Replace '*' with '.*' to allow the asterisk to be used as a wildcard.
-
-            pattern += '.*';
-        } else if (RegexLibrary._isSpecialRegularExpressionCharacter(character)) {
-           // A special regular expression character, but not an asterisk.
-           // Escape this character.
-
-           pattern += '\\' + character;
-        } else {
-
-            pattern += character;
-        }
-    }
-
-    if (!endsWith(pattern, '.*')) {
-        pattern += '.*';
-    }
-    pattern += '$';
-    return new RegExp(pattern);
-};
-
-UnitTestSuite.testFunctionFor('RegexLibrary.getRegex()', function () {
-    assertThat('excess asterisk characters are removed',
-               RegexLibrary.getRegex('java.**.***o**e*').pattern, is(RegexLibrary.getRegex('java.*.*o*e').pattern));
-});
-
-RegexLibrary.getExactMatchRegex = function (searchString) {
-    var pattern = '^';
-
-    for (i = 0; i < searchString.length; i++) {
-        var character = searchString.charAt(i);
-        if (this._isSpecialRegularExpressionCharacter(character)) {
-           pattern += '\\' + character;
-        } else {
-            pattern += character;
-        }
-    }
-
-    pattern += '$';
-    return new RegExp(pattern, "i");
-};
-
-RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
-    return ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*'].some(function (specialCharacter) {
-        return character === specialCharacter;
-    });
-};
-
-
-/*
- * ----------------------------------------------------------------------------
- * SEARCH
- * ----------------------------------------------------------------------------
- */
-
-/**
- * @class Search (undocumented).
- */
-Search = {
-    lastAutoOpenURL : null
-};
-
-Search.update = function () {
-    if (Query.isMenuMode()) {
-        this.Menu.update();
-    } else if (Query.isAnchorMode()) {
-        this.Anchors.update();
-        this._autoOpen(this.Anchors.getTopLink());
-    } else {
-        this.PackagesAndClasses.update();
-        this._autoOpen(this.PackagesAndClasses.getTopLink());
-    }
-};
-
-Search._autoOpen = function (link) {
-    if (link && UserPreference.AUTO_OPEN.getValue()) {
-        var url = link.getUrl();
-        if (url !== lastAutoOpenURL) {
-            lastAutoOpenURL = url;
-            openInSummaryFrame(url);
-        }
-    }
-};
-
-
-/*
- * ----------------------------------------------------------------------------
- * SEARCH.PACKAGESANDCLASSES
- * ----------------------------------------------------------------------------
- */
-
-/**
- * @class Search.PackagesAndClasses (undocumented).
- */
-Search.PackagesAndClasses = {
-    previousQuery : null,
-    currentLinks : null,
-    topLink : null
-};
-
-Search.PackagesAndClasses.update = function () {
-    this._update();
-};
-
-Search.PackagesAndClasses.getTopLink = function () {
-    return this.topLink;
-};
-
-Search.PackagesAndClasses._update = function () {
-    if (this.previousQuery !== null && this.previousQuery === Query.getSearchString()) {
-        return;
-    }
-
-    var stopWatch = new StopWatch();
-
-    var condition = RegexLibrary.createCondition(Query.getSearchString());
-    var exactMatchCondition = RegexLibrary.createExactMatchCondition(Query.getSearchString());
-    this._append(condition, exactMatchCondition);
-
-    Log.message('\n' +
-        '\'' + Query.getSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n' +
-        RegexLibrary.getRegex(Query.getSearchString()) + '\n'
-    );
-
-    this.previousQuery = Query.getSearchString();
-};
-
-Search.PackagesAndClasses._append = function (condition, exactMatchCondition) {
-    if (this.previousQuery !== null && Query.getSearchString().indexOf(this.previousQuery) === 0) {
-        // Characters have been added to the end of the previous query. Start
-        // with the current search list and filter out any links that do not match.
-
-    } else {
-        // Otherwise, start with the complete search list.
-
-        this.currentLinks = ALL_LINKS.concat();
-    }
-
-    this.currentLinks = this.currentLinks.filter(condition);
-    var bestMatch = getBestMatch(exactMatchCondition, this.currentLinks);
-    this.topLink = getTopLink(this.currentLinks, bestMatch);
-
-    if (Query.isClassMode()) {
-        var html = this._constructHTML(this.currentLinks, bestMatch);
-        View.setContentNodeHTML(html);
-    }
-};
-
-Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
-    var html = '';
-    if (bestMatch && classLinks.length > 1) {
-        html += '<br/><b><i>Best Match</i></b><br/>';
-        html += bestMatch.getType().getName();
-        html += '<br/>';
-        html += bestMatch.getHTML();
-        html += '<br/>';
-    }
-    var type;
-    var newType;
-    classLinks.forEach(function (link) {
-        newType = link.getType();
-        if (type !== newType) {
-            html += '<br/><b>' + newType.getHeader() + '</b><br/>';
-            type = newType;
-        }
-        html += link.getHTML();
-        html += '<br/>';
-    });
-    return html;
-};
-
-
-/*
- * ----------------------------------------------------------------------------
- * SEARCH.ANCHORS
- * ----------------------------------------------------------------------------
- */
-
-/**
- * @class Search.Anchors (undocumented).
- */
-Search.Anchors = {
-    topLink : null
-};
-
-Search.Anchors.update = function () {
-    var searchAnchors = this;
-    AnchorsLoader.load(Search.PackagesAndClasses.getTopLink(), function (anchorLinks) {
-        var condition = RegexLibrary.createCondition(Query.getSearchString());
-        searchAnchors._append(Search.PackagesAndClasses.getTopLink(), anchorLinks, condition);
-    });
-};
-
-Search.Anchors.getTopLink = function () {
-    return this.topLink;
-};
-
-Search.Anchors._append = function (classLink, anchorLinks, condition) {
-    this.topLink = null;
-    var html = '';
-    var i;
-    for (i = 0; i < anchorLinks.length; i++) {
-        var al = anchorLinks[i];
-        if (condition(al)) {
-            html += al.getHTML();
-            if (!this.topLink) {
-                this.topLink = al;
-            }
-        }
-    }
- 
-    if (Query.isAnchorMode()) {
-        View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + html + '</p>');
-    }
-};
-
-
-/*
- * ----------------------------------------------------------------------------
- * SEARCH.MENU
- * ----------------------------------------------------------------------------
- */
-
-/**
- * @class Search.Menu (undocumented).
- */
-Search.Menu = {};
-
-Search.Menu.update = function () {
-    var menu = this._createMenu();
-    View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
-
-    if (!Query.getSearchString()) {
-        return;
-    }
-
-    var node = View.getContentNode();
-    var xpathResult = document.evaluate('//a', node, null, 
-                                        XPathResult.ANY_TYPE, null);
-    var node;
-    while ((node = xpathResult.iterateNext()) !== null) {
-        var textNode = node.firstChild;
-        if (textNode
-                && textNode.nodeType === 3 /* Node.TEXT_NODE */
-                && textNode.nodeValue.indexOf('@' + Query.getSearchString()) === 0) {
-            openInSummaryFrame(node.getAttribute('href'));
-            Query.input('');
-            search();
-            return;
-        }
-    }
-    Query.update('@');
-};
-
-Search.Menu._createMenu = function () {
-    var menu;
-    if (Search.PackagesAndClasses.getTopLink().getType() === LinkType.PACKAGE) {
-        menu = UserPreference.PACKAGE_MENU.getValue();
-    } else {
-        menu = UserPreference.CLASS_MENU.getValue();
-    }
-    var rx = /##(\w+)##/;
-    var matches;
-    while ((matches = rx.exec(menu)) !== null) {
-        var f = MENU_REPLACEMENT[matches[1]];
-        var rx2 = new RegExp(matches[0], 'g');
-        if (!f) {
-            menu = menu.replace(rx2, '');
-        } else {
-            var anchorLink = null;
-            if (Query.isAnchorSearchStarted()) {
-                anchorLink = Search.Anchors.getTopLink();
-            }
-            menu = menu.replace(rx2, f(Search.PackagesAndClasses.getTopLink(), anchorLink));
-        }
-    }
-    return menu;
-};
-
 
 function openInSummaryFrame(url) {
     var summaryFrame = Frames.getSummaryFrame();
