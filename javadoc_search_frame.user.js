@@ -1143,7 +1143,6 @@ View._watch = function (element, callback, msec) {
  */
 Query = {
     mode : 1,
-    modeChanged : false,
     search : '',
     lastClassSearch : '',
     lastAnchorSearch : ''
@@ -1167,10 +1166,6 @@ Query.isMenuMode = function () {
 
 Query.getSearchString = function () {
     return this.search;
-};
-
-Query.isModeChanged = function () {
-    return this.modeChanged;
 };
 
 Query.isAnchorSearchStarted = function () {
@@ -1344,9 +1339,7 @@ Query._isSpecialRegularExpressionCharacter = function (character) {
 };
 
 Query.input = function (input) {
-    var lastMode = this.mode;
     input = this._shiftMode(input);
-    this.modeChanged  = (lastMode !== this.mode);
     this.search = this._getSearchStringFromInput(input);
 };
 
