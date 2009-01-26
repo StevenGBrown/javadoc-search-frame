@@ -1604,6 +1604,12 @@ Search = {
 };
 
 Search.update = function () {
+    // The anchor search is asynchronous, so cancel the current anchor search
+    // if the mode has changed.
+    if (!Query.isAnchorMode()) {
+        this.Anchors.cancel();
+    }
+
     if (Query.isMenuMode()) {
         this.Menu.update();
     } else if (Query.isAnchorMode()) {
@@ -1732,6 +1738,10 @@ Search.Anchors.update = function () {
         var condition = RegexLibrary.createCondition(Query.getSearchString());
         searchAnchors._append(Search.PackagesAndClasses.getTopLink(), anchorLinks, condition);
     });
+};
+
+Search.Anchors.cancel = function () {
+    AnchorsLoader.cancel();
 };
 
 Search.Anchors.getTopLink = function () {
