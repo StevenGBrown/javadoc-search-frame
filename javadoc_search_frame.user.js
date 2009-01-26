@@ -1445,72 +1445,70 @@ Query._memoryLastSearch = function (lastSearch) {
 
 /*
  * ----------------------------------------------------------------------------
- * SUPPORTING CLASSES: METHOD SEARCH
+ * ANCHORS LOADER
  * ----------------------------------------------------------------------------
  */
 
 /**
  * @class AnchorsLoader (undocumented).
  */
-AnchorsLoader = {};
+AnchorsLoader = {
+    classLink : null,
+    anchorLinks : null
+};
 
-AnchorsLoader.load = function (classLink) {
-    var handler = new AnchorsRequestHandler();
-    handler.loading(classLink);
+AnchorsLoader.load = function (classLink, loadingCompleteCallback) {
+    if (this.classLink === classLink) {
+        if (this.anchorLinks !== null) {
+            loadingCompleteCallback(this.anchorLinks);
+        }
+        return;
+    }
+    this.classLink = classLink;
+    this.anchorLinks = null;
+    this._loading(classLink);
+    var anchorsLoader = this;
     try {
-        var req = new XMLHttpRequest();
-        req.open('GET', classLink.getUrl(), true);
-        req.onreadystatechange = function () { 
-            if (req.readyState === 2) {
-                handler.parsing(classLink);
-            } else if (req.readyState === 4 && req.responseText) { 
-                handler.completed(req, classLink);
+        var request = new XMLHttpRequest();
+        request.open('GET', classLink.getUrl(), true);
+        request.onreadystatechange = function () { 
+            if (request.readyState === 4 && request.responseText) { 
+                anchorsLoader._completed(request.responseText, classLink, loadingCompleteCallback);
             }
         };
-        req.send(null);
+        request.send(null);
     } catch(e) {
         var p = {};
         p.method = 'GET';
         p.url = classLink.getUrl();
-        p.onreadystatechange = function (res) {
-            if (res.readyState === 2) {
-                handler.parsing(classLink);
-            } else if (res.readyState === 4 && res.responseText) { 
-                handler.completed(res, classLink);
+        p.onreadystatechange = function (result) {
+            if (result.readyState === 4 && result.responseText) { 
+                anchorsLoader._completed(request.responseText, classLink, loadingCompleteCallback);
             }
         };
         GM_xmlhttpRequest(p);
     }
 };
 
-
-/**
- * @class AnchorsRequestHandler (undocumented).
- */
-AnchorsRequestHandler = function () {
+AnchorsLoader.cancel = function () {
+    this.classLink = null;
+    this.anchorLinks = null;
 };
 
-AnchorsRequestHandler.prototype.loading = function (classLink) {
-    AnchorsCache.setLoading(classLink);
-    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>loading...</p>');
+AnchorsLoader._loading = function (classLink) {
+    View.setContentNodeHTML(classLink.getHTML() + '<p>loading...</p>');
 };
 
-AnchorsRequestHandler.prototype.parsing = function (classLink) {
-    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>parsing...</p>');
-};
-
-AnchorsRequestHandler.prototype.completed = function (req, classLink) {
-    if (! Query.isAnchorMode() || classLink !== TOP_CLASS_LINK) {
+AnchorsLoader._completed = function (responseText, classLink, loadingCompleteCallback) {
+    if (!Query.isAnchorMode() || this.classLink !== classLink) {
         return;
     }
-    var names = this._getAnchorNames(req.responseText);
-    var nodes = this._createAnchorLinkArray(classLink.getUrl(), names);
-    AnchorsCache.add(classLink, nodes);
-    selectAnchors();
+    var names = this._getAnchorNames(responseText);
+    this.anchorLinks = this._createAnchorLinkArray(classLink.getUrl(), names);
+    loadingCompleteCallback(this.anchorLinks);
 };
 
-AnchorsRequestHandler.prototype._createAnchorLinkArray = function (baseurl, 
-                                                                  names) {
+AnchorsLoader._createAnchorLinkArray = function (baseurl, names) {
     var nodes = [];
     var keywordNodes = [];
     var i;
@@ -1528,7 +1526,7 @@ AnchorsRequestHandler.prototype._createAnchorLinkArray = function (baseurl,
     return nodes;
 };
 
-AnchorsRequestHandler.prototype._getAnchorNames = function (doc) {
+AnchorsLoader._getAnchorNames = function (doc) {
     var pat = /<A NAME=\"([^\"]+)\"/gi;
     var i = 0;
     var matches;
@@ -1539,6 +1537,12 @@ AnchorsRequestHandler.prototype._getAnchorNames = function (doc) {
     return names;
 };
 
+
+/*
+ * ----------------------------------------------------------------------------
+ * ANCHORLINK
+ * ----------------------------------------------------------------------------
+ */
 
 /**
  * @class AnchorLink (undocumented).
@@ -1621,37 +1625,6 @@ AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
     }
     html += '>' + name + '</a></li>';
     return html;
-};
-
-
-/**
- * @class AnchorsCache (undocumented).
- */
-AnchorsCache = {
-    cache : {},
-    loading : {}
-};
-
-AnchorsCache.add = function (classLink, anchors) {
-    this.cache[classLink] = anchors;
-};
-
-AnchorsCache.get = function (classLink) {
-    return this.cache[classLink];
-};
-
-AnchorsCache.contains = function (classLink) {
-    return this.cache[classLink];
-};
-
-AnchorsCache.setLoading = function (classLink) {
-    if (!this.cache[classLink]) {
-        this.cache[classLink] = this.loading;
-    }
-};
-
-AnchorsCache.isLoading = function (classLink) {
-    return this.cache[classLink] === this.loading;
 };
 
 
@@ -2195,24 +2168,13 @@ function constructHTML(classLinks, bestMatch) {
 }
 
 function selectAnchors() {
-    if (!TOP_CLASS_LINK || AnchorsCache.isLoading(TOP_CLASS_LINK)) {
-        return;
-    }
-    if (!AnchorsCache.contains(TOP_CLASS_LINK)) {
-        AnchorsLoader.load(TOP_CLASS_LINK);
-        return;
-    }
-    PREVIOUS_CLASS_LINKS_QUERY = null;
-    var condition = Query.createCondition();
-    appendAnchors(TOP_CLASS_LINK, condition);
+    AnchorsLoader.load(TOP_CLASS_LINK, function (anchorLinks) {
+        var condition = Query.createCondition();
+        appendAnchors(TOP_CLASS_LINK, anchorLinks, condition);
+    });
 }
 
-function appendAnchors(classLink, condition) {
-    var anchorLinks = AnchorsCache.get(classLink);
-    if (!anchorLinks) {
-        return;
-    }
-
+function appendAnchors(classLink, anchorLinks, condition) {
     TOP_ANCHOR_LINK = null;
     var html = '';
     var i;
