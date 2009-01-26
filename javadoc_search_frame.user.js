@@ -2099,7 +2099,7 @@ Search = {
 
 Search.update = function () {
     if (Query.isMenuMode()) {
-        this._Menu.update();
+        this.Menu.update();
     } else if (Query.isAnchorMode()) {
         this.Anchors.update();
         this._autoOpen(this.Anchors.getTopLink());
@@ -2301,12 +2301,12 @@ Search.Menu._createMenu = function () {
 };
 
 Search.Menu.update = function () {
-    if (!Query.getSearchString() || !Search.PackagesAndClasses.getTopLink()) {
-        return;
-    }
-
     var menu = this._createMenu();
     View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
+
+    if (!Query.getSearchString()) {
+        return;
+    }
 
     var node = View.getContentNode();
     var xpathResult = document.evaluate('//a', node, null, 
