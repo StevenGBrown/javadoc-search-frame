@@ -1456,7 +1456,7 @@ AnchorsLoader = {};
 
 AnchorsLoader.load = function (classLink) {
     if (AnchorsCache.contains(classLink)) {
-        updateAnchors();
+        selectAnchors();
         return;
     }
     var handler = new AnchorsRequestHandler();
@@ -1504,7 +1504,7 @@ AnchorsRequestHandler.prototype.completed = function (req, classLink) {
     var names = this._getAnchorNames(req.responseText);
     var nodes = this._createAnchorLinkArray(classLink.getUrl(), names);
     AnchorsCache.add(classLink, nodes);
-    updateAnchors();
+    selectAnchors();
 };
 
 AnchorsRequestHandler.prototype._createAnchorLinkArray = function (baseurl, 
@@ -2227,12 +2227,6 @@ function selectAnchors() {
     PREVIOUS_CLASS_LINKS_QUERY = null;
     var condition = Query.createCondition();
     AnchorsCache.appendAnchors(TOP_CLASS_LINK, condition);
-}
-
-function updateAnchors() {
-    if (Query.isAnchorMode()) {
-        selectAnchors(Query.getSearchString());
-    }
 }
 
 function openInNewTab(url) {
