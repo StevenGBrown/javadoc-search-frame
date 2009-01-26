@@ -2252,18 +2252,6 @@ Search.Anchors._append = function (classLink, anchorLinks, condition) {
 };
 
 
-function openInNewTab(url) {
-    window.open(url);
-}
-
-function openInSummaryFrame(url) {
-    var summaryFrame = Frames.getSummaryFrame();
-    if (summaryFrame) {
-        summaryFrame.location.href = url;
-    }
-}
-
-
 /*
  * ----------------------------------------------------------------------------
  * SEARCH.MENU
@@ -2274,31 +2262,6 @@ function openInSummaryFrame(url) {
  * @class Search.Menu (undocumented).
  */
 Search.Menu = {};
-
-Search.Menu._createMenu = function () {
-    var menu;
-    if (Search.PackagesAndClasses.getTopLink().getType() === LinkType.PACKAGE) {
-        menu = UserPreference.PACKAGE_MENU.getValue();
-    } else {
-        menu = UserPreference.CLASS_MENU.getValue();
-    }
-    var rx = /##(\w+)##/;
-    var matches;
-    while ((matches = rx.exec(menu)) !== null) {
-        var f = MENU_REPLACEMENT[matches[1]];
-        var rx2 = new RegExp(matches[0], 'g');
-        if (!f) {
-            menu = menu.replace(rx2, '');
-        } else {
-            var anchorLink = null;
-            if (Query.isAnchorSearchStarted()) {
-                anchorLink = Search.Anchors.getTopLink();
-            }
-            menu = menu.replace(rx2, f(Search.PackagesAndClasses.getTopLink(), anchorLink));
-        }
-    }
-    return menu;
-};
 
 Search.Menu.update = function () {
     var menu = this._createMenu();
@@ -2326,6 +2289,42 @@ Search.Menu.update = function () {
     Query.update('@');
 };
 
+Search.Menu._createMenu = function () {
+    var menu;
+    if (Search.PackagesAndClasses.getTopLink().getType() === LinkType.PACKAGE) {
+        menu = UserPreference.PACKAGE_MENU.getValue();
+    } else {
+        menu = UserPreference.CLASS_MENU.getValue();
+    }
+    var rx = /##(\w+)##/;
+    var matches;
+    while ((matches = rx.exec(menu)) !== null) {
+        var f = MENU_REPLACEMENT[matches[1]];
+        var rx2 = new RegExp(matches[0], 'g');
+        if (!f) {
+            menu = menu.replace(rx2, '');
+        } else {
+            var anchorLink = null;
+            if (Query.isAnchorSearchStarted()) {
+                anchorLink = Search.Anchors.getTopLink();
+            }
+            menu = menu.replace(rx2, f(Search.PackagesAndClasses.getTopLink(), anchorLink));
+        }
+    }
+    return menu;
+};
+
+
+function openInSummaryFrame(url) {
+    var summaryFrame = Frames.getSummaryFrame();
+    if (summaryFrame) {
+        summaryFrame.location.href = url;
+    }
+}
+
+function openInNewTab(url) {
+    window.open(url);
+}
 
 function endsWith(stringOne, stringTwo) {
     var strIndex = stringOne.length - stringTwo.length;
