@@ -1455,17 +1455,14 @@ Query._memoryLastSearch = function (lastSearch) {
 AnchorsLoader = {};
 
 AnchorsLoader.load = function (classLink) {
-    if (AnchorsCache.contains(classLink)) {
-        selectAnchors();
-        return;
-    }
     var handler = new AnchorsRequestHandler();
+    handler.loading(classLink);
     try {
         var req = new XMLHttpRequest();
         req.open('GET', classLink.getUrl(), true);
         req.onreadystatechange = function () { 
             if (req.readyState === 2) {
-                handler.loaded(req, classLink);
+                handler.parsing(classLink);
             } else if (req.readyState === 4 && req.responseText) { 
                 handler.completed(req, classLink);
             }
@@ -1477,7 +1474,7 @@ AnchorsLoader.load = function (classLink) {
         p.url = classLink.getUrl();
         p.onreadystatechange = function (res) {
             if (res.readyState === 2) {
-                handler.loaded(res, classLink);
+                handler.parsing(classLink);
             } else if (res.readyState === 4 && res.responseText) { 
                 handler.completed(res, classLink);
             }
@@ -1493,7 +1490,12 @@ AnchorsLoader.load = function (classLink) {
 AnchorsRequestHandler = function () {
 };
 
-AnchorsRequestHandler.prototype.loaded = function (req, classLink) {
+AnchorsRequestHandler.prototype.loading = function (classLink) {
+    AnchorsCache.setLoading(classLink);
+    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>loading...</p>');
+};
+
+AnchorsRequestHandler.prototype.parsing = function (classLink) {
     View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>parsing...</p>');
 };
 
@@ -1626,47 +1628,30 @@ AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
  * @class AnchorsCache (undocumented).
  */
 AnchorsCache = {
-    cache : []
+    cache : {},
+    loading : {}
 };
 
 AnchorsCache.add = function (classLink, anchors) {
-    this.cache[classLink.getUrl()] = anchors;
+    this.cache[classLink] = anchors;
+};
+
+AnchorsCache.get = function (classLink) {
+    return this.cache[classLink];
 };
 
 AnchorsCache.contains = function (classLink) {
-    return this.cache[classLink.getUrl()];
+    return this.cache[classLink];
 };
 
-AnchorsCache.appendAnchors = function (classLink, condition) {
-    var anchorLinks = this.cache[classLink.getUrl()];
-    if (!anchorLinks) {
-        return;
+AnchorsCache.setLoading = function (classLink) {
+    if (!this.cache[classLink]) {
+        this.cache[classLink] = this.loading;
     }
+};
 
-    TOP_ANCHOR_LINK = null;
-    var html = '';
-    var count = 0;
-    var i;
-    for (i = 0; i < anchorLinks.length; i++) {
-        var al = anchorLinks[i];
-        if (condition(al)) {
-            count++;
-            html += al.getHTML();
-            if (!TOP_ANCHOR_LINK) {
-                TOP_ANCHOR_LINK = al;
-            }
-        }
-    }
- 
-    if (TOP_ANCHOR_LINK !== null && UserPreference.AUTO_OPEN.getValue() && ! Query.isModeChanged()) {
-        var url = TOP_ANCHOR_LINK.getUrl();
-        if (url !== LAST_AUTO_OPEN_URL) {
-            LAST_AUTO_OPEN_URL = url;
-            openInSummaryFrame(url);
-        }
-    }
- 
-    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>' + html + '</p>');
+AnchorsCache.isLoading = function (classLink) {
+    return this.cache[classLink] === this.loading;
 };
 
 
@@ -1760,11 +1745,7 @@ function search() {
             selectMenu();
         }
     } else if (Query.isAnchorMode()) {
-        if (Query.isModeChanged()) {
-            loadAnchors();
-        } else {
-            selectAnchors();
-        }
+        selectAnchors();
     } else {
         selectClasses();
     }
@@ -2213,21 +2194,48 @@ function constructHTML(classLinks, bestMatch) {
     return html;
 }
 
-function loadAnchors() {
-    if (TOP_CLASS_LINK) {
-      View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>loading...</p>');
-      AnchorsLoader.load(TOP_CLASS_LINK);
-    }
-}
-
 function selectAnchors() {
-    if (!TOP_CLASS_LINK || !AnchorsCache.contains(TOP_CLASS_LINK)) {
+    if (!TOP_CLASS_LINK || AnchorsCache.isLoading(TOP_CLASS_LINK)) {
+        return;
+    }
+    if (!AnchorsCache.contains(TOP_CLASS_LINK)) {
+        AnchorsLoader.load(TOP_CLASS_LINK);
         return;
     }
     PREVIOUS_CLASS_LINKS_QUERY = null;
     var condition = Query.createCondition();
-    AnchorsCache.appendAnchors(TOP_CLASS_LINK, condition);
+    appendAnchors(TOP_CLASS_LINK, condition);
 }
+
+function appendAnchors(classLink, condition) {
+    var anchorLinks = AnchorsCache.get(classLink);
+    if (!anchorLinks) {
+        return;
+    }
+
+    TOP_ANCHOR_LINK = null;
+    var html = '';
+    var i;
+    for (i = 0; i < anchorLinks.length; i++) {
+        var al = anchorLinks[i];
+        if (condition(al)) {
+            html += al.getHTML();
+            if (!TOP_ANCHOR_LINK) {
+                TOP_ANCHOR_LINK = al;
+            }
+        }
+    }
+ 
+    if (TOP_ANCHOR_LINK !== null && UserPreference.AUTO_OPEN.getValue() && ! Query.isModeChanged()) {
+        var url = TOP_ANCHOR_LINK.getUrl();
+        if (url !== LAST_AUTO_OPEN_URL) {
+            LAST_AUTO_OPEN_URL = url;
+            openInSummaryFrame(url);
+        }
+    }
+ 
+    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>' + html + '</p>');
+};
 
 function openInNewTab(url) {
     window.open(url);
