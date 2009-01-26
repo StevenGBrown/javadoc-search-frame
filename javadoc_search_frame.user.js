@@ -1177,18 +1177,14 @@ Query.isAnchorSearchStarted = function () {
     return false;
 };
 
-Query.createCondition = function () {
-    return Query._createCondition(this.search);
-};
-
-Query._createCondition = function (searchString) {
+Query.createCondition = function (searchString) {
     if (searchString.length === 0 || searchString === '*') {
         return function (link) {
             return true;
         };
     }
 
-    var pattern = Query._getRegex(searchString);
+    var pattern = Query.getRegex(searchString);
 
     return function (link) {
         return link.matches(pattern);
@@ -1210,7 +1206,7 @@ UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
 
     var assertThatSearchResultFor = function (searchString, searchResult) {
         assertThat('Search for: ' + searchString,
-                   allLinks.filter(Query._createCondition(searchString)),
+                   allLinks.filter(Query.createCondition(searchString)),
                    is(searchResult));
     };
 
@@ -1244,29 +1240,21 @@ UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
             is([javaxSwingBorderAbstractBorderClass]));
 });
 
-Query.createExactMatchCondition = function () {
-    return Query._createExactMatchCondition(this.search);
-};
-
-Query._createExactMatchCondition = function (searchString) {
+Query.createExactMatchCondition = function (searchString) {
     if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
         return function (link) {
             return false;
         };
     }
 
-    var pattern = Query._getExactMatchRegex(searchString);
+    var pattern = Query.getExactMatchRegex(searchString);
 
     return function (link) {
         return link.matches(pattern);
     };
 };
 
-Query.getRegex = function () {
-    return Query._getRegex(this.search);
-};
-
-Query._getRegex = function (searchString) {
+Query.getRegex = function (searchString) {
     searchString = searchString.replace(/\*{2,}/g, '*');
 
     var pattern = '^';
@@ -1313,10 +1301,10 @@ Query._getRegex = function (searchString) {
 
 UnitTestSuite.testFunctionFor('Query.getRegex()', function () {
     assertThat('excess asterisk characters are removed',
-               Query._getRegex('java.**.***o**e*').pattern, is(Query._getRegex('java.*.*o*e').pattern));
+               Query.getRegex('java.**.***o**e*').pattern, is(Query.getRegex('java.*.*o*e').pattern));
 });
 
-Query._getExactMatchRegex = function (searchString) {
+Query.getExactMatchRegex = function (searchString) {
     var pattern = '^';
 
     for (i = 0; i < searchString.length; i++) {
@@ -2055,7 +2043,7 @@ UnitTestSuite.testFunctionFor('getBestMatch(exactMatchCondition, links)', functi
         javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
 
     var assertThatBestMatchFor = function (searchString, searchResult) {
-        var exactMatchCondition = Query._createExactMatchCondition(searchString);
+        var exactMatchCondition = Query.createExactMatchCondition(searchString);
         assertThat('Best match for: ' + searchString,
                    getBestMatch(exactMatchCondition, allLinks),
                    is(searchResult));
@@ -2143,13 +2131,13 @@ Search.PackagesAndClasses._update = function () {
 
     var stopWatch = new StopWatch();
 
-    var condition = Query.createCondition();
-    var exactMatchCondition = Query.createExactMatchCondition();
+    var condition = Query.createCondition(Query.getSearchString());
+    var exactMatchCondition = Query.createExactMatchCondition(Query.getSearchString());
     this._append(condition, exactMatchCondition);
 
     Log.message('\n' +
         '\'' + Query.getSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n' +
-        Query.getRegex() + '\n'
+        Query.getRegex(Query.getSearchString()) + '\n'
     );
 
     this.previousQuery = Query.getSearchString();
@@ -2216,7 +2204,7 @@ Search.Anchors = {
 Search.Anchors.update = function () {
     var searchAnchors = this;
     AnchorsLoader.load(Search.PackagesAndClasses.getTopLink(), function (anchorLinks) {
-        var condition = Query.createCondition();
+        var condition = Query.createCondition(Query.getSearchString());
         searchAnchors._append(Search.PackagesAndClasses.getTopLink(), anchorLinks, condition);
     });
 };
