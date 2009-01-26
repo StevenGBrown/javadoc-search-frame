@@ -518,34 +518,40 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
 /**
  * @class Frames (undocumented).
  */
-Frames = {
-    initialised : false,
-};
+Frames = {};
 
 Frames.getAllPackagesFrame = function () {
-    this._initialise();
-    return this['packageListFrame'];
+    return this._getFrame('packageListFrame');
 };
 
 Frames.getSummaryFrame = function () {
-    this._initialise();
-    return this['classFrame'];
+    return this._getFrame('classFrame');
 };
 
-Frames._initialise = function () {
-    var frameIndex;
-    var frame;
-    if (!this.initialised) {
-        if (top.frames) {
-            for (frameIndex = 0; frameIndex < top.frames.length; frameIndex++) {
-                frame = top.frames[frameIndex];
-                if (frame.name && frame.document) {
-                    this[frame.name] = frame;
-                }
-            }
+Frames.hideAllPackagesFrame = function () {
+    var framesets = parent.document.getElementsByTagName('frameset');
+    if (framesets) {
+        var frameset = framesets[1];
+        if (frameset) {
+            frameset.setAttribute('rows', '0,*');
+            frameset.setAttribute('border', 0);
+            frameset.setAttribute('frameborder', 0);
+            frameset.setAttribute('framespacing', 0);
+            scroll(0, 0);
         }
-        this.initialised = true;
     }
+};
+
+Frames._getFrame = function (name) {
+    var frame;
+    var i;
+    for (i = 0; i < parent.frames.length; i++) {
+        frame = parent.frames[i];
+        if (frame && frame.name === name && frame.document) {
+            return frame;
+        }
+    }
+    return null;
 };
 
 
@@ -981,6 +987,7 @@ ClassLink.prototype.toString = function () {
  */
 View = {
     searchField : null,
+    unitTestFailedWarningParent : null,
     unitTestFailedWarning : null,
     contentNodeParent : null,
     contentNode : null
@@ -1017,42 +1024,48 @@ View.focusOnSearchField = function () {
 
 View.warnOfFailedUnitTest = function () {
     if (Frames.getSummaryFrame()) {
-        document.body.insertBefore(this.unitTestFailedWarning, this.contentNode);
+        this.unitTestFailedWarningParent.appendChild(this.unitTestFailedWarning);
     }
 };
 
 View._create = function (eventHandlers) {
+    var tableElement = document.createElement('table');
+    var tableRowElementOne = document.createElement('tr');
+    var tableDataCellElementOne = document.createElement('td');
+    var tableRowElementTwo = document.createElement('tr');
+    var tableDataCellElementTwo = document.createElement('td');
+
+    this.searchField = this._createSearchField(eventHandlers);
+    var eraseButton = this._createEraseButton(eventHandlers);
+    var settingsLink = this._createSettingsLink(eventHandlers);
+    this.contentNodeParent = tableRowElementTwo;
+    this.contentNode = tableDataCellElementTwo;
+    if (Frames.getSummaryFrame()) {
+        this.unitTestFailedWarning = this._createUnitTestFailedWarning(eventHandlers);
+        this.unitTestFailedWarningParent = tableDataCellElementOne;
+    }
+
+    tableElement.appendChild(tableRowElementOne);
+    tableRowElementOne.appendChild(tableDataCellElementOne);
+    tableDataCellElementOne.appendChild(this.searchField);
+    tableDataCellElementOne.appendChild(eraseButton);
+    tableDataCellElementOne.appendChild(document.createElement('br'));
+    if (Frames.getSummaryFrame()) {
+        tableDataCellElementOne.appendChild(settingsLink);
+    }
+    tableElement.appendChild(tableRowElementTwo);
+    tableRowElementTwo.appendChild(tableDataCellElementTwo);
+
+    [tableElement, tableRowElementOne, tableDataCellElementOne,
+            tableRowElementTwo, tableDataCellElementTwo].forEach(function (element) {
+        element.style.border = '0';
+        element.style.width = '100%';
+    });
+
     while (document.body.firstChild) {
         document.body.removeChild(document.body.firstChild);
     }
-
-    this.searchField = this._createSearchField(eventHandlers);
-    document.body.appendChild(this.searchField);
-
-    var eraseButton = this._createEraseButton(eventHandlers);
-    document.body.appendChild(eraseButton);
-    document.body.appendChild(document.createElement('br'));
-
-    if (Frames.getSummaryFrame()) {
-        var settingsLink = this._createSettingsLink(eventHandlers);
-        document.body.appendChild(settingsLink);
-    }
-
-    var tableElement = document.createElement('table');
-    this.contentNodeParent = document.createElement('tr');
-    this.contentNode = document.createElement('td');
-
-    var parentElement = document.body;
-    [tableElement, this.contentNodeParent, this.contentNode].forEach(function (element) {
-        element.style.border = '0';
-        element.style.width = '100%';
-        parentElement.appendChild(element);
-        parentElement = element;
-    });
-
-    if (Frames.getSummaryFrame()) {
-        this.unitTestFailedWarning = this._createUnitTestFailedWarning(eventHandlers);
-    }
+    document.body.appendChild(tableElement);
 };
 
 View._createSearchField = function (eventHandlers) {
@@ -1713,14 +1726,7 @@ function init() {
     // Hide the package list frame.
     if (Frames.getAllPackagesFrame()) {
         var hidePackageFrameStopWatch = new StopWatch();
-        var frameset = top.document.getElementsByTagName('frameset')[1];
-        if (frameset) {
-            frameset.setAttribute('rows', '0,*');
-            frameset.setAttribute('border', 0);
-            frameset.setAttribute('frameborder', 0);
-            frameset.setAttribute('framespacing', 0);
-            scroll(0, 0);
-        }
+        Frames.hideAllPackagesFrame();
         hidePackageFrameStopWatch.stop();
     }
 
