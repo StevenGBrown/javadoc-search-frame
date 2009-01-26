@@ -69,32 +69,6 @@ var SEARCH_ACCESS_KEY = 's';
  */
 var ERASE_ACCESS_KEY = 'a';
 
-/**
- * Placeholder values that can be entered into the class_menu or package_menu
- * settings and will, when the menu is opened, be replaced with data relevant
- * to the current package or class.
- */
-var MENU_REPLACEMENT = {
-    CLASS_NAME: function (classLink) { 
-        return classLink.getClassName();
-    },
-
-    PACKAGE_NAME: function (classLink) { 
-        return classLink.getPackageName();
-    },
-
-    PACKAGE_PATH: function (classLink) { 
-        return classLink.getPackageName().replace(/\./g, '/');
-    },
-
-    ANCHOR_NAME: function (classLink, anchorLink) {
-        if (!anchorLink) {
-            return '';
-        }
-        return anchorLink.getNameWithoutParameter();
-    }
-};
-
 var ALL_LINKS = [];
 
 
@@ -1793,7 +1767,9 @@ Search.Anchors._append = function (classLink, anchorLinks, condition) {
 /**
  * @class Search.Menu (undocumented).
  */
-Search.Menu = {};
+Search.Menu = {
+    menuReplacement : null
+};
 
 Search.Menu.update = function () {
     var menu = this._createMenu();
@@ -1828,10 +1804,11 @@ Search.Menu._createMenu = function () {
     } else {
         menu = UserPreference.CLASS_MENU.getValue();
     }
+    var menuReplacement = this._getMenuReplacement();
     var rx = /##(\w+)##/;
     var matches;
     while ((matches = rx.exec(menu)) !== null) {
-        var f = MENU_REPLACEMENT[matches[1]];
+        var f = menuReplacement[matches[1]];
         var rx2 = new RegExp(matches[0], 'g');
         if (!f) {
             menu = menu.replace(rx2, '');
@@ -1844,6 +1821,34 @@ Search.Menu._createMenu = function () {
         }
     }
     return menu;
+};
+
+/**
+ * Placeholder values that can be entered into the class_menu or package_menu
+ * settings and will, when the menu is opened, be replaced with data relevant
+ * to the current package or class.
+ */
+Search.Menu._getMenuReplacement = function () {
+    if (!this.menuReplacement) {
+        this.menuReplacement = {
+            CLASS_NAME: function (classLink) { 
+                return classLink.getClassName();
+            },
+            PACKAGE_NAME: function (classLink) { 
+                return classLink.getPackageName();
+            },
+            PACKAGE_PATH: function (classLink) { 
+                return classLink.getPackageName().replace(/\./g, '/');
+            },
+            ANCHOR_NAME: function (classLink, anchorLink) {
+                if (!anchorLink) {
+                    return '';
+                }
+                return anchorLink.getNameWithoutParameter();
+            }
+        };
+    }
+    return this.menuReplacement;
 };
 
 
