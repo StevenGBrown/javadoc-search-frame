@@ -2099,11 +2099,7 @@ Search = {
 
 Search.update = function () {
     if (Query.isMenuMode()) {
-        if (Query.isModeChanged()) {
-            showMenu();
-        } else {
-            selectMenu();
-        }
+        this._Menu.update();
     } else if (Query.isAnchorMode()) {
         this.Anchors.update();
         this._autoOpen(this.Anchors.getTopLink());
@@ -2267,38 +2263,50 @@ function openInSummaryFrame(url) {
     }
 }
 
-function showMenu() {
-    if (!Search.PackagesAndClasses.getTopLink()) {
-      return;
-    }
-    var content;
+
+/*
+ * ----------------------------------------------------------------------------
+ * SEARCH.MENU
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Search.Menu (undocumented).
+ */
+Search.Menu = {};
+
+Search.Menu._createMenu = function () {
+    var menu;
     if (Search.PackagesAndClasses.getTopLink().getType() === LinkType.PACKAGE) {
-        content = UserPreference.PACKAGE_MENU.getValue();
+        menu = UserPreference.PACKAGE_MENU.getValue();
     } else {
-        content = UserPreference.CLASS_MENU.getValue();
+        menu = UserPreference.CLASS_MENU.getValue();
     }
     var rx = /##(\w+)##/;
     var matches;
-    while ((matches = rx.exec(content)) !== null) {
+    while ((matches = rx.exec(menu)) !== null) {
         var f = MENU_REPLACEMENT[matches[1]];
         var rx2 = new RegExp(matches[0], 'g');
         if (!f) {
-            content = content.replace(rx2, '');
+            menu = menu.replace(rx2, '');
         } else {
             var anchorLink = null;
             if (Query.isAnchorSearchStarted()) {
                 anchorLink = Search.Anchors.getTopLink();
             }
-            content = content.replace(rx2, f(Search.PackagesAndClasses.getTopLink(), anchorLink));
+            menu = menu.replace(rx2, f(Search.PackagesAndClasses.getTopLink(), anchorLink));
         }
     }
-    View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + content + '</p>');
-}
+    return menu;
+};
 
-function selectMenu() {
-    if (!Query.getSearchString()) {
+Search.Menu.update = function () {
+    if (!Query.getSearchString() || !Search.PackagesAndClasses.getTopLink()) {
         return;
     }
+
+    var menu = this._createMenu();
+    View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
 
     var node = View.getContentNode();
     var xpathResult = document.evaluate('//a', node, null, 
@@ -2307,21 +2315,17 @@ function selectMenu() {
     while ((node = xpathResult.iterateNext()) !== null) {
         var textNode = node.firstChild;
         if (textNode
-            && textNode.nodeType === 3 /* Node.TEXT_NODE */
-            && textNode.nodeValue.indexOf('@' + Query.getSearchString()) === 0) {
-            openMenu(node);
+                && textNode.nodeType === 3 /* Node.TEXT_NODE */
+                && textNode.nodeValue.indexOf('@' + Query.getSearchString()) === 0) {
+            openInSummaryFrame(node.getAttribute('href'));
             Query.input('');
             search();
             return;
         }
     }
     Query.update('@');
-}
+};
 
-function openMenu(node) {
-    var href = node.getAttribute('href');
-    openInSummaryFrame(href);
-}
 
 function endsWith(stringOne, stringTwo) {
     var strIndex = stringOne.length - stringTwo.length;
