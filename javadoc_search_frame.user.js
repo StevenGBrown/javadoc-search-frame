@@ -1177,155 +1177,6 @@ Query.isAnchorSearchStarted = function () {
     return false;
 };
 
-Query.createCondition = function (searchString) {
-    if (searchString.length === 0 || searchString === '*') {
-        return function (link) {
-            return true;
-        };
-    }
-
-    var pattern = Query.getRegex(searchString);
-
-    return function (link) {
-        return link.matches(pattern);
-    };
-};
-
-UnitTestSuite.testFunctionFor('Query.createCondition()', function () {
-    var javaIoPackage = new PackageLink('java.io');
-    var javaLangPackage = new PackageLink('java.lang');
-    var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
-    var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
-    var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
-    var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
-    var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
-
-    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
-        javaLangObjectClass, javaxSwingBorderFactoryClass,
-        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
-
-    var assertThatSearchResultFor = function (searchString, searchResult) {
-        assertThat('Search for: ' + searchString,
-                   allLinks.filter(Query.createCondition(searchString)),
-                   is(searchResult));
-    };
-
-    assertThatSearchResultFor('java.io',
-            is([javaIoPackage, javaIoCloseableClass]));
-    assertThatSearchResultFor('j',
-            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
-                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
-    assertThatSearchResultFor('J',
-            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
-                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
-    assertThatSearchResultFor('Object',
-            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
-    assertThatSearchResultFor('O',
-            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
-    assertThatSearchResultFor('java.lang.Object',
-            is([javaLangObjectClass]));
-    assertThatSearchResultFor('JAVA.LANG.OBJECT',
-            is([javaLangObjectClass]));
-    assertThatSearchResultFor('java.lang',
-            is([javaLangPackage, javaLangObjectClass]));
-    assertThatSearchResultFor('java.lang.',
-            is([javaLangObjectClass]));
-    assertThatSearchResultFor('java.*.o*e',
-            is([javaLangObjectClass]));
-    assertThatSearchResultFor('java.*.*o*e',
-            is([javaIoCloseableClass, javaLangObjectClass]));
-    assertThatSearchResultFor('java.**.***o**e*',
-            is([javaIoCloseableClass, javaLangObjectClass]));
-    assertThatSearchResultFor('javax.swing.border.A',
-            is([javaxSwingBorderAbstractBorderClass]));
-});
-
-Query.createExactMatchCondition = function (searchString) {
-    if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
-        return function (link) {
-            return false;
-        };
-    }
-
-    var pattern = Query.getExactMatchRegex(searchString);
-
-    return function (link) {
-        return link.matches(pattern);
-    };
-};
-
-Query.getRegex = function (searchString) {
-    searchString = searchString.replace(/\*{2,}/g, '*');
-
-    var pattern = '^';
-
-    for (i = 0; i < searchString.length; i++) {
-        var character = searchString.charAt(i);
-        if (/[A-Z]/.test(character) && i > 0) {
-            // An uppercase character which is not at the beginning of the
-            // search input string. Perform a case-insensitive match of this
-            // character. If the matched character is uppercase, allow any
-            // number of lowercase characters to be matched before it. This
-            // allows for Camel Case searching.
-
-            // The \.? term allows a Camel Case search to match an inner class.
-
-            pattern += '(([a-z]*\.?' + character + ')|' + character.toLowerCase() + ')';
-        } else if (/[a-zA-Z]/.test(character)) {
-            // A lowercase character, or an uppercase character at the
-            // beginning of the search input string. Perform a case-insensitive
-            // match of this character.
-
-            pattern += '(' + character.toUpperCase() + '|' + character.toLowerCase() + ')';
-        } else if (character === '*') {
-            // Replace '*' with '.*' to allow the asterisk to be used as a wildcard.
-
-            pattern += '.*';
-        } else if (Query._isSpecialRegularExpressionCharacter(character)) {
-           // A special regular expression character, but not an asterisk.
-           // Escape this character.
-
-           pattern += '\\' + character;
-        } else {
-
-            pattern += character;
-        }
-    }
-
-    if (!endsWith(pattern, '.*')) {
-        pattern += '.*';
-    }
-    pattern += '$';
-    return new RegExp(pattern);
-};
-
-UnitTestSuite.testFunctionFor('Query.getRegex()', function () {
-    assertThat('excess asterisk characters are removed',
-               Query.getRegex('java.**.***o**e*').pattern, is(Query.getRegex('java.*.*o*e').pattern));
-});
-
-Query.getExactMatchRegex = function (searchString) {
-    var pattern = '^';
-
-    for (i = 0; i < searchString.length; i++) {
-        var character = searchString.charAt(i);
-        if (Query._isSpecialRegularExpressionCharacter(character)) {
-           pattern += '\\' + character;
-        } else {
-            pattern += character;
-        }
-    }
-
-    pattern += '$';
-    return new RegExp(pattern, "i");
-};
-
-Query._isSpecialRegularExpressionCharacter = function (character) {
-    return ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*'].some(function (specialCharacter) {
-        return character === specialCharacter;
-    });
-};
-
 Query.input = function (input) {
     input = this._shiftMode(input);
     this.search = this._getSearchStringFromInput(input);
@@ -2043,7 +1894,7 @@ UnitTestSuite.testFunctionFor('getBestMatch(exactMatchCondition, links)', functi
         javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
 
     var assertThatBestMatchFor = function (searchString, searchResult) {
-        var exactMatchCondition = Query.createExactMatchCondition(searchString);
+        var exactMatchCondition = RegexLibrary.createExactMatchCondition(searchString);
         assertThat('Best match for: ' + searchString,
                    getBestMatch(exactMatchCondition, allLinks),
                    is(searchResult));
@@ -2063,6 +1914,167 @@ UnitTestSuite.testFunctionFor('getBestMatch(exactMatchCondition, links)', functi
     assertThatBestMatchFor('java.*.*o*e', is(null));
     assertThatBestMatchFor('javax.swing.border.A', is(null));
 });
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * REGEX LIBRARY
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class RegexLibrary (undocumented).
+ */
+RegexLibrary = {};
+
+RegexLibrary.createCondition = function (searchString) {
+    if (searchString.length === 0 || searchString === '*') {
+        return function (link) {
+            return true;
+        };
+    }
+
+    var pattern = this.getRegex(searchString);
+
+    return function (link) {
+        return link.matches(pattern);
+    };
+};
+
+UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
+    var javaIoPackage = new PackageLink('java.io');
+    var javaLangPackage = new PackageLink('java.lang');
+    var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
+    var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
+    var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
+    var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
+    var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
+
+    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
+        javaLangObjectClass, javaxSwingBorderFactoryClass,
+        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
+
+    var assertThatSearchResultFor = function (searchString, searchResult) {
+        assertThat('Search for: ' + searchString,
+                   allLinks.filter(RegexLibrary.createCondition(searchString)),
+                   is(searchResult));
+    };
+
+    assertThatSearchResultFor('java.io',
+            is([javaIoPackage, javaIoCloseableClass]));
+    assertThatSearchResultFor('j',
+            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
+                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
+    assertThatSearchResultFor('J',
+            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
+                javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
+    assertThatSearchResultFor('Object',
+            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
+    assertThatSearchResultFor('O',
+            is([javaLangObjectClass, orgOmgCorbaObjectClass]));
+    assertThatSearchResultFor('java.lang.Object',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('JAVA.LANG.OBJECT',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('java.lang',
+            is([javaLangPackage, javaLangObjectClass]));
+    assertThatSearchResultFor('java.lang.',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('java.*.o*e',
+            is([javaLangObjectClass]));
+    assertThatSearchResultFor('java.*.*o*e',
+            is([javaIoCloseableClass, javaLangObjectClass]));
+    assertThatSearchResultFor('java.**.***o**e*',
+            is([javaIoCloseableClass, javaLangObjectClass]));
+    assertThatSearchResultFor('javax.swing.border.A',
+            is([javaxSwingBorderAbstractBorderClass]));
+});
+
+RegexLibrary.createExactMatchCondition = function (searchString) {
+    if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
+        return function (link) {
+            return false;
+        };
+    }
+
+    var pattern = this.getExactMatchRegex(searchString);
+
+    return function (link) {
+        return link.matches(pattern);
+    };
+};
+
+RegexLibrary.getRegex = function (searchString) {
+    searchString = searchString.replace(/\*{2,}/g, '*');
+
+    var pattern = '^';
+
+    for (i = 0; i < searchString.length; i++) {
+        var character = searchString.charAt(i);
+        if (/[A-Z]/.test(character) && i > 0) {
+            // An uppercase character which is not at the beginning of the
+            // search input string. Perform a case-insensitive match of this
+            // character. If the matched character is uppercase, allow any
+            // number of lowercase characters to be matched before it. This
+            // allows for Camel Case searching.
+
+            // The \.? term allows a Camel Case search to match an inner class.
+
+            pattern += '(([a-z]*\.?' + character + ')|' + character.toLowerCase() + ')';
+        } else if (/[a-zA-Z]/.test(character)) {
+            // A lowercase character, or an uppercase character at the
+            // beginning of the search input string. Perform a case-insensitive
+            // match of this character.
+
+            pattern += '(' + character.toUpperCase() + '|' + character.toLowerCase() + ')';
+        } else if (character === '*') {
+            // Replace '*' with '.*' to allow the asterisk to be used as a wildcard.
+
+            pattern += '.*';
+        } else if (RegexLibrary._isSpecialRegularExpressionCharacter(character)) {
+           // A special regular expression character, but not an asterisk.
+           // Escape this character.
+
+           pattern += '\\' + character;
+        } else {
+
+            pattern += character;
+        }
+    }
+
+    if (!endsWith(pattern, '.*')) {
+        pattern += '.*';
+    }
+    pattern += '$';
+    return new RegExp(pattern);
+};
+
+UnitTestSuite.testFunctionFor('RegexLibrary.getRegex()', function () {
+    assertThat('excess asterisk characters are removed',
+               RegexLibrary.getRegex('java.**.***o**e*').pattern, is(RegexLibrary.getRegex('java.*.*o*e').pattern));
+});
+
+RegexLibrary.getExactMatchRegex = function (searchString) {
+    var pattern = '^';
+
+    for (i = 0; i < searchString.length; i++) {
+        var character = searchString.charAt(i);
+        if (this._isSpecialRegularExpressionCharacter(character)) {
+           pattern += '\\' + character;
+        } else {
+            pattern += character;
+        }
+    }
+
+    pattern += '$';
+    return new RegExp(pattern, "i");
+};
+
+RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
+    return ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*'].some(function (specialCharacter) {
+        return character === specialCharacter;
+    });
+};
 
 
 /*
@@ -2131,13 +2143,13 @@ Search.PackagesAndClasses._update = function () {
 
     var stopWatch = new StopWatch();
 
-    var condition = Query.createCondition(Query.getSearchString());
-    var exactMatchCondition = Query.createExactMatchCondition(Query.getSearchString());
+    var condition = RegexLibrary.createCondition(Query.getSearchString());
+    var exactMatchCondition = RegexLibrary.createExactMatchCondition(Query.getSearchString());
     this._append(condition, exactMatchCondition);
 
     Log.message('\n' +
         '\'' + Query.getSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n' +
-        Query.getRegex(Query.getSearchString()) + '\n'
+        RegexLibrary.getRegex(Query.getSearchString()) + '\n'
     );
 
     this.previousQuery = Query.getSearchString();
@@ -2204,7 +2216,7 @@ Search.Anchors = {
 Search.Anchors.update = function () {
     var searchAnchors = this;
     AnchorsLoader.load(Search.PackagesAndClasses.getTopLink(), function (anchorLinks) {
-        var condition = Query.createCondition(Query.getSearchString());
+        var condition = RegexLibrary.createCondition(Query.getSearchString());
         searchAnchors._append(Search.PackagesAndClasses.getTopLink(), anchorLinks, condition);
     });
 };
