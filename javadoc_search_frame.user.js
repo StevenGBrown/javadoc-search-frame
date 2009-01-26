@@ -96,11 +96,6 @@ var MENU_REPLACEMENT = {
 };
 
 var ALL_LINKS = [];
-var CURRENT_LINKS = [];
-var TOP_CLASS_LINK = null;
-var TOP_ANCHOR_LINK = null;
-var LAST_AUTO_OPEN_URL = null;
-var PREVIOUS_CLASS_LINKS_QUERY = null;
 
 
 /*
@@ -1711,17 +1706,7 @@ function init() {
  * Perform a search.
  */
 function search() {
-    if (Query.isMenuMode()) {
-        if (Query.isModeChanged()) {
-            showMenu();
-        } else {
-            selectMenu();
-        }
-    } else if (Query.isAnchorMode()) {
-        selectAnchors();
-    } else {
-        selectClasses();
-    }
+    Search.update();
 }
 
 /**
@@ -2098,8 +2083,72 @@ UnitTestSuite.testFunctionFor('getBestMatch(exactMatchCondition, links)', functi
     assertThatBestMatchFor('javax.swing.border.A', is(null));
 });
 
-function selectClasses() {
-    if (PREVIOUS_CLASS_LINKS_QUERY !== null && PREVIOUS_CLASS_LINKS_QUERY === Query.getSearchString()) {
+
+/*
+ * ----------------------------------------------------------------------------
+ * SEARCH
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Search (undocumented).
+ */
+Search = {
+    lastAutoOpenURL : null
+};
+
+Search.update = function () {
+    if (Query.isMenuMode()) {
+        if (Query.isModeChanged()) {
+            showMenu();
+        } else {
+            selectMenu();
+        }
+    } else if (Query.isAnchorMode()) {
+        this.Anchors.update();
+        this._autoOpen(this.Anchors.getTopLink());
+    } else {
+        this.PackagesAndClasses.update();
+        this._autoOpen(this.PackagesAndClasses.getTopLink());
+    }
+};
+
+Search._autoOpen = function (link) {
+    if (link && UserPreference.AUTO_OPEN.getValue()) {
+        var url = link.getUrl();
+        if (url !== lastAutoOpenURL) {
+            lastAutoOpenURL = url;
+            openInSummaryFrame(url);
+        }
+    }
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * SEARCH.PACKAGESANDCLASSES
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Search.PackagesAndClasses (undocumented).
+ */
+Search.PackagesAndClasses = {
+    previousQuery : null,
+    currentLinks : null,
+    topLink : null
+};
+
+Search.PackagesAndClasses.update = function () {
+    this._update();
+};
+
+Search.PackagesAndClasses.getTopLink = function () {
+    return this.topLink;
+};
+
+Search.PackagesAndClasses._update = function () {
+    if (this.previousQuery !== null && this.previousQuery === Query.getSearchString()) {
         return;
     }
 
@@ -2107,44 +2156,38 @@ function selectClasses() {
 
     var condition = Query.createCondition();
     var exactMatchCondition = Query.createExactMatchCondition();
-    appendClasses(condition, exactMatchCondition);
+    this._append(condition, exactMatchCondition);
 
     Log.message('\n' +
         '\'' + Query.getSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n' +
         Query.getRegex() + '\n'
     );
 
-    if (TOP_CLASS_LINK && UserPreference.AUTO_OPEN.getValue()) {
-        var url = TOP_CLASS_LINK.getUrl();
-        if (url !== LAST_AUTO_OPEN_URL) {
-            LAST_AUTO_OPEN_URL = url;
-            openInSummaryFrame(url);
-        }
-    }
+    this.previousQuery = Query.getSearchString();
+};
 
-    PREVIOUS_CLASS_LINKS_QUERY = Query.getSearchString();
-}
-
-function appendClasses(condition, exactMatchCondition) {
-    if (PREVIOUS_CLASS_LINKS_QUERY !== null && Query.getSearchString().indexOf(PREVIOUS_CLASS_LINKS_QUERY) === 0) {
+Search.PackagesAndClasses._append = function (condition, exactMatchCondition) {
+    if (this.previousQuery !== null && Query.getSearchString().indexOf(this.previousQuery) === 0) {
         // Characters have been added to the end of the previous query. Start
         // with the current search list and filter out any links that do not match.
 
     } else {
         // Otherwise, start with the complete search list.
 
-        CURRENT_LINKS = ALL_LINKS.concat();
+        this.currentLinks = ALL_LINKS.concat();
     }
 
-    CURRENT_LINKS = CURRENT_LINKS.filter(condition);
-    var bestMatch = getBestMatch(exactMatchCondition, CURRENT_LINKS);
-    TOP_CLASS_LINK = getTopLink(CURRENT_LINKS, bestMatch);
+    this.currentLinks = this.currentLinks.filter(condition);
+    var bestMatch = getBestMatch(exactMatchCondition, this.currentLinks);
+    this.topLink = getTopLink(this.currentLinks, bestMatch);
 
-    var html = constructHTML(CURRENT_LINKS, bestMatch);
-    View.setContentNodeHTML(html);
-}
+    if (Query.isClassMode()) {
+        var html = this._constructHTML(this.currentLinks, bestMatch);
+        View.setContentNodeHTML(html);
+    }
+};
 
-function constructHTML(classLinks, bestMatch) {
+Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
     var html = '';
     if (bestMatch && classLinks.length > 1) {
         html += '<br/><b><i>Best Match</i></b><br/>';
@@ -2165,39 +2208,53 @@ function constructHTML(classLinks, bestMatch) {
         html += '<br/>';
     });
     return html;
-}
+};
 
-function selectAnchors() {
-    AnchorsLoader.load(TOP_CLASS_LINK, function (anchorLinks) {
+
+/*
+ * ----------------------------------------------------------------------------
+ * SEARCH.ANCHORS
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Search.Anchors (undocumented).
+ */
+Search.Anchors = {
+    topLink : null
+};
+
+Search.Anchors.update = function () {
+    var searchAnchors = this;
+    AnchorsLoader.load(Search.PackagesAndClasses.getTopLink(), function (anchorLinks) {
         var condition = Query.createCondition();
-        appendAnchors(TOP_CLASS_LINK, anchorLinks, condition);
+        searchAnchors._append(Search.PackagesAndClasses.getTopLink(), anchorLinks, condition);
     });
-}
+};
 
-function appendAnchors(classLink, anchorLinks, condition) {
-    TOP_ANCHOR_LINK = null;
+Search.Anchors.getTopLink = function () {
+    return this.topLink;
+};
+
+Search.Anchors._append = function (classLink, anchorLinks, condition) {
+    this.topLink = null;
     var html = '';
     var i;
     for (i = 0; i < anchorLinks.length; i++) {
         var al = anchorLinks[i];
         if (condition(al)) {
             html += al.getHTML();
-            if (!TOP_ANCHOR_LINK) {
-                TOP_ANCHOR_LINK = al;
+            if (!this.topLink) {
+                this.topLink = al;
             }
         }
     }
  
-    if (TOP_ANCHOR_LINK !== null && UserPreference.AUTO_OPEN.getValue() && ! Query.isModeChanged()) {
-        var url = TOP_ANCHOR_LINK.getUrl();
-        if (url !== LAST_AUTO_OPEN_URL) {
-            LAST_AUTO_OPEN_URL = url;
-            openInSummaryFrame(url);
-        }
+    if (Query.isAnchorMode()) {
+        View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + html + '</p>');
     }
- 
-    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>' + html + '</p>');
 };
+
 
 function openInNewTab(url) {
     window.open(url);
@@ -2211,11 +2268,11 @@ function openInSummaryFrame(url) {
 }
 
 function showMenu() {
-    if (!TOP_CLASS_LINK) {
+    if (!Search.PackagesAndClasses.getTopLink()) {
       return;
     }
     var content;
-    if (TOP_CLASS_LINK.getType() === LinkType.PACKAGE) {
+    if (Search.PackagesAndClasses.getTopLink().getType() === LinkType.PACKAGE) {
         content = UserPreference.PACKAGE_MENU.getValue();
     } else {
         content = UserPreference.CLASS_MENU.getValue();
@@ -2230,12 +2287,12 @@ function showMenu() {
         } else {
             var anchorLink = null;
             if (Query.isAnchorSearchStarted()) {
-                anchorLink = TOP_ANCHOR_LINK;
+                anchorLink = Search.Anchors.getTopLink();
             }
-            content = content.replace(rx2, f(TOP_CLASS_LINK, anchorLink));
+            content = content.replace(rx2, f(Search.PackagesAndClasses.getTopLink(), anchorLink));
         }
     }
-    View.setContentNodeHTML(TOP_CLASS_LINK.getHTML() + '<p>' + content + '</p>');
+    View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + content + '</p>');
 }
 
 function selectMenu() {
@@ -2343,10 +2400,10 @@ EventHandlers._returnKeyPressed = function (controlModifier) {
     search();
 
     var url = null;
-    if (Query.isClassMode() && TOP_CLASS_LINK) {
-        url = TOP_CLASS_LINK.getUrl();
+    if (Query.isClassMode() && Search.PackagesAndClasses.getTopLink()) {
+        url = Search.PackagesAndClasses.getTopLink().getUrl();
     } else if (Query.isAnchorMode()) {
-        url = TOP_ANCHOR_LINK.getUrl();
+        url = Search.Anchors.getTopLink().getUrl();
     }
 
     if (url) {
