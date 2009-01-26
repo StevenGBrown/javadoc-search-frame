@@ -1619,11 +1619,11 @@ AnchorLink.prototype._getKeywordOrNot = function (name) {
 };
 
 AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
-    var html = '<li><a href="' + url + '" target="classFrame" class="anchorLink"';
+    var html = '<a href="' + url + '" target="classFrame" class="anchorLink"';
     if (keywordOrNot) {
         html += ' style="color:#666"';
     }
-    html += '>' + name + '</a></li>';
+    html += '>' + name.replace(/ /g, '&nbsp;') + '</a><br/>';
     return html;
 };
 
