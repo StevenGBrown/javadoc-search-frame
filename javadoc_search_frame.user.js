@@ -1138,8 +1138,28 @@ Query.isMenuMode = function () {
     return this.mode === Query.MENU_MODE;
 };
 
-Query.getSearchString = function () {
-    return this.search;
+Query.getClassSearchString = function () {
+    if (Query.isClassMode()) {
+        return this.search;
+    }
+    return this.lastClassSearch;
+};
+
+Query.getAnchorSearchString = function () {
+    if (Query.isAnchorMode()) {
+        return this.search;
+    }
+    if (Query.isClassMode()) {
+        return null;
+    }
+    return this.lastAnchorSearch;
+};
+
+Query.getMenuSearchString = function () {
+    if (Query.isMenuMode()) {
+        return this.search;
+    }
+    return null;
 };
 
 Query.isAnchorSearchStarted = function () {
@@ -1604,20 +1624,14 @@ Search = {
 };
 
 Search.update = function () {
-    // The anchor search is asynchronous, so cancel the current anchor search
-    // if the mode has changed.
-    if (!Query.isAnchorMode()) {
-        this.Anchors.cancel();
-    }
+    this.PackagesAndClasses.update();
+    this.Anchors.update();
+    this.Menu.update();
 
-    if (Query.isMenuMode()) {
-        this.Menu.update();
-    } else if (Query.isAnchorMode()) {
-        this.Anchors.update();
-        this._autoOpen(this.Anchors.getTopLink());
-    } else {
-        this.PackagesAndClasses.update();
+    if (Query.isClassMode()) {
         this._autoOpen(this.PackagesAndClasses.getTopLink());
+    } else if (Query.isAnchorMode()) {
+        this._autoOpen(this.Anchors.getTopLink());
     }
 };
 
@@ -1643,6 +1657,7 @@ Search._autoOpen = function (link) {
  */
 Search.PackagesAndClasses = {
     previousQuery : null,
+    previousClassMode : null,
     currentLinks : null,
     topLink : null
 };
@@ -1656,46 +1671,48 @@ Search.PackagesAndClasses.getTopLink = function () {
 };
 
 Search.PackagesAndClasses._update = function () {
-    if (this.previousQuery !== null && this.previousQuery === Query.getSearchString()) {
-        return;
-    }
-
     var stopWatch = new StopWatch();
+    var searchPerformed = false;
 
-    var condition = RegexLibrary.createCondition(Query.getSearchString());
-    var exactMatchCondition = RegexLibrary.createExactMatchCondition(Query.getSearchString());
-    this._append(condition, exactMatchCondition);
+    var searchString = Query.getClassSearchString();
+    if (this.previousQuery === null || this.previousQuery !== searchString) {
+        var condition = RegexLibrary.createCondition(searchString);
+        var exactMatchCondition = RegexLibrary.createExactMatchCondition(searchString);
 
-    Log.message('\n' +
-        '\'' + Query.getSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n' +
-        RegexLibrary.getRegex(Query.getSearchString()) + '\n'
-    );
+        if (this.previousQuery !== null && searchString.indexOf(this.previousQuery) === 0) {
+            // Characters have been added to the end of the previous query. Start
+            // with the current search list and filter out any links that do not match.
+        } else {
+            // Otherwise, start with the complete search list.
+            this.currentLinks = ALL_LINKS.concat();
+        }
 
-    this.previousQuery = Query.getSearchString();
-};
-
-Search.PackagesAndClasses._append = function (condition, exactMatchCondition) {
-    if (this.previousQuery !== null && Query.getSearchString().indexOf(this.previousQuery) === 0) {
-        // Characters have been added to the end of the previous query. Start
-        // with the current search list and filter out any links that do not match.
-
-    } else {
-        // Otherwise, start with the complete search list.
-
-        this.currentLinks = ALL_LINKS.concat();
+        this.currentLinks = this.currentLinks.filter(condition);
+        var bestMatch = getBestMatch(exactMatchCondition, this.currentLinks);
+        this.topLink = getTopLink(this.currentLinks, bestMatch);
+        searchPerformed = true;
     }
 
-    this.currentLinks = this.currentLinks.filter(condition);
-    var bestMatch = getBestMatch(exactMatchCondition, this.currentLinks);
-    this.topLink = getTopLink(this.currentLinks, bestMatch);
-
-    if (Query.isClassMode()) {
+    if (Query.isClassMode() && (searchPerformed || !this.previousClassMode)) {
         var html = this._constructHTML(this.currentLinks, bestMatch);
         View.setContentNodeHTML(html);
+    }
+
+    this.previousQuery = searchString;
+    this.previousClassMode = Query.isClassMode();
+
+    if (searchPerformed) {
+        Log.message('\n' +
+            '\'' + searchString + '\' in ' + stopWatch.timeElapsed() + '\n' +
+            RegexLibrary.getRegex(searchString) + '\n'
+        );
     }
 };
 
 Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
+    if (classLinks.length === 0) {
+        return 'No search results.';
+    }
     var html = '';
     if (bestMatch && classLinks.length > 1) {
         html += '<br/><b><i>Best Match</i></b><br/>';
@@ -1733,37 +1750,38 @@ Search.Anchors = {
 };
 
 Search.Anchors.update = function () {
-    var searchAnchors = this;
-    AnchorsLoader.load(Search.PackagesAndClasses.getTopLink(), function (anchorLinks) {
-        var condition = RegexLibrary.createCondition(Query.getSearchString());
-        searchAnchors._append(Search.PackagesAndClasses.getTopLink(), anchorLinks, condition);
-    });
-};
+    if (Query.isClassMode()) {
+        AnchorsLoader.cancel();
+        return;
+    }
 
-Search.Anchors.cancel = function () {
-    AnchorsLoader.cancel();
+    var searchAnchors = this;
+    var topClassLink = Search.PackagesAndClasses.getTopLink();
+    AnchorsLoader.load(topClassLink, function (anchorLinks) {
+        var searchString = Query.getAnchorSearchString();
+        var condition = RegexLibrary.createCondition(searchString);
+        searchAnchors._append(topClassLink, anchorLinks, condition);
+    });
 };
 
 Search.Anchors.getTopLink = function () {
     return this.topLink;
 };
 
-Search.Anchors._append = function (classLink, anchorLinks, condition) {
-    this.topLink = null;
-    var html = '';
-    var i;
-    for (i = 0; i < anchorLinks.length; i++) {
-        var al = anchorLinks[i];
-        if (condition(al)) {
-            html += al.getHTML();
-            if (!this.topLink) {
-                this.topLink = al;
-            }
-        }
-    }
- 
+Search.Anchors._append = function (topClassLink, anchorLinks, condition) {
+    var matchingAnchorLinks = anchorLinks.filter(condition);
+    this.topLink = matchingAnchorLinks.length > 0 ? matchingAnchorLinks[0] : null;
+
     if (Query.isAnchorMode()) {
-        View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + html + '</p>');
+        var html = '';
+        if (matchingAnchorLinks.length === 0) {
+            html += 'No search results.';
+        } else {
+           anchorLinks.forEach(function (anchorLink) {
+                html += anchorLink.getHTML();
+            });
+        }
+        View.setContentNodeHTML(topClassLink.getHTML() + '<p>' + html + '</p>');
     }
 };
 
@@ -1782,10 +1800,19 @@ Search.Menu = {
 };
 
 Search.Menu.update = function () {
-    var menu = this._createMenu();
-    View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
+    if (!Query.isMenuMode()) {
+        return;
+    }
 
-    if (!Query.getSearchString()) {
+    var menu = this._createMenu();
+    if (Search.PackagesAndClasses.getTopLink()) {
+        View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
+    } else {
+        View.setContentNodeHTML('No search results.<p>' + menu + '</p>');
+    }
+
+    var searchString = Query.getMenuSearchString();
+    if (!searchString) {
         return;
     }
 
@@ -1797,7 +1824,7 @@ Search.Menu.update = function () {
         var textNode = node.firstChild;
         if (textNode
                 && textNode.nodeType === 3 /* Node.TEXT_NODE */
-                && textNode.nodeValue.indexOf('@' + Query.getSearchString()) === 0) {
+                && textNode.nodeValue.indexOf('@' + searchString) === 0) {
             openInSummaryFrame(node.getAttribute('href'));
             Query.input('');
             search();
@@ -1808,8 +1835,11 @@ Search.Menu.update = function () {
 };
 
 Search.Menu._createMenu = function () {
+    var topClassLink = Search.PackagesAndClasses.getTopLink();
+    var topAnchorLink = Search.Anchors.getTopLink();
+
     var menu;
-    if (Search.PackagesAndClasses.getTopLink().getType() === LinkType.PACKAGE) {
+    if (topClassLink && topClassLink.getType() === LinkType.PACKAGE) {
         menu = UserPreference.PACKAGE_MENU.getValue();
     } else {
         menu = UserPreference.CLASS_MENU.getValue();
@@ -1820,14 +1850,10 @@ Search.Menu._createMenu = function () {
     while ((matches = rx.exec(menu)) !== null) {
         var f = menuReplacement[matches[1]];
         var rx2 = new RegExp(matches[0], 'g');
-        if (!f) {
-            menu = menu.replace(rx2, '');
+        if (f) {
+            menu = menu.replace(rx2, f(topClassLink, topAnchorLink));
         } else {
-            var anchorLink = null;
-            if (Query.isAnchorSearchStarted()) {
-                anchorLink = Search.Anchors.getTopLink();
-            }
-            menu = menu.replace(rx2, f(Search.PackagesAndClasses.getTopLink(), anchorLink));
+            menu = menu.replace(rx2, '');
         }
     }
     return menu;
@@ -1842,19 +1868,16 @@ Search.Menu._getMenuReplacement = function () {
     if (!this.menuReplacement) {
         this.menuReplacement = {
             CLASS_NAME: function (classLink) { 
-                return classLink.getClassName();
+                return classLink ? classLink.getClassName() : '';
             },
-            PACKAGE_NAME: function (classLink) { 
-                return classLink.getPackageName();
+            PACKAGE_NAME: function (classOrPackageLink) { 
+                return classOrPackageLink ? classOrPackageLink.getPackageName() : '';
             },
-            PACKAGE_PATH: function (classLink) { 
-                return classLink.getPackageName().replace(/\./g, '/');
+            PACKAGE_PATH: function (classOrPackageLink) { 
+                return classOrPackageLink ? classOrPackageLink.getPackageName().replace(/\./g, '/') : '';
             },
-            ANCHOR_NAME: function (classLink, anchorLink) {
-                if (!anchorLink) {
-                    return '';
-                }
-                return anchorLink.getNameWithoutParameter();
+            ANCHOR_NAME: function (classOrPackageLink, anchorLink) {
+                return anchorLink ? anchorLink.getNameWithoutParameter() : '';
             }
         };
     }
