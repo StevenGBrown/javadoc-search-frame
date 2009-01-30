@@ -1595,32 +1595,38 @@ RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
  * @class Search (undocumented).
  */
 Search = {
-    lastAutoOpenURL : null
+    previousEntireSearchString : null,
+    previousAutoOpenURL : null
 };
 
 Search.update = function () {
     var stopWatch = new StopWatch();
 
-    this.PackagesAndClasses.update();
-    this.Anchors.update();
-    this.Menu.update();
+    var entireSearchString = Query.getEntireSearchString();
+    if (this.previousEntireSearchString === null || entireSearchString !== this.previousEntireSearchString) {
+        this.previousEntireSearchString = entireSearchString;
 
-    Log.message('\n' +
-        '\'' + Query.getEntireSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n'
-    );
+        this.PackagesAndClasses.update();
+        this.Anchors.update();
+        this.Menu.update();
 
-    if (Query.isClassMode()) {
-        this._autoOpen(this.PackagesAndClasses.getTopLink());
-    } else if (Query.isAnchorMode()) {
-        this._autoOpen(this.Anchors.getTopLink());
+        Log.message('\n' +
+            '\'' + entireSearchString + '\' in ' + stopWatch.timeElapsed() + '\n'
+        );
+
+        if (Query.isClassMode()) {
+            this._autoOpen(this.PackagesAndClasses.getTopLink());
+        } else if (Query.isAnchorMode()) {
+            this._autoOpen(this.Anchors.getTopLink());
+        }
     }
 };
 
 Search._autoOpen = function (link) {
     if (link && UserPreference.AUTO_OPEN.getValue()) {
         var url = link.getUrl();
-        if (url !== lastAutoOpenURL) {
-            lastAutoOpenURL = url;
+        if (url !== previousAutoOpenURL) {
+            previousAutoOpenURL = url;
             openInSummaryFrame(url);
         }
     }
