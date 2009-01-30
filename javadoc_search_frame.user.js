@@ -1162,15 +1162,6 @@ Query.getMenuSearchString = function () {
     return null;
 };
 
-Query.isAnchorSearchStarted = function () {
-    if (this.isAnchorMode()) {
-        return (0 < this.searchString.length);
-    } else if (this.isMenuMode()) {
-        return (1 < this.lastAnchorSearch.length); // lastAnchorSearch starts with '#'
-    }
-    return false;
-};
-
 Query.input = function (input) {
     input = this._shiftMode(input);
     this.search = this._getSearchStringFromInput(input);
