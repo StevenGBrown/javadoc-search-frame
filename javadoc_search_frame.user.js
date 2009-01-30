@@ -1180,15 +1180,21 @@ Query.erase = function () {
 };
 
 Query._convertFieldValueToSearchString = function (fieldValue) {
+    var searchString;
     if (Query.isClassMode()) {
-        return fieldValue;
+        searchString = fieldValue;
+    } else if (Query.isAnchorMode()) {
+        searchString = this.classSearchString + fieldValue;
+    } else if (Query.isMenuMode()) {
+        searchString = this.classSearchString;
+        if (this.anchorSearchString !== null) {
+            searchString += '#' + this.anchorSearchString;
+        }
+        if (fieldValue.indexOf('@') !== -1) {
+            searchString += fieldValue;
+        }
     }
-    if (Query.isAnchorMode()) {
-        return this.classSearchString + fieldValue;
-    }
-    if (Query.isMenuMode()) {
-        return this.classSearchString + '#' + this.anchorSearchString + fieldValue;
-    }
+    return searchString;
 };
 
 Query._convertSearchStringToFieldValue = function (searchString) {
