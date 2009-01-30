@@ -1777,7 +1777,7 @@ Search.Anchors._append = function (topClassLink, anchorLinks, condition) {
         if (matchingAnchorLinks.length === 0) {
             html += 'No search results.';
         } else {
-           anchorLinks.forEach(function (anchorLink) {
+           matchingAnchorLinks.forEach(function (anchorLink) {
                 html += anchorLink.getHTML();
             });
         }
