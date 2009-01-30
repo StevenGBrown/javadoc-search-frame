@@ -1116,142 +1116,120 @@ View._watch = function (element, callback, msec) {
  * @class Query (undocumented).
  */
 Query = {
-    mode : 1,
-    search : '',
-    lastClassSearch : '',
-    lastAnchorSearch : ''
+    classSearchString : '',
+    anchorSearchString : null,
+    menuSearchString : null
 };
 
-Query.CLASS_MODE = 1;
-Query.ANCHOR_MODE = 2;
-Query.MENU_MODE = 3;
-
 Query.isClassMode = function () {
-    return this.mode === Query.CLASS_MODE;
+    return !this.isAnchorMode() && !this.isMenuMode();
 };
 
 Query.isAnchorMode = function () {
-    return this.mode === Query.ANCHOR_MODE;
+    return this.anchorSearchString !== null &&
+           this.menuSearchString === null;
 };
 
 Query.isMenuMode = function () {
-    return this.mode === Query.MENU_MODE;
+    return this.menuSearchString !== null;
 };
 
 Query.getClassSearchString = function () {
-    if (Query.isClassMode()) {
-        return this.search;
-    }
-    return this.lastClassSearch;
+    return this.classSearchString;
 };
 
 Query.getAnchorSearchString = function () {
-    if (Query.isAnchorMode()) {
-        return this.search;
-    }
-    if (Query.isClassMode()) {
-        return null;
-    }
-    return this.lastAnchorSearch;
+    return this.anchorSearchString;
 };
 
 Query.getMenuSearchString = function () {
-    if (Query.isMenuMode()) {
-        return this.search;
+    return this.menuSearchString;
+};
+
+Query.getEntireSearchString = function () {
+    var searchString = this.classSearchString;
+    if (this.anchorSearchString !== null) {
+        searchString += '#';
+        searchString += this.anchorSearchString;
     }
-    return null;
+    if (this.menuSearchString !== null) {
+        searchString += '@';
+        searchString += this.menuSearchString;
+    }
+    return searchString;
 };
 
 Query.input = function (input) {
-    input = this._shiftMode(input);
-    this.search = this._getSearchStringFromInput(input);
-};
-
-Query.update = function (input) {
-    View.setSearchFieldValue(input);
-    this.input(input);
+    var searchString = this._convertFieldValueToSearchString(input);
+    this._processSearchString(searchString);
+    var newFieldValue = this._convertSearchStringToFieldValue(searchString);
+    View.setSearchFieldValue(newFieldValue);
 };
 
 Query.erase = function () {
-    if (this.isAnchorMode() && 0 < this.search.length) {
-        this.update('#');
-    } else {
-        this.update('');
+    if (Query.isClassMode()) {
+        this.classSearchString = '';
+    } else if (Query.isAnchorMode()) {
+        this.anchorSearchString = null;
+    } else if (Query.isMenuMode()) {
+        this.menuSearchString = null;
+    }
+    var newSearchString = Query.getEntireSearchString();
+    var newFieldValue = this._convertSearchStringToFieldValue(newSearchString);
+    View.setSearchFieldValue(newFieldValue);
+};
+
+Query._convertFieldValueToSearchString = function (fieldValue) {
+    if (Query.isClassMode()) {
+        return fieldValue;
+    }
+    if (Query.isAnchorMode()) {
+        return this.classSearchString + fieldValue;
+    }
+    if (Query.isMenuMode()) {
+        return this.classSearchString + '#' + this.anchorSearchString + fieldValue;
     }
 };
 
-Query._getSearchStringFromInput = function (input) {
-    if (this.isMenuMode()) {
-        if (input.length <= 1) {
-            return '';
+Query._convertSearchStringToFieldValue = function (searchString) {
+    var fieldValue = searchString;
+    if (fieldValue.indexOf('#') !== -1) {
+        var splitOnHashCharacter = fieldValue.split('#', 2);
+        fieldValue = '#' + splitOnHashCharacter[1];
+    }
+    var indexOfAtCharacter = fieldValue.indexOf('@');
+    if (indexOfAtCharacter !== -1) {
+        var splitOnAtCharacter = fieldValue.split('@', 2);
+        if (splitOnAtCharacter[1].length > 0) {
+            fieldValue = splitOnAtCharacter[0];
         } else {
-            return input.substring(1, 2);
+            fieldValue = '@';
         }
-    } else if (this.isAnchorMode()) {
-        if (0 < input.lastIndexOf('#')) {
-            View.setSearchFieldValue('#');
-            return '';
-        } else {
-            input = input.substring(1);
-            return input;
-        }
-    } else if (this.isClassMode()) {
-        return input;
+    }
+    return fieldValue;
+};
+
+Query._processSearchString = function (searchString) {
+    this.classSearchString = null;
+    this.anchorSearchString = null;
+    this.menuSearchString = null;
+
+    if (searchString.indexOf('#') !== -1) {
+        var splitOnHashCharacter = searchString.split('#', 2);
+        this.classSearchString = splitOnHashCharacter[0];
+        this.anchorSearchString = this._checkForMenuSearchString(splitOnHashCharacter[1]);
     } else {
-        return '';
+        this.classSearchString = this._checkForMenuSearchString(searchString);
     }
 };
 
-Query._shiftMode = function (input) {
-    var lastSearch;
-    if (input.indexOf('@') !== -1) {
-        if (this.isMenuMode()) {
-            return input;
-        }
-        // * -> menuMode
-        lastSearch = input.replace(/@/g, '');
-        this._memoryLastSearch(lastSearch);
-        View.setSearchFieldValue('@');
-        this.mode = Query.MENU_MODE;
-        return '@';
-    } else if (input.indexOf('#') !== -1) {
-        if (this.isAnchorMode()) {
-            return input;
-        }
-        // * -> anchorMode
-        lastSearch = input.replace(/#/g, '');
-        this._memoryLastSearch(lastSearch);
-        View.setSearchFieldValue('#');
-        this.mode = Query.ANCHOR_MODE;
-        return '#';
-    } else if (this.isMenuMode() && this.lastAnchorSearch !== '') {
-        // menuMode -> anchorMode
-        View.setSearchFieldValue(this.lastAnchorSearch);
-        input = this.lastAnchorSearch;
-        this.lastAnchorSearch = '';
-        this.mode = Query.ANCHOR_MODE;
-        return input;
-    } else if (! this.isClassMode()) {
-        // * -> classMode
-        View.setSearchFieldValue(this.lastClassSearch);
-        input = this.lastClassSearch;
-        this.lastAnchorSearch = '';
-        this.lastClassSearch = '';
-        this.mode = Query.CLASS_MODE;
-        return input;
+Query._checkForMenuSearchString = function (searchString) {
+    if (searchString.indexOf('@') !== -1) {
+        var splitOnAtCharacter = searchString.split('@', 2);
+        this.menuSearchString = splitOnAtCharacter[1];
+        return splitOnAtCharacter[0];
     }
-    return input;
-};
-
-Query._memoryLastSearch = function (lastSearch) {
-    if (this.isClassMode()) {
-        this.lastClassSearch = lastSearch;
-        this.lastAnchorSearch = '';
-        this.search = '';
-    } else if (this.isAnchorMode()) {
-        this.lastAnchorSearch = lastSearch;
-        this.search = '';
-    }
+    return searchString;
 };
 
 
@@ -1615,9 +1593,15 @@ Search = {
 };
 
 Search.update = function () {
+    var stopWatch = new StopWatch();
+
     this.PackagesAndClasses.update();
     this.Anchors.update();
     this.Menu.update();
+
+    Log.message('\n' +
+        '\'' + Query.getEntireSearchString() + '\' in ' + stopWatch.timeElapsed() + '\n'
+    );
 
     if (Query.isClassMode()) {
         this._autoOpen(this.PackagesAndClasses.getTopLink());
@@ -1662,7 +1646,6 @@ Search.PackagesAndClasses.getTopLink = function () {
 };
 
 Search.PackagesAndClasses._update = function () {
-    var stopWatch = new StopWatch();
     var searchPerformed = false;
 
     var searchString = Query.getClassSearchString();
@@ -1691,13 +1674,6 @@ Search.PackagesAndClasses._update = function () {
 
     this.previousQuery = searchString;
     this.previousClassMode = Query.isClassMode();
-
-    if (searchPerformed) {
-        Log.message('\n' +
-            '\'' + searchString + '\' in ' + stopWatch.timeElapsed() + '\n' +
-            RegexLibrary.getRegex(searchString) + '\n'
-        );
-    }
 };
 
 Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
@@ -1796,7 +1772,12 @@ Search.Menu.update = function () {
     }
 
     var menu = this._createMenu();
-    if (Search.PackagesAndClasses.getTopLink()) {
+    if (Search.Anchors.getTopLink()) {
+        View.setContentNodeHTML(
+            Search.PackagesAndClasses.getTopLink().getHTML() + '<br/>' +
+            Search.Anchors.getTopLink().getHTML() +
+            '<p>' + menu + '</p>');
+    } else if (Search.PackagesAndClasses.getTopLink()) {
         View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
     } else {
         View.setContentNodeHTML('No search results.<p>' + menu + '</p>');
@@ -1817,12 +1798,10 @@ Search.Menu.update = function () {
                 && textNode.nodeType === 3 /* Node.TEXT_NODE */
                 && textNode.nodeValue.indexOf('@' + searchString) === 0) {
             openInSummaryFrame(node.getAttribute('href'));
-            Query.input('');
             search();
             return;
         }
     }
-    Query.update('@');
 };
 
 Search.Menu._createMenu = function () {
