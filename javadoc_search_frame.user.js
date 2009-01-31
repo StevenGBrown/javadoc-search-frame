@@ -1160,44 +1160,61 @@ Query.getEntireSearchString = function () {
 };
 
 Query.input = function (input) {
-    var searchString = this._convertFieldValueToSearchString(input);
-    this._processSearchString(searchString);
-    var newFieldValue = this._convertSearchStringToFieldValue(searchString);
-    View.setSearchFieldValue(newFieldValue);
+    this._processInput(input);
+    this._updateView();
 };
 
 Query.erase = function () {
-    if (Query.isClassMode()) {
-        this.classSearchString = '';
-    } else if (Query.isAnchorMode()) {
-        this.anchorSearchString = null;
-    } else if (Query.isMenuMode()) {
-        this.menuSearchString = null;
-    }
-    var newSearchString = Query.getEntireSearchString();
-    var newFieldValue = this._convertSearchStringToFieldValue(newSearchString);
-    View.setSearchFieldValue(newFieldValue);
+    this._processErase();
+    this._updateView();
 };
 
-Query._convertFieldValueToSearchString = function (fieldValue) {
+Query._processInput = function (input) {
     var searchString;
-    if (Query.isClassMode()) {
-        searchString = fieldValue;
-    } else if (Query.isAnchorMode()) {
-        searchString = this.classSearchString + fieldValue;
-    } else if (Query.isMenuMode()) {
+    if (this.isClassMode()) {
+        searchString = input;
+    } else if (this.isAnchorMode()) {
+        searchString = this.classSearchString + input;
+    } else if (this.isMenuMode()) {
         searchString = this.classSearchString;
         if (this.anchorSearchString !== null) {
             searchString += '#' + this.anchorSearchString;
         }
-        if (fieldValue.indexOf('@') !== -1) {
-            searchString += fieldValue;
+        if (input.indexOf('@') !== -1) {
+            searchString += input;
         }
     }
-    return searchString;
+
+    var tokens = [];
+    var splitOnPrefix;
+    ['@', '#'].forEach(function (prefix) {
+        if (searchString.indexOf(prefix) !== -1) {
+            splitOnPrefix = searchString.split(prefix, 2);
+            tokens.push(splitOnPrefix[1]);
+            searchString = splitOnPrefix[0];
+        } else {
+            tokens.push(null);
+        }
+    });
+
+    this.classSearchString = searchString;
+    this.anchorSearchString = tokens[1];
+    this.menuSearchString = tokens[0];
 };
 
-Query._convertSearchStringToFieldValue = function (searchString) {
+Query._processErase = function () {
+    if (this.isClassMode()) {
+        this.classSearchString = '';
+    } else if (this.isAnchorMode()) {
+        this.anchorSearchString = null;
+    } else if (this.isMenuMode()) {
+        this.menuSearchString = null;
+    }
+};
+
+Query._updateView = function () {
+    var searchString = this.getEntireSearchString();
+
     var fieldValue = searchString;
     if (fieldValue.indexOf('#') !== -1) {
         var splitOnHashCharacter = fieldValue.split('#', 2);
@@ -1212,30 +1229,8 @@ Query._convertSearchStringToFieldValue = function (searchString) {
             fieldValue = '@';
         }
     }
-    return fieldValue;
-};
 
-Query._processSearchString = function (searchString) {
-    this.classSearchString = null;
-    this.anchorSearchString = null;
-    this.menuSearchString = null;
-
-    if (searchString.indexOf('#') !== -1) {
-        var splitOnHashCharacter = searchString.split('#', 2);
-        this.classSearchString = splitOnHashCharacter[0];
-        this.anchorSearchString = this._checkForMenuSearchString(splitOnHashCharacter[1]);
-    } else {
-        this.classSearchString = this._checkForMenuSearchString(searchString);
-    }
-};
-
-Query._checkForMenuSearchString = function (searchString) {
-    if (searchString.indexOf('@') !== -1) {
-        var splitOnAtCharacter = searchString.split('@', 2);
-        this.menuSearchString = splitOnAtCharacter[1];
-        return splitOnAtCharacter[0];
-    }
-    return searchString;
+    View.setSearchFieldValue(fieldValue);
 };
 
 
