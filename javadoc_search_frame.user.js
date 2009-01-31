@@ -1874,9 +1874,11 @@ Search.Menu._getMenuReplacement = function () {
 function init() {
     var initStopWatch = new StopWatch();
 
-    // Ensure that this is the correct document. This is necessary for
-    // Google Chrome, which currently ignores the @include metadata tag.
-    if (!endsWith(document.location.toString(), '/allclasses-frame.html')) {
+    // If running Google Chrome, check that this is the correct document. This
+    // is necessary since, as of January 2009, Google Chrome ignores the
+    // @include metadata tag.
+    var browserIsChrome = navigator.userAgent.toLowerCase().indexOf('chrome') !== -1;
+    if (browserIsChrome && !endsWith(document.location.toString(), '/allclasses-frame.html')) {
         return;
     }
 
