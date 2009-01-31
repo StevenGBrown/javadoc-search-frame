@@ -512,11 +512,15 @@ Frames.hideAllPackagesFrame = function () {
 };
 
 Frames._getFrame = function (name) {
+    if (this[name]) {
+        return this[name];
+    }
     var frame;
     var i;
     for (i = 0; i < parent.frames.length; i++) {
         frame = parent.frames[i];
         if (frame && frame.name === name && frame.document) {
+            this[name] = frame;
             return frame;
         }
     }
