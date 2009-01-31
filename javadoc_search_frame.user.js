@@ -513,8 +513,8 @@ Frames.getSummaryFrame = function () {
     return this._getFrame('classFrame');
 };
 
-Frames.openInSummaryFrame = function (url) {
-    if (this.previousURLOpenedInSummaryFrame === null || url !== this.previousURLOpenedInSummaryFrame) {
+Frames.openInSummaryFrame = function (url, reload) {
+    if (reload || this.previousURLOpenedInSummaryFrame === null || url !== this.previousURLOpenedInSummaryFrame) {
         var summaryFrame = this.getSummaryFrame();
         if (summaryFrame) {
             this.previousURLOpenedInSummaryFrame = url;
@@ -1825,7 +1825,7 @@ Search.Menu.update = function () {
         if (textNode
                 && textNode.nodeType === 3 /* Node.TEXT_NODE */
                 && textNode.nodeValue.indexOf('@' + searchString) === 0) {
-            Frames.openInSummaryFrame(node.getAttribute('href'));
+            Frames.openInSummaryFrame(node.getAttribute('href'), true);
             search();
             return;
         }
