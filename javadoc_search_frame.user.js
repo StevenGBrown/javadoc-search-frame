@@ -487,14 +487,12 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
 /**
  * @class Frames (undocumented).
  */
-Frames = {};
+Frames = {
+    previousURLOpenedInSummaryFrame : null
+};
 
 Frames.getAllPackagesFrame = function () {
     return this._getFrame('packageListFrame');
-};
-
-Frames.getSummaryFrame = function () {
-    return this._getFrame('classFrame');
 };
 
 Frames.hideAllPackagesFrame = function () {
@@ -510,6 +508,20 @@ Frames.hideAllPackagesFrame = function () {
         }
     }
 };
+
+Frames.getSummaryFrame = function () {
+    return this._getFrame('classFrame');
+};
+
+Frames.openInSummaryFrame = function (url) {
+    if (this.previousURLOpenedInSummaryFrame === null || url !== this.previousURLOpenedInSummaryFrame) {
+        var summaryFrame = this.getSummaryFrame();
+        if (summaryFrame) {
+            this.previousURLOpenedInSummaryFrame = url;
+            summaryFrame.location.href = url;
+        }
+    }
+}
 
 Frames._getFrame = function (name) {
     if (this[name]) {
@@ -1594,8 +1606,7 @@ RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
  * @class Search (undocumented).
  */
 Search = {
-    previousEntireSearchString : null,
-    previousAutoOpenURL : null
+    previousEntireSearchString : null
 };
 
 Search.update = function () {
@@ -1624,10 +1635,7 @@ Search.update = function () {
 Search._autoOpen = function (link) {
     if (link && UserPreference.AUTO_OPEN.getValue()) {
         var url = link.getUrl();
-        if (url !== previousAutoOpenURL) {
-            previousAutoOpenURL = url;
-            openInSummaryFrame(url);
-        }
+        Frames.openInSummaryFrame(url);
     }
 };
 
@@ -1817,7 +1825,7 @@ Search.Menu.update = function () {
         if (textNode
                 && textNode.nodeType === 3 /* Node.TEXT_NODE */
                 && textNode.nodeValue.indexOf('@' + searchString) === 0) {
-            openInSummaryFrame(node.getAttribute('href'));
+            Frames.openInSummaryFrame(node.getAttribute('href'));
             search();
             return;
         }
@@ -2334,17 +2342,6 @@ UnitTestSuite.testFunctionFor('getBestMatch(exactMatchCondition, links)', functi
     assertThatBestMatchFor('javax.swing.border.A', is(null));
 });
 
-function openInSummaryFrame(url) {
-    var summaryFrame = Frames.getSummaryFrame();
-    if (summaryFrame) {
-        summaryFrame.location.href = url;
-    }
-}
-
-function openInNewTab(url) {
-    window.open(url);
-}
-
 function endsWith(stringOne, stringTwo) {
     var strIndex = stringOne.length - stringTwo.length;
     return strIndex >= 0 && stringOne.substring(strIndex) === stringTwo;
@@ -2430,9 +2427,9 @@ EventHandlers._returnKeyPressed = function (controlModifier) {
 
     if (url) {
         if (controlModifier) {
-            openInNewTab(url);
+            window.open(url);
         } else {
-            openInSummaryFrame(url);
+            Frames.openInSummaryFrame(url);
         }
     }
 };
