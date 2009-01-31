@@ -1674,7 +1674,7 @@ Search.PackagesAndClasses._update = function () {
         searchPerformed = true;
     }
 
-    if (Query.isClassMode() && (searchPerformed || !this.previousClassMode)) {
+    if (Query.isClassMode() && (searchPerformed || !this.previousClassMode) || !this.topLink) {
         var html = this._constructHTML(this.currentLinks, bestMatch);
         View.setContentNodeHTML(html);
     }
@@ -1724,13 +1724,13 @@ Search.Anchors = {
 };
 
 Search.Anchors.update = function () {
-    if (Query.isClassMode()) {
+    var topClassLink = Search.PackagesAndClasses.getTopLink();
+    if (Query.isClassMode() || !topClassLink) {
         AnchorsLoader.cancel();
         return;
     }
 
     var searchAnchors = this;
-    var topClassLink = Search.PackagesAndClasses.getTopLink();
     AnchorsLoader.load(topClassLink, function (anchorLinks) {
         var searchString = Query.getAnchorSearchString();
         var condition = RegexLibrary.createCondition(searchString);
@@ -1746,7 +1746,7 @@ Search.Anchors._append = function (topClassLink, anchorLinks, condition) {
     var matchingAnchorLinks = anchorLinks.filter(condition);
     this.topLink = matchingAnchorLinks.length > 0 ? matchingAnchorLinks[0] : null;
 
-    if (Query.isAnchorMode()) {
+    if (Query.isAnchorMode() || !this.topLink) {
         var html = '';
         if (matchingAnchorLinks.length === 0) {
             html += 'No search results.';
@@ -1778,16 +1778,25 @@ Search.Menu.update = function () {
         return;
     }
 
-    var menu = this._createMenu();
-    if (Search.Anchors.getTopLink()) {
+    var topClassLink = Search.PackagesAndClasses.getTopLink();
+    var topAnchorLink = Search.Anchors.getTopLink();
+
+    var menu;
+    if (Query.getAnchorSearchString() !== null) {
+        if (!topAnchorLink) {
+            return;
+        }
+        menu = this._createMenu(topClassLink, topAnchorLink);
         View.setContentNodeHTML(
             Search.PackagesAndClasses.getTopLink().getHTML() + '<br/>' +
             Search.Anchors.getTopLink().getHTML() +
             '<p>' + menu + '</p>');
-    } else if (Search.PackagesAndClasses.getTopLink()) {
-        View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
     } else {
-        View.setContentNodeHTML('No search results.<p>' + menu + '</p>');
+        if (!topClassLink) {
+            return;
+        }
+        menu = this._createMenu(topClassLink);
+        View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
     }
 
     var searchString = Query.getMenuSearchString();
@@ -1811,10 +1820,7 @@ Search.Menu.update = function () {
     }
 };
 
-Search.Menu._createMenu = function () {
-    var topClassLink = Search.PackagesAndClasses.getTopLink();
-    var topAnchorLink = Search.Anchors.getTopLink();
-
+Search.Menu._createMenu = function (topClassLink, topAnchorLink) {
     var menu;
     if (topClassLink && topClassLink.getType() === LinkType.PACKAGE) {
         menu = UserPreference.PACKAGE_MENU.getValue();
