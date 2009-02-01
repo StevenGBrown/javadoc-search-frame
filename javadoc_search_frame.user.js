@@ -1669,8 +1669,8 @@ Search.PackagesAndClasses._update = function () {
         }
 
         this.currentLinks = this.currentLinks.filter(condition);
-        var bestMatch = getBestMatch(exactMatchCondition, this.currentLinks);
-        this.topLink = getTopLink(this.currentLinks, bestMatch);
+        var bestMatch = this._getBestMatch(exactMatchCondition, this.currentLinks);
+        this.topLink = this._getTopLink(this.currentLinks, bestMatch);
         searchPerformed = true;
     }
 
@@ -1682,6 +1682,88 @@ Search.PackagesAndClasses._update = function () {
     this.previousQuery = searchString;
     this.previousClassMode = Query.isClassMode();
 };
+
+Search.PackagesAndClasses._getTopLink = function (links, bestMatch) {
+    if (bestMatch) {
+        return bestMatch;
+    }
+    if (links.length > 0) {
+        return links[0];
+    }
+    return null;
+};
+
+UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getTopLink(classLinks, bestMatch)', function () {
+    var classLinkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component', 'java/awt/Component');
+    var classLinkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object', 'java/lang/Object');
+    var getTopLink = Search.PackagesAndClasses._getTopLink;
+
+    assertThat('no links, best match undefined', getTopLink([]), is(null));
+    assertThat('one link, best match undefined', getTopLink([classLinkOne]), is(classLinkOne));
+    assertThat('two links, best match undefined', getTopLink([classLinkOne, classLinkTwo]), is(classLinkOne));
+    assertThat('no links, best match defined', getTopLink([], classLinkOne), is(classLinkOne));
+    assertThat('one link, best match defined', getTopLink([classLinkOne], classLinkTwo), is(classLinkTwo));
+});
+
+/**
+ * Get the best match (if any) from the given array of links.
+ */
+Search.PackagesAndClasses._getBestMatch = function (exactMatchCondition, links) {
+    var exactMatchLinks = links.filter(exactMatchCondition);
+    // If all of the links displayed in the search list are exact matches, do
+    // not display a best match.
+    if (exactMatchLinks.length === links.length) {
+        return null;
+    }
+    // If there is more than one exact match, choose the link with the shortest
+    // name to be the best match.
+    var bestMatch = null;
+    var bestMatchNameLength;
+    var name;
+    exactMatchLinks.forEach(function (link) {
+        name = (link.getType() === LinkType.PACKAGE ? link.getPackageName() : link.getCanonicalName());
+        if (!bestMatch || name.length < bestMatchNameLength) {
+            bestMatch = link;
+            bestMatchNameLength = name.length;
+        }
+    });
+    return bestMatch;
+};
+
+UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(exactMatchCondition, links)', function () {
+    var javaIoPackage = new PackageLink('java.io');
+    var javaLangPackage = new PackageLink('java.lang');
+    var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
+    var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
+    var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
+    var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
+    var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
+
+    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
+        javaLangObjectClass, javaxSwingBorderFactoryClass,
+        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
+
+    var assertThatBestMatchFor = function (searchString, searchResult) {
+        var exactMatchCondition = RegexLibrary.createExactMatchCondition(searchString);
+        assertThat('Best match for: ' + searchString,
+                   Search.PackagesAndClasses._getBestMatch(exactMatchCondition, allLinks),
+                   is(searchResult));
+    };
+
+    assertThatBestMatchFor('java.io', is(javaIoPackage));
+    assertThatBestMatchFor('j', is(null));
+    assertThatBestMatchFor('J', is(null));
+    assertThatBestMatchFor('Object', is(javaLangObjectClass));
+    assertThatBestMatchFor('O', is(null));
+    assertThatBestMatchFor('java.lang.Object', is(javaLangObjectClass));
+    assertThatBestMatchFor('JAVA.LANG.OBJECT', is(javaLangObjectClass));
+    assertThatBestMatchFor('org.omg.CORBA.Object', is(orgOmgCorbaObjectClass));
+    assertThatBestMatchFor('java.lang', is(javaLangPackage));
+    assertThatBestMatchFor('java.lang.', is(null));
+    assertThatBestMatchFor('java.*.o*e', is(null));
+    assertThatBestMatchFor('java.*.*o*e', is(null));
+    assertThatBestMatchFor('javax.swing.border.A', is(null));
+});
 
 Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
     if (classLinks.length === 0) {
@@ -2244,90 +2326,6 @@ UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHTML)', function () {
     runTitleTestCase( {
             href:'javax/xml/ws/Action.html', type:LinkType.ANNOTATION,
             package:'javax.xml.ws', class:'Action', italic:false} );
-});
-
-/**
- * Get the first link found in the given array of links.
- */
-function getTopLink(links, bestMatch) {
-    if (bestMatch) {
-        return bestMatch;
-    }
-    if (links.length > 0) {
-        return links[0];
-    }
-    return null;
-}
-
-UnitTestSuite.testFunctionFor('getTopLink(classLinks, bestMatch)', function () {
-    var classLinkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component', 'java/awt/Component');
-    var classLinkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object', 'java/lang/Object');
-
-    assertThat('no links, best match undefined', getTopLink([]), is(null));
-    assertThat('one link, best match undefined', getTopLink([classLinkOne]), is(classLinkOne));
-    assertThat('two links, best match undefined', getTopLink([classLinkOne, classLinkTwo]), is(classLinkOne));
-    assertThat('no links, best match defined', getTopLink([], classLinkOne), is(classLinkOne));
-    assertThat('one link, best match defined', getTopLink([classLinkOne], classLinkTwo), is(classLinkTwo));
-});
-
-/**
- * Get the best match (if any) from the given array of links.
- */
-function getBestMatch(exactMatchCondition, links) {
-    var exactMatchLinks = links.filter(exactMatchCondition);
-    // If all of the links displayed in the search list are exact matches, do
-    // not display a best match.
-    if (exactMatchLinks.length === links.length) {
-        return null;
-    }
-    // If there is more than one exact match, choose the link with the shortest
-    // name to be the best match.
-    var bestMatch = null;
-    var bestMatchNameLength;
-    var name;
-    exactMatchLinks.forEach(function (link) {
-        name = (link.getType() === LinkType.PACKAGE ? link.getPackageName() : link.getCanonicalName());
-        if (!bestMatch || name.length < bestMatchNameLength) {
-            bestMatch = link;
-            bestMatchNameLength = name.length;
-        }
-    });
-    return bestMatch;
-}
-
-UnitTestSuite.testFunctionFor('getBestMatch(exactMatchCondition, links)', function () {
-    var javaIoPackage = new PackageLink('java.io');
-    var javaLangPackage = new PackageLink('java.lang');
-    var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
-    var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
-    var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
-    var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
-    var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
-
-    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
-        javaLangObjectClass, javaxSwingBorderFactoryClass,
-        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
-
-    var assertThatBestMatchFor = function (searchString, searchResult) {
-        var exactMatchCondition = RegexLibrary.createExactMatchCondition(searchString);
-        assertThat('Best match for: ' + searchString,
-                   getBestMatch(exactMatchCondition, allLinks),
-                   is(searchResult));
-    };
-
-    assertThatBestMatchFor('java.io', is(javaIoPackage));
-    assertThatBestMatchFor('j', is(null));
-    assertThatBestMatchFor('J', is(null));
-    assertThatBestMatchFor('Object', is(javaLangObjectClass));
-    assertThatBestMatchFor('O', is(null));
-    assertThatBestMatchFor('java.lang.Object', is(javaLangObjectClass));
-    assertThatBestMatchFor('JAVA.LANG.OBJECT', is(javaLangObjectClass));
-    assertThatBestMatchFor('org.omg.CORBA.Object', is(orgOmgCorbaObjectClass));
-    assertThatBestMatchFor('java.lang', is(javaLangPackage));
-    assertThatBestMatchFor('java.lang.', is(null));
-    assertThatBestMatchFor('java.*.o*e', is(null));
-    assertThatBestMatchFor('java.*.*o*e', is(null));
-    assertThatBestMatchFor('javax.swing.border.A', is(null));
 });
 
 function endsWith(stringOne, stringTwo) {
