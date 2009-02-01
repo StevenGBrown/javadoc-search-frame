@@ -1365,26 +1365,14 @@ AnchorsLoader.load = function (classLink, loadingCompleteCallback) {
     this.anchorLinks = null;
     this._loading(classLink);
     var anchorsLoader = this;
-    try {
-        var request = new XMLHttpRequest();
-        request.open('GET', classLink.getUrl(), true);
-        request.onreadystatechange = function () { 
-            if (request.readyState === 4 && request.responseText) { 
-                anchorsLoader._completed(request.responseText, classLink, loadingCompleteCallback);
-            }
-        };
-        request.send(null);
-    } catch(e) {
-        var p = {};
-        p.method = 'GET';
-        p.url = classLink.getUrl();
-        p.onreadystatechange = function (result) {
-            if (result.readyState === 4 && result.responseText) { 
-                anchorsLoader._completed(request.responseText, classLink, loadingCompleteCallback);
-            }
-        };
-        GM_xmlhttpRequest(p);
-    }
+    var request = new XMLHttpRequest();
+    request.open('GET', classLink.getUrl());
+    request.onreadystatechange = function () { 
+        if (request.readyState === 4 && request.responseText) { 
+            anchorsLoader._completed(request.responseText, classLink, loadingCompleteCallback);
+        }
+    };
+    request.send();
 };
 
 AnchorsLoader.cancel = function () {
