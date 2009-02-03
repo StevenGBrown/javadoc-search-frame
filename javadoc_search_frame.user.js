@@ -122,8 +122,6 @@ StopWatch.prototype.timeElapsed = function () {
  * @class Error Console logging utility.
  */
 Log = {
-    enabled : false,
-
     gmLogAvailable : function () {
         try {
             return GM_log;
@@ -134,22 +132,9 @@ Log = {
 };
 
 /**
- * Enable logging.
- * Before this function is called, the {@link Log#message} function will have no
- * effect.
- */
-Log.enable = function () {
-    this.enabled = true;
-};
-
-/**
  * Log the given object to the Error Console as a message.
  */
 Log.message = function (logMessage) {
-    if (!this.enabled) {
-        return;
-    }
-
     if (this.gmLogAvailable) {
         // Greasemonkey logging function.
         GM_log(logMessage);
@@ -1350,44 +1335,43 @@ AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
  * @class AnchorsLoader (undocumented).
  */
 AnchorsLoader = {
+    request : null,
     classLink : null,
     anchorLinks : null
 };
 
-AnchorsLoader.load = function (classLink, loadingCompleteCallback) {
+AnchorsLoader.load = function (classLink, callbacks) {
     if (this.classLink === classLink) {
         if (this.anchorLinks !== null) {
-            loadingCompleteCallback(this.anchorLinks);
+            callbacks.alreadyLoaded(this.anchorLinks);
         }
         return;
     }
     this.classLink = classLink;
     this.anchorLinks = null;
-    this._loading(classLink);
+    callbacks.loading(classLink);
     var anchorsLoader = this;
     var request = new XMLHttpRequest();
     request.open('GET', classLink.getUrl());
     request.onreadystatechange = function () { 
         if (request.readyState === 4 && request.responseText) { 
-            anchorsLoader._completed(request.responseText, classLink, loadingCompleteCallback);
+            anchorsLoader._completed(request.responseText, classLink, callbacks.loadingComplete);
         }
     };
     request.send();
+    this.request = request;
 };
 
 AnchorsLoader.cancel = function () {
+    if (this.request) {
+        this.request.abort();
+    }
+    this.request = null;
     this.classLink = null;
     this.anchorLinks = null;
 };
 
-AnchorsLoader._loading = function (classLink) {
-    View.setContentNodeHTML(classLink.getHTML() + '<p>loading...</p>');
-};
-
 AnchorsLoader._completed = function (responseText, classLink, loadingCompleteCallback) {
-    if (!Query.isAnchorMode() || this.classLink !== classLink) {
-        return;
-    }
     var names = this._getAnchorNames(responseText);
     this.anchorLinks = this._createAnchorLinkArray(classLink.getUrl(), names);
     loadingCompleteCallback(this.anchorLinks);
@@ -1412,7 +1396,7 @@ AnchorsLoader._createAnchorLinkArray = function (baseurl, names) {
 };
 
 AnchorsLoader._getAnchorNames = function (doc) {
-    var pat = /<A NAME=\"([^\"]+)\"/gi;
+    var pat = /<a name=\"([^\"]+)\"/gi;
     var i = 0;
     var matches;
     var names = [];
@@ -1594,35 +1578,54 @@ RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
  * @class Search (undocumented).
  */
 Search = {
-    previousEntireSearchString : null
+    previousEntireSearchString : null,
+    topLink : null
 };
 
-Search.update = function () {
+Search.perform = function (parameters) {
     var stopWatch = new StopWatch();
+    if (parameters) {
+        var forceUpdate = parameters.forceUpdate;
+        var suppressLogMessage = parameters.suppressLogMessage;
+    }
 
     var entireSearchString = Query.getEntireSearchString();
-    if (this.previousEntireSearchString === null || entireSearchString !== this.previousEntireSearchString) {
-        this.previousEntireSearchString = entireSearchString;
+    if (forceUpdate ||
+            this.previousEntireSearchString === null ||
+            entireSearchString !== this.previousEntireSearchString) {
 
-        this.PackagesAndClasses.update();
-        this.Anchors.update();
-        this.Menu.update();
+        var searchContext = {};
+        this.PackagesAndClasses.perform(searchContext, Query.getClassSearchString());
+        this.Anchors.perform(searchContext, Query.getAnchorSearchString());
+        this.Menu.perform(searchContext, Query.getMenuSearchString());
 
-        Log.message('\n' +
-            '\'' + entireSearchString + '\' in ' + stopWatch.timeElapsed() + '\n'
-        );
-
-        if (Query.isClassMode()) {
-            this._autoOpen(this.PackagesAndClasses.getTopLink());
-        } else if (Query.isAnchorMode()) {
-            this._autoOpen(this.Anchors.getTopLink());
+        if (searchContext.getContentNodeHTML) {
+            View.setContentNodeHTML(searchContext.getContentNodeHTML());
         }
+        this.topLink = searchContext.topAnchorLink || searchContext.topClassLink;
+
+        if (!suppressLogMessage) {
+            Log.message('\n' +
+                '\'' + entireSearchString + '\' in ' + stopWatch.timeElapsed() + '\n'
+            );
+        }
+
+        this._autoOpen();
     }
+
+    this.previousEntireSearchString = entireSearchString;
 };
 
-Search._autoOpen = function (link) {
-    if (link && UserPreference.AUTO_OPEN.getValue()) {
-        var url = link.getUrl();
+Search.getTopLinkURL = function () {
+    if (this.topLink) {
+        return this.topLink.getUrl();
+    }
+    return null;
+};
+
+Search._autoOpen = function () {
+    var url = this.getTopLinkURL();
+    if (url && UserPreference.AUTO_OPEN.getValue()) {
         Frames.openInSummaryFrame(url);
     }
 };
@@ -1639,23 +1642,11 @@ Search._autoOpen = function (link) {
  */
 Search.PackagesAndClasses = {
     previousQuery : null,
-    previousClassMode : null,
     currentLinks : null,
     topLink : null
 };
 
-Search.PackagesAndClasses.update = function () {
-    this._update();
-};
-
-Search.PackagesAndClasses.getTopLink = function () {
-    return this.topLink;
-};
-
-Search.PackagesAndClasses._update = function () {
-    var searchPerformed = false;
-
-    var searchString = Query.getClassSearchString();
+Search.PackagesAndClasses.perform = function (searchContext, searchString) {
     if (this.previousQuery === null || this.previousQuery !== searchString) {
         var condition = RegexLibrary.createCondition(searchString);
         var exactMatchCondition = RegexLibrary.createExactMatchCondition(searchString);
@@ -1671,16 +1662,17 @@ Search.PackagesAndClasses._update = function () {
         this.currentLinks = this.currentLinks.filter(condition);
         var bestMatch = this._getBestMatch(exactMatchCondition, this.currentLinks);
         this.topLink = this._getTopLink(this.currentLinks, bestMatch);
-        searchPerformed = true;
-    }
-
-    if (Query.isClassMode() && (searchPerformed || !this.previousClassMode) || !this.topLink) {
-        var html = this._constructHTML(this.currentLinks, bestMatch);
-        View.setContentNodeHTML(html);
     }
 
     this.previousQuery = searchString;
-    this.previousClassMode = Query.isClassMode();
+
+    var constructHTML = this._constructHTML;
+    var currentLinks = this.currentLinks;
+    searchContext.getContentNodeHTML = function () {
+        return constructHTML(currentLinks, bestMatch);
+    };
+
+    searchContext.topClassLink = this.topLink;
 };
 
 Search.PackagesAndClasses._getTopLink = function (links, bestMatch) {
@@ -1801,34 +1793,37 @@ Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
 /**
  * @class Search.Anchors (undocumented).
  */
-Search.Anchors = {
-    topLink : null
-};
+Search.Anchors = {};
 
-Search.Anchors.update = function () {
-    var topClassLink = Search.PackagesAndClasses.getTopLink();
-    if (Query.isClassMode() || !topClassLink) {
+Search.Anchors.perform = function (searchContext, searchString) {
+    var topClassLink = searchContext.topClassLink;
+
+    if (searchString === null || !topClassLink) {
         AnchorsLoader.cancel();
         return;
     }
 
     var searchAnchors = this;
-    AnchorsLoader.load(topClassLink, function (anchorLinks) {
-        var searchString = Query.getAnchorSearchString();
-        var condition = RegexLibrary.createCondition(searchString);
-        searchAnchors._append(topClassLink, anchorLinks, condition);
+    AnchorsLoader.load(topClassLink, {
+        alreadyLoaded : function (anchorLinks) {
+            var condition = RegexLibrary.createCondition(searchString);
+            searchAnchors._append(searchContext, topClassLink, anchorLinks, condition);
+            searchContext.anchorLinksLoaded = true;
+        },
+        loading : function () {
+            searchContext.contentNodeHTML = topClassLink.getHTML() + '<p>loading...</p>';
+        },
+        loadingComplete : function () {
+            Search.perform({forceUpdate : true});
+        }
     });
 };
 
-Search.Anchors.getTopLink = function () {
-    return this.topLink;
-};
-
-Search.Anchors._append = function (topClassLink, anchorLinks, condition) {
+Search.Anchors._append = function (searchContext, topClassLink, anchorLinks, condition) {
     var matchingAnchorLinks = anchorLinks.filter(condition);
-    this.topLink = matchingAnchorLinks.length > 0 ? matchingAnchorLinks[0] : null;
+    searchContext.topAnchorLink = matchingAnchorLinks.length > 0 ? matchingAnchorLinks[0] : null;
 
-    if (Query.isAnchorMode() || !this.topLink) {
+    searchContext.getContentNodeHTML = function () {
         var html = '';
         if (matchingAnchorLinks.length === 0) {
             html += 'No search results.';
@@ -1837,8 +1832,8 @@ Search.Anchors._append = function (topClassLink, anchorLinks, condition) {
                 html += anchorLink.getHTML();
             });
         }
-        View.setContentNodeHTML(topClassLink.getHTML() + '<p>' + html + '</p>');
-    }
+        return topClassLink.getHTML() + '<p>' + html + '</p>';
+    };
 };
 
 
@@ -1855,48 +1850,41 @@ Search.Menu = {
     menuReplacement : null
 };
 
-Search.Menu.update = function () {
-    if (!Query.isMenuMode()) {
+Search.Menu.perform = function (searchContext, searchString) {
+    var topClassLink = searchContext.topClassLink;
+    var topAnchorLink = searchContext.topAnchorLink;
+
+    if (searchString === null || !searchContext.anchorLinksLoaded ||
+            (!topClassLink && topAnchorLink === undefined) || topAnchorLink === null) {
         return;
     }
 
-    var topClassLink = Search.PackagesAndClasses.getTopLink();
-    var topAnchorLink = Search.Anchors.getTopLink();
-
-    var menu;
-    if (Query.getAnchorSearchString() !== null) {
-        if (!topAnchorLink) {
-            return;
+    var menu = this._createMenu(topClassLink, topAnchorLink);
+    searchContext.getContentNodeHTML = function () {
+        var html = topClassLink.getHTML();
+        if (topAnchorLink) {
+            html += '<br/>' + topAnchorLink.getHTML();
         }
-        menu = this._createMenu(topClassLink, topAnchorLink);
-        View.setContentNodeHTML(
-            Search.PackagesAndClasses.getTopLink().getHTML() + '<br/>' +
-            Search.Anchors.getTopLink().getHTML() +
-            '<p>' + menu + '</p>');
-    } else {
-        if (!topClassLink) {
-            return;
-        }
-        menu = this._createMenu(topClassLink);
-        View.setContentNodeHTML(Search.PackagesAndClasses.getTopLink().getHTML() + '<p>' + menu + '</p>');
-    }
+        html += '<p>' + menu + '</p>';
+        return html;
+    };
 
-    var searchString = Query.getMenuSearchString();
     if (!searchString) {
         return;
     }
 
-    var node = View.getContentNode();
-    var xpathResult = document.evaluate('//a', node, null, 
+    var node = document.createElement('p');
+    node.innerHTML = menu;
+    var xpathResult = document.evaluate('//a', node, null,
                                         XPathResult.ANY_TYPE, null);
-    var node;
-    while ((node = xpathResult.iterateNext()) !== null) {
-        var textNode = node.firstChild;
+    var anchorNode;
+    while ((anchorNode = xpathResult.iterateNext()) !== null) {
+        var textNode = anchorNode.firstChild;
         if (textNode
                 && textNode.nodeType === 3 /* Node.TEXT_NODE */
                 && textNode.nodeValue.indexOf('@' + searchString) === 0) {
-            Frames.openInSummaryFrame(node.getAttribute('href'), true);
-            search();
+            Frames.openInSummaryFrame(anchorNode.getAttribute('href'), true);
+            Search.perform();
             return;
         }
     }
@@ -1994,7 +1982,7 @@ function init() {
     // Perform an initial search. This will populate the class frame with the
     // entire list of packages and classes.
     var initialSearchStopWatch = new StopWatch();
-    search();
+    Search.perform({suppressLogMessage : true});
     initialSearchStopWatch.stop();
 
     // Run the unit test.
@@ -2017,7 +2005,6 @@ function init() {
     View.focusOnSearchField();
     focusSearchFieldStopWatch.stop();
 
-    Log.enable();
     Log.message('\n' +
         'initialised in ' + initStopWatch.timeElapsed() + ' total\n' +
         '- contents of existing frames retrieved in ' + retrieveInnerHtmlStopWatch.timeElapsed() + '\n' +
@@ -2029,13 +2016,6 @@ function init() {
             '- package frame hidden in ' + hidePackageFrameStopWatch.timeElapsed() + '\n' : '') +
         '- search field given focus in ' + focusSearchFieldStopWatch.timeElapsed() + '\n'
     );
-}
-
-/**
- * Perform a search.
- */
-function search() {
-    Search.update();
 }
 
 /**
@@ -2376,7 +2356,7 @@ EventHandlers.searchFieldKeyup = function (e) {
 
 EventHandlers.searchFieldChanged = function (input) {
     Query.input(input);
-    search();
+    Search.perform();
 };
 
 EventHandlers.searchFieldFocus = function (e) {
@@ -2386,7 +2366,7 @@ EventHandlers.searchFieldFocus = function (e) {
 EventHandlers.eraseButtonClick = function () {
     Query.erase();
     View.focusOnSearchField();
-    search();
+    Search.perform();
 };
 
 EventHandlers.settingsLinkClicked = function () {
@@ -2402,15 +2382,9 @@ EventHandlers.unitTestResultsLinkClicked = function () {
 EventHandlers._returnKeyPressed = function (controlModifier) {
     var searchFieldValue = View.getSearchFieldValue();
     Query.input(searchFieldValue);
-    search();
+    Search.perform();
 
-    var url = null;
-    if (Query.isClassMode() && Search.PackagesAndClasses.getTopLink()) {
-        url = Search.PackagesAndClasses.getTopLink().getUrl();
-    } else if (Query.isAnchorMode()) {
-        url = Search.Anchors.getTopLink().getUrl();
-    }
-
+    var url = Search.getTopLinkURL();
     if (url) {
         if (controlModifier) {
             window.open(url);
@@ -2424,7 +2398,7 @@ EventHandlers._escapeKeyPressed = function () {
     var searchFieldValue = View.getSearchFieldValue();
     if (searchFieldValue) {
         Query.erase();
-        search();
+        Search.perform();
     }
 };
 
