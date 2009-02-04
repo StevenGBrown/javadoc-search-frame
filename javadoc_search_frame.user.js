@@ -1122,19 +1122,6 @@ Query = {
     menuSearchString : null
 };
 
-Query.isClassMode = function () {
-    return !this.isAnchorMode() && !this.isMenuMode();
-};
-
-Query.isAnchorMode = function () {
-    return this.anchorSearchString !== null &&
-           this.menuSearchString === null;
-};
-
-Query.isMenuMode = function () {
-    return this.menuSearchString !== null;
-};
-
 Query.getClassSearchString = function () {
     return this.classSearchString;
 };
@@ -1172,11 +1159,7 @@ Query.erase = function () {
 
 Query._processInput = function (input) {
     var searchString;
-    if (this.isClassMode()) {
-        searchString = input;
-    } else if (this.isAnchorMode()) {
-        searchString = this.classSearchString + input;
-    } else if (this.isMenuMode()) {
+    if (this.menuSearchString !== null) {
         searchString = this.classSearchString;
         if (this.anchorSearchString !== null) {
             searchString += '#' + this.anchorSearchString;
@@ -1184,6 +1167,10 @@ Query._processInput = function (input) {
         if (input.indexOf('@') !== -1) {
             searchString += input;
         }
+    } else if (this.anchorSearchString !== null) {
+        searchString = this.classSearchString + input;
+    } else {
+        searchString = input;
     }
 
     var tokens = [];
@@ -1204,12 +1191,12 @@ Query._processInput = function (input) {
 };
 
 Query._processErase = function () {
-    if (this.isClassMode()) {
-        this.classSearchString = '';
-    } else if (this.isAnchorMode()) {
-        this.anchorSearchString = null;
-    } else if (this.isMenuMode()) {
+    if (this.menuSearchString !== null) {
         this.menuSearchString = null;
+    } else if (this.anchorSearchString !== null) {
+        this.anchorSearchString = null;
+    } else {
+        this.classSearchString = '';
     }
 };
 
