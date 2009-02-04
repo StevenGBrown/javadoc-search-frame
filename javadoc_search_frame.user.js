@@ -588,10 +588,16 @@ WebPage.SETTINGS = {
             }
             textAreaHTML += '>' + preference.getValue() + '</textarea>';
 
+            var restoreDefaultButtonHTML = '<input id="' + restoreDefaultButtonId + '"';
+            if (!UserPreference.canGetAndSet()) {
+                restoreDefaultButtonHTML += ' disabled="true"';
+            }
+            restoreDefaultButtonHTML += ' type=button value="Restore Default"/>';
+
             return  '<p>\n' +
                     '<b>' + key + '</b><br/>\n' +
                     textAreaHTML + '<br/>\n' +
-                    '<input id="' + restoreDefaultButtonId + '" type=button value="Restore Default"/><br/>\n' +
+                    restoreDefaultButtonHTML + '<br/>\n' +
                     text + '\n' +
                     '</p>\n';
         },
