@@ -541,6 +541,38 @@ WebPage = {};
  */
 WebPage.SETTINGS = {
     privateFunctions : {
+        createTable : function (pageDocument, title, subTitle, contents) {
+            var tableElement = pageDocument.createElement('table');
+            tableElement.style.borderStyle = 'groove';
+            tableElement.style.borderColor = 'blue';
+            tableElement.style.borderWidth = 'thick';
+
+            var headerTableRow = pageDocument.createElement('tr');
+            headerTableRow.style.backgroundColor = '#AFEEEE';
+            tableElement.appendChild(headerTableRow);
+
+            var headerTableDataElement = pageDocument.createElement('td');
+            var headerInnerHTML = '<b>' + title + '</b>';
+            if (subTitle) {
+                headerInnerHTML += '<br/>' + subTitle;
+            }
+            headerTableDataElement.innerHTML = headerInnerHTML;
+            headerTableRow.appendChild(headerTableDataElement);
+
+            var contentsTableRow = pageDocument.createElement('tr');
+            contentsTableRow.style.backgroundColor = '#F0FFF0';
+            tableElement.appendChild(contentsTableRow);
+
+            var contentsTableDataElement = pageDocument.createElement('td');
+            contentsTableRow.appendChild(contentsTableDataElement);
+
+            var contentsParagraphElement = pageDocument.createElement('p');
+            contentsParagraphElement.innerHTML = contents;
+            contentsTableDataElement.appendChild(contentsParagraphElement);
+
+            return tableElement;
+        },
+
         radioButton : function (args) {
             var radioButtonHTML = '<label>' +
                     '<input id="' + args.id + '" type=radio name="' + args.name + '" value="true"';
@@ -558,7 +590,7 @@ WebPage.SETTINGS = {
             return radioButtonHTML;
         },
 
-        booleanOption : function (preference, trueText, falseText) {
+        booleanOption : function (pageDocument, preference, title, trueText, falseText) {
             var key = preference.getKey();
             var trueChecked = preference.getValue();
             var trueDefault = preference.getDefaultValue();
@@ -570,19 +602,17 @@ WebPage.SETTINGS = {
                     name : key, id : key + '_false', text : falseText,
                     isChecked : !trueChecked, isDisabled : !UserPreference.canGetAndSet(), isDefault : !trueDefault});
 
-            return  '<p>\n' +
-                    '<b>' + key + '</b><br/>\n' +
-                    trueRadioButtonHTML + '<br/>\n' +
-                    falseRadioButtonHTML + '<br/>\n' +
-                    '</p>\n';
+            return this.createTable(pageDocument, title, '',
+                    trueRadioButtonHTML + '<br/>' +
+                    falseRadioButtonHTML);
         },
 
-        menuOption : function (preference, text) {
+        menuOption : function (pageDocument, preference, title, subTitle) {
             var key = preference.getKey();
             var textAreaId = key + '_text_area';
             var restoreDefaultButtonId = key + '_restore_default_button';
 
-            var textAreaHTML = '<textarea id="' + textAreaId + '" rows="5" cols="100" wrap="off"';
+            var textAreaHTML = '<textarea id="' + textAreaId + '" rows="5" cols="150" wrap="off"';
             if (!UserPreference.canGetAndSet()) {
                 textAreaHTML += ' disabled="true"';
             }
@@ -594,30 +624,26 @@ WebPage.SETTINGS = {
             }
             restoreDefaultButtonHTML += ' type=button value="Restore Default"/>';
 
-            return  '<p>\n' +
-                    '<b>' + key + '</b><br/>\n' +
-                    textAreaHTML + '<br/>\n' +
-                    restoreDefaultButtonHTML + '<br/>\n' +
-                    text + '\n' +
-                    '</p>\n';
+            return this.createTable(pageDocument, title, subTitle,
+                    textAreaHTML + '<br/>' +
+                    restoreDefaultButtonHTML);
         },
 
-        getInstructions : function () {
-            var instructions = '<p>\n';
+        getInstructions : function (pageDocument) {
+            var instructionsElement = pageDocument.createElement('p');
             if (UserPreference.canGetAndSet()) {
-                instructions += 'Changes to these preferences will take effect the next time a ' +
-                                'Javadoc page in opened in your browser. Alternatively, refresh ' +
-                                'a currently open Javadoc page to have these preferences take ' +
-                                'effect immediately.\n';
+                instructionsElement.innerHTML =
+                        'Changes to these preferences will take effect the next time a ' +
+                        'Javadoc page in opened in your browser. Alternatively, refresh ' +
+                        'a currently open Javadoc page to have these preferences take ' +
+                        'effect immediately.';
             } else {
-                instructions +=
-                        '<font color=RED>\n' +
-                        'Settings cannot be configured. The GM_getValue and GM_setValue ' +
-                        'functions are not supported by your browser.\n' +
-                        '</font>\n';
+                instructionsElement.innerHTML =
+                        'Settings cannot be configured. The <code>GM_getValue</code> and ' +
+                        '<code>GM_setValue</code> functions are not supported by your browser.';
+                instructionsElement.style.color = 'red';
             }
-            instructions += '</p>\n';
-            return instructions;
+            return instructionsElement;
         },
 
         registerBooleanOptionEventListeners : function (pageDocument, preference) {
@@ -652,18 +678,27 @@ WebPage.SETTINGS = {
 
     title : 'Settings',
 
-    getContents : function () {
-        var instructions = this.privateFunctions.getInstructions();
-        var autoOpenHTML = this.privateFunctions.booleanOption(UserPreference.AUTO_OPEN,
-                'Automatically open the first package or class in the list after each search.',
-                'Wait for the Enter key to be pressed');
-        var classMenuHTML = this.privateFunctions.menuOption(UserPreference.CLASS_MENU,
-                'Menu displayed when pressing the \'@\' key if a class is currently displayed ' +
+    getContents : function (pageDocument) {
+        var instructionsElement = this.privateFunctions.getInstructions(pageDocument);
+        var autoOpenElement = this.privateFunctions.booleanOption(
+                pageDocument, UserPreference.AUTO_OPEN, 'Automatic Opening of Links',
+                'On. Automatically open the first package, class or method in the list after each search.',
+                'Off. Wait for the <tt>Enter</tt> key to be pressed.');
+        var classMenuElement = this.privateFunctions.menuOption(
+                pageDocument, UserPreference.CLASS_MENU, 'Class/Method Menu',
+                'Menu displayed when pressing the <tt>@</tt> key if a class or method is ' +
+                'currently displayed at the top of the search list.');
+        var packageMenuElement = this.privateFunctions.menuOption(
+                pageDocument, UserPreference.PACKAGE_MENU, 'Package Menu',
+                'Menu displayed when pressing the <tt>@</tt> key if a package is currently displayed ' +
                 'at the top of the search list.');
-        var packageMenuHTML = this.privateFunctions.menuOption(UserPreference.PACKAGE_MENU,
-                'Menu displayed when pressing the \'@\' key if a package is currently displayed ' +
-                'at the top of the search list.');
-        return instructions + autoOpenHTML + classMenuHTML + packageMenuHTML;
+
+        return [
+            instructionsElement, pageDocument.createElement('p'),
+            autoOpenElement,     pageDocument.createElement('p'),
+            classMenuElement,    pageDocument.createElement('p'),
+            packageMenuElement
+        ];
     },
 
     registerEventListeners : function (pageDocument) {
@@ -750,7 +785,7 @@ WebPage.UNIT_TEST_RESULTS = {
 
     title : 'Unit Test Results',
 
-    getContents : function () {
+    getContents : function (pageDocument) {
         var unitTestResult = UnitTestSuite.run();
         var resultsText = '';
         resultsText += this.privateFunctions.getSummary(unitTestResult);
@@ -761,7 +796,9 @@ WebPage.UNIT_TEST_RESULTS = {
                     resultForFunctionUnderTest.functionUnderTest, resultForFunctionUnderTest.results);
         }, this);
 
-        return resultsText;
+        var contentsElement = pageDocument.createElement('p');
+        contentsElement.innerHTML = resultsText;
+        return [contentsElement];
     },
 
     open : function () {
@@ -774,21 +811,27 @@ WebPage.UNIT_TEST_RESULTS = {
  * @private
  */
 WebPage._open = function (page) {
-    var pageBodyInnerHTML = '';
-    pageBodyInnerHTML +=
-            '<h1>' + SCRIPT_META_DATA.name + '</h1>\n' +
-            '<p>\n' +
-            'Version: ' + SCRIPT_META_DATA.version + '<br/>\n' +
-            '<a href="' + SCRIPT_META_DATA.homepage + '">' + SCRIPT_META_DATA.homepage + '</a>\n' +
-            '</p>\n' +
-            '<hr/>\n' +
-            '<p><h2>' + page.title + '</h2></p>\n' +
-            '<hr/>\n';
-    pageBodyInnerHTML += page.getContents();
-
     var summaryFrame = Frames.getSummaryFrame();
     var pageDocument = summaryFrame.document;
-    pageDocument.body.innerHTML = pageBodyInnerHTML;
+
+    while (pageDocument.body.firstChild) {
+        pageDocument.body.removeChild(pageDocument.body.firstChild);
+    }
+
+    var headerElement = pageDocument.createElement('p');
+    headerElement.innerHTML =
+            '<table width="100%"><tr><td align="left">' +
+            '<h2>' + page.title + '</h2>' +
+            '</td><td align="right">' +
+            '<a href="' + SCRIPT_META_DATA.homepage + '">' + SCRIPT_META_DATA.name + '</a><br/>' +
+            '<i>' + SCRIPT_META_DATA.version + '</i>' +
+            '</td></tr></table>' +
+            '<hr/>';
+    pageDocument.body.appendChild(headerElement);
+
+    page.getContents(pageDocument).forEach(function (pageElement) {
+        pageDocument.body.appendChild(pageElement);
+    });
 
     if (page.registerEventListeners) {
         page.registerEventListeners(pageDocument);
@@ -1074,7 +1117,7 @@ View._createEraseButton = function (eventHandlers) {
 View._createSettingsLink = function (eventHandlers) {
     var anchorElement = document.createElement('a');
     anchorElement.setAttribute('href', 'javascript:void(0);');
-    anchorElement.appendChild(document.createTextNode(WebPage.SETTINGS.title));
+    anchorElement.textContent = WebPage.SETTINGS.title;
     anchorElement.addEventListener('click', eventHandlers.settingsLinkClicked, false);
     var fontElement = document.createElement('font');
     fontElement.setAttribute('size', '-2');
@@ -1085,7 +1128,7 @@ View._createSettingsLink = function (eventHandlers) {
 View._createUnitTestFailedWarning = function (eventHandlers) {
     var anchorElement = document.createElement('a');
     anchorElement.setAttribute('href', 'javascript:void(0);');
-    anchorElement.appendChild(document.createTextNode('Unit test failed. Click here for details.'));
+    anchorElement.textContent = 'Unit test failed. Click here for details.';
     anchorElement.addEventListener('click', eventHandlers.unitTestResultsLinkClicked, false);
     var fontElement = document.createElement('font');
     fontElement.setAttribute('size', '-2');
