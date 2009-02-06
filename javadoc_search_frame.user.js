@@ -5,6 +5,7 @@
 // @homepage      http://code.google.com/p/javadoc-search-frame
 // @version       DEVELOPMENT
 // @include       */allclasses-frame.html
+// @include       */package-frame.html
 // ==/UserScript==
 
 var SCRIPT_META_DATA = {
@@ -447,6 +448,11 @@ UserPreference.AUTO_OPEN = new UserPreference('auto_open', false);
 /**
  * @field
  */
+UserPreference.HIDE_PACKAGE_FRAME = new UserPreference('hide_package_frame', true);
+
+/**
+ * @field
+ */
 UserPreference.PACKAGE_MENU = new UserPreference('package_menu',
         "<a href='http://www.koders.com/?s=##PACKAGE_NAME##' target='classFrame'>@1:search(koders)</a><br/>\n" +
         "<a href='http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##' target='classFrame'>@2:search(Docjar)</a><br/>\n");
@@ -684,6 +690,10 @@ WebPage.SETTINGS = {
                 pageDocument, UserPreference.AUTO_OPEN, 'Automatic Opening of Links',
                 'On. Automatically open the first package, class or method in the list after each search.',
                 'Off. Wait for the <tt>Enter</tt> key to be pressed.');
+        var hidePackageFrameElement = this.privateFunctions.booleanOption(
+                pageDocument, UserPreference.HIDE_PACKAGE_FRAME, 'Merge the Package and Class Frames',
+                'Yes. All packages and classes can be searched using a single combined frame.',
+                'No. The package frame will not be hidden. Only one package can be searched at a time.');
         var classMenuElement = this.privateFunctions.menuOption(
                 pageDocument, UserPreference.CLASS_MENU, 'Class/Method Menu',
                 'Menu displayed when pressing the <tt>@</tt> key if a class or method is ' +
@@ -694,15 +704,17 @@ WebPage.SETTINGS = {
                 'at the top of the search list.');
 
         return [
-            instructionsElement, pageDocument.createElement('p'),
-            autoOpenElement,     pageDocument.createElement('p'),
-            classMenuElement,    pageDocument.createElement('p'),
+            instructionsElement,     pageDocument.createElement('p'),
+            autoOpenElement,         pageDocument.createElement('p'),
+            hidePackageFrameElement, pageDocument.createElement('p'),
+            classMenuElement,        pageDocument.createElement('p'),
             packageMenuElement
         ];
     },
 
     registerEventListeners : function (pageDocument) {
         this.privateFunctions.registerBooleanOptionEventListeners(pageDocument, UserPreference.AUTO_OPEN);
+        this.privateFunctions.registerBooleanOptionEventListeners(pageDocument, UserPreference.HIDE_PACKAGE_FRAME);
         this.privateFunctions.registerMenuOptionEventListeners(pageDocument, UserPreference.CLASS_MENU);
         this.privateFunctions.registerMenuOptionEventListeners(pageDocument, UserPreference.PACKAGE_MENU);
     },
@@ -2007,7 +2019,11 @@ function init() {
     var searchListStopWatch = new StopWatch();
     var packageLinks = getPackageLinks(packagesInnerHTML);
     var classLinks = getClassLinks(classesInnerHTML);
-    ALL_LINKS = packageLinks.concat(classLinks);
+    if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
+        ALL_LINKS = packageLinks.concat(classLinks);
+    } else {
+        ALL_LINKS = classLinks;
+    }
     if (ALL_LINKS.length === 0) {
         return false;
     }
@@ -2033,7 +2049,7 @@ function init() {
     unitTestStopWatch.stop();
 
     // Hide the package list frame.
-    if (Frames.getAllPackagesFrame()) {
+    if (Frames.getAllPackagesFrame() && UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
         var hidePackageFrameStopWatch = new StopWatch();
         Frames.hideAllPackagesFrame();
         hidePackageFrameStopWatch.stop();
