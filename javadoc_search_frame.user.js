@@ -2424,12 +2424,12 @@ EventHandlers.eraseButtonClick = function () {
     Search.perform();
 };
 
-EventHandlers.settingsLinkClicked = function () {
+EventHandlers.settingsLinkClicked = function (event) {
     WebPage.SETTINGS.open();
     event.preventDefault();
 };
 
-EventHandlers.unitTestResultsLinkClicked = function () {
+EventHandlers.unitTestResultsLinkClicked = function (event) {
     WebPage.UNIT_TEST_RESULTS.open();
     event.preventDefault();
 };
