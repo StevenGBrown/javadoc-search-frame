@@ -1334,15 +1334,16 @@ AnchorsLoader = {
 };
 
 AnchorsLoader.load = function (classLink, callbacks) {
+    if (this.classLink === classLink && this.anchorLinks) {
+        callbacks.alreadyLoaded(this.anchorLinks);
+        return;
+    }
+    callbacks.loading(classLink);
     if (this.classLink === classLink) {
-        if (this.anchorLinks !== null) {
-            callbacks.alreadyLoaded(this.anchorLinks);
-        }
         return;
     }
     this.classLink = classLink;
     this.anchorLinks = null;
-    callbacks.loading(classLink);
     var anchorsLoader = this;
     var request = new XMLHttpRequest();
     request.open('GET', classLink.getUrl());
@@ -1804,7 +1805,9 @@ Search.Anchors.perform = function (searchContext, searchString) {
             searchContext.anchorLinksLoaded = true;
         },
         loading : function () {
-            searchContext.contentNodeHTML = topClassLink.getHTML() + '<p>loading...</p>';
+            searchContext.getContentNodeHTML = function () {
+                return topClassLink.getHTML() + '<p>loading...</p>';
+            };
         },
         loadingComplete : function () {
             Search.perform({forceUpdate : true});
