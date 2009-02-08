@@ -1846,7 +1846,6 @@ Search.Anchors = {};
 
 Search.Anchors.perform = function (searchContext, searchString) {
     var topClassLink = searchContext.topClassLink;
-
     if (searchString === null || !topClassLink) {
         AnchorsLoader.cancel();
         return;
@@ -1857,12 +1856,12 @@ Search.Anchors.perform = function (searchContext, searchString) {
         alreadyLoaded : function (anchorLinks) {
             var condition = RegexLibrary.createCondition(searchString);
             searchAnchors._append(searchContext, topClassLink, anchorLinks, condition);
-            searchContext.anchorLinksLoaded = true;
         },
         loading : function () {
             searchContext.getContentNodeHTML = function () {
                 return topClassLink.getHTML() + '<p>loading...</p>';
             };
+            searchContext.anchorLinksLoading = true;
         },
         loadingComplete : function () {
             Search.perform({forceUpdate : true});
@@ -1905,8 +1904,9 @@ Search.Menu.perform = function (searchContext, searchString) {
     var topClassLink = searchContext.topClassLink;
     var topAnchorLink = searchContext.topAnchorLink;
 
-    if (searchString === null || !searchContext.anchorLinksLoaded ||
-            (!topClassLink && topAnchorLink === undefined) || topAnchorLink === null) {
+    var performMenuSearch = searchString !== null && topClassLink &&
+            !searchContext.anchorLinksLoading && topAnchorLink !== null;
+    if (!performMenuSearch) {
         return;
     }
 
