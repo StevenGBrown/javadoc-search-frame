@@ -70,7 +70,10 @@ var SEARCH_ACCESS_KEY = 's';
  */
 var ERASE_ACCESS_KEY = 'a';
 
-var ALL_LINKS = [];
+/**
+ * Array of all package and class links.
+ */
+var ALL_PACKAGE_AND_CLASS_LINKS = [];
 
 
 /*
@@ -1711,7 +1714,7 @@ Search.PackagesAndClasses.perform = function (searchContext, searchString) {
             // with the current search list and filter out any links that do not match.
         } else {
             // Otherwise, start with the complete search list.
-            this.currentLinks = ALL_LINKS.concat();
+            this.currentLinks = ALL_PACKAGE_AND_CLASS_LINKS.concat();
         }
 
         var condition = RegexLibrary.createCondition(searchString);
@@ -2033,16 +2036,16 @@ function init() {
     var classesInnerHTML = getClassesInnerHtml();
     retrieveInnerHtmlStopWatch.stop();
 
-    // Initialise stored class links.
+    // Initialise stored package and class links.
     var searchListStopWatch = new StopWatch();
     var packageLinks = getPackageLinks(packagesInnerHTML);
     var classLinks = getClassLinks(classesInnerHTML);
     if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
-        ALL_LINKS = packageLinks.concat(classLinks);
+        ALL_PACKAGE_AND_CLASS_LINKS = packageLinks.concat(classLinks);
     } else {
-        ALL_LINKS = classLinks;
+        ALL_PACKAGE_AND_CLASS_LINKS = classLinks;
     }
-    if (ALL_LINKS.length === 0) {
+    if (ALL_PACKAGE_AND_CLASS_LINKS.length === 0) {
         return false;
     }
     searchListStopWatch.stop();
