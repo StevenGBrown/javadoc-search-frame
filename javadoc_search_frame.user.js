@@ -1485,6 +1485,8 @@ RegexLibrary.createCondition = function (searchString) {
 };
 
 UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
+    var javaAwtGeomPoint2DClass = new ClassLink(LinkType.CLASS, 'java.awt.geom', 'Point2D');
+    var javaAwtGeomPoint2DDoubleClass = new ClassLink(LinkType.CLASS, 'java.awt.geom', 'Point2D.Double');
     var javaIoPackage = new PackageLink('java.io');
     var javaLangPackage = new PackageLink('java.lang');
     var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
@@ -1493,9 +1495,9 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
     var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
     var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
 
-    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
-        javaLangObjectClass, javaxSwingBorderFactoryClass,
-        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
+    var allLinks = [ javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass,
+        javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
+        javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
 
     var assertThatSearchResultFor = function (searchString, searchResult) {
         assertThat('Search for: ' + searchString,
@@ -1506,10 +1508,12 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
     assertThatSearchResultFor('java.io',
             is([javaIoPackage, javaIoCloseableClass]));
     assertThatSearchResultFor('j',
-            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
+            is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass, javaIoPackage,
+                javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
                 javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
     assertThatSearchResultFor('J',
-            is([javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
+            is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass, javaIoPackage,
+                javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
                 javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
     assertThatSearchResultFor('Object',
             is([javaLangObjectClass, orgOmgCorbaObjectClass]));
@@ -1526,11 +1530,15 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
     assertThatSearchResultFor('java.*.o*e',
             is([javaLangObjectClass]));
     assertThatSearchResultFor('java.*.*o*e',
-            is([javaIoCloseableClass, javaLangObjectClass]));
+            is([javaAwtGeomPoint2DDoubleClass, javaIoCloseableClass, javaLangObjectClass]));
     assertThatSearchResultFor('java.**.***o**e*',
-            is([javaIoCloseableClass, javaLangObjectClass]));
+            is([javaAwtGeomPoint2DDoubleClass, javaIoCloseableClass, javaLangObjectClass]));
     assertThatSearchResultFor('javax.swing.border.A',
             is([javaxSwingBorderAbstractBorderClass]));
+    assertThatSearchResultFor('PoiD',
+            is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
+    assertThatSearchResultFor('PoiDD',
+            is([javaAwtGeomPoint2DDoubleClass]));
 });
 
 RegexLibrary.createCaseInsensitiveExactMatchCondition = function (searchString) {
@@ -1569,9 +1577,9 @@ RegexLibrary._getRegex = function (searchString) {
             // number of lowercase characters to be matched before it. This
             // allows for Camel Case searching.
 
-            // The \.? term allows a Camel Case search to match an inner class.
+            // The \\\.? term allows a Camel Case search to match an inner class.
 
-            pattern += '(([a-z]*\.?' + character + ')|' + character.toLowerCase() + ')';
+            pattern += '(([a-z\\d]*\\\.?' + character + ')|' + character.toLowerCase() + ')';
         } else if (/[a-zA-Z]/.test(character)) {
             // A lowercase character, or an uppercase character at the
             // beginning of the search input string. Perform a case-insensitive
