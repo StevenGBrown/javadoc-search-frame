@@ -1474,7 +1474,7 @@ RegexLibrary.createCondition = function (searchString) {
         };
     }
 
-    var pattern = this.getRegex(searchString);
+    var pattern = this._getRegex(searchString);
 
     return function (link) {
         return link.matches(pattern);
@@ -1530,21 +1530,29 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
             is([javaxSwingBorderAbstractBorderClass]));
 });
 
-RegexLibrary.createExactMatchCondition = function (searchString) {
+RegexLibrary.createCaseInsensitiveExactMatchCondition = function (searchString) {
+    return this._createExactMatchCondition(searchString, false);
+};
+
+RegexLibrary.createCaseSensitiveExactMatchCondition = function (searchString) {
+    return this._createExactMatchCondition(searchString, true);
+};
+
+RegexLibrary._createExactMatchCondition = function (searchString, caseSensitive) {
     if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
         return function (link) {
             return false;
         };
     }
 
-    var pattern = this.getExactMatchRegex(searchString);
+    var pattern = this._getExactMatchRegex(searchString, caseSensitive);
 
     return function (link) {
         return link.matches(pattern);
     };
 };
 
-RegexLibrary.getRegex = function (searchString) {
+RegexLibrary._getRegex = function (searchString) {
     searchString = searchString.replace(/\*{2,}/g, '*');
 
     var pattern = '^';
@@ -1589,12 +1597,12 @@ RegexLibrary.getRegex = function (searchString) {
     return new RegExp(pattern);
 };
 
-UnitTestSuite.testFunctionFor('RegexLibrary.getRegex()', function () {
+UnitTestSuite.testFunctionFor('RegexLibrary._getRegex()', function () {
     assertThat('excess asterisk characters are removed',
-               RegexLibrary.getRegex('java.**.***o**e*').pattern, is(RegexLibrary.getRegex('java.*.*o*e').pattern));
+               RegexLibrary._getRegex('java.**.***o**e*').pattern, is(RegexLibrary._getRegex('java.*.*o*e').pattern));
 });
 
-RegexLibrary.getExactMatchRegex = function (searchString) {
+RegexLibrary._getExactMatchRegex = function (searchString, caseSensitive) {
     var pattern = '^';
 
     for (i = 0; i < searchString.length; i++) {
@@ -1607,7 +1615,7 @@ RegexLibrary.getExactMatchRegex = function (searchString) {
     }
 
     pattern += '$';
-    return new RegExp(pattern, "i");
+    return caseSensitive ? new RegExp(pattern) : new RegExp(pattern, 'i');
 };
 
 RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
@@ -1697,8 +1705,6 @@ Search.PackagesAndClasses = {
 
 Search.PackagesAndClasses.perform = function (searchContext, searchString) {
     if (this.previousQuery === null || this.previousQuery !== searchString) {
-        var condition = RegexLibrary.createCondition(searchString);
-        var exactMatchCondition = RegexLibrary.createExactMatchCondition(searchString);
 
         if (this.previousQuery !== null && searchString.indexOf(this.previousQuery) === 0) {
             // Characters have been added to the end of the previous query. Start
@@ -1708,8 +1714,9 @@ Search.PackagesAndClasses.perform = function (searchContext, searchString) {
             this.currentLinks = ALL_LINKS.concat();
         }
 
+        var condition = RegexLibrary.createCondition(searchString);
         this.currentLinks = this.currentLinks.filter(condition);
-        var bestMatch = this._getBestMatch(exactMatchCondition, this.currentLinks);
+        var bestMatch = this._getBestMatch(searchString, this.currentLinks);
         this.topLink = this._getTopLink(this.currentLinks, bestMatch);
     }
 
@@ -1749,12 +1756,19 @@ UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getTopLink(classLinks,
 /**
  * Get the best match (if any) from the given array of links.
  */
-Search.PackagesAndClasses._getBestMatch = function (exactMatchCondition, links) {
-    var exactMatchLinks = links.filter(exactMatchCondition);
+Search.PackagesAndClasses._getBestMatch = function (searchString, links) {
+    var caseInsensitiveExactMatchCondition = RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString);
+    var exactMatchLinks = links.filter(caseInsensitiveExactMatchCondition);
     // If all of the links displayed in the search list are exact matches, do
     // not display a best match.
     if (exactMatchLinks.length === links.length) {
         return null;
+    }
+    // Attempt to reduce the matches further by performing a case-sensitive match.
+    var caseSensitiveExactMatchCondition = RegexLibrary.createCaseSensitiveExactMatchCondition(searchString);
+    var caseSensitiveExactMatchLinks = exactMatchLinks.filter(caseSensitiveExactMatchCondition);
+    if (caseSensitiveExactMatchLinks.length > 0) {
+        exactMatchLinks = caseSensitiveExactMatchLinks;
     }
     // If there is more than one exact match, choose the link with the shortest
     // name to be the best match.
@@ -1771,7 +1785,7 @@ Search.PackagesAndClasses._getBestMatch = function (exactMatchCondition, links) 
     return bestMatch;
 };
 
-UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(exactMatchCondition, links)', function () {
+UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(searchString, links)', function () {
     var javaIoPackage = new PackageLink('java.io');
     var javaLangPackage = new PackageLink('java.lang');
     var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
@@ -1779,15 +1793,17 @@ UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(exactMatc
     var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
     var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
     var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
+    var hudsonPackage = new PackageLink('hudson');
+    var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS, 'hudson.model', 'Hudson');
 
     var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
         javaLangObjectClass, javaxSwingBorderFactoryClass,
-        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
+        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass,
+        hudsonPackage, hudsonModelHudsonClass ];
 
     var assertThatBestMatchFor = function (searchString, searchResult) {
-        var exactMatchCondition = RegexLibrary.createExactMatchCondition(searchString);
         assertThat('Best match for: ' + searchString,
-                   Search.PackagesAndClasses._getBestMatch(exactMatchCondition, allLinks),
+                   Search.PackagesAndClasses._getBestMatch(searchString, allLinks),
                    is(searchResult));
     };
 
@@ -1804,6 +1820,8 @@ UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(exactMatc
     assertThatBestMatchFor('java.*.o*e', is(null));
     assertThatBestMatchFor('java.*.*o*e', is(null));
     assertThatBestMatchFor('javax.swing.border.A', is(null));
+    assertThatBestMatchFor('hudson', is(hudsonPackage));
+    assertThatBestMatchFor('Hudson', is(hudsonModelHudsonClass));
 });
 
 Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
