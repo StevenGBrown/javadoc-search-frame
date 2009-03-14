@@ -59,18 +59,6 @@ OTHER DEALINGS IN THE SOFTWARE.
  */
 
 /**
- * Access key that will focus on the search field when activated ('s').
- * To activate in Mozilla Firefox 2.0 or later press Alt+Shift+S.
- */
-var SEARCH_ACCESS_KEY = 's';
-
-/**
- * Access key that will clear the search field when activated ('a').
- * To activate in Mozilla Firefox 2.0 or later press Alt+Shift+A.
- */
-var ERASE_ACCESS_KEY = 'a';
-
-/**
  * Array of all package and class links.
  */
 var ALL_PACKAGE_AND_CLASS_LINKS = [];
@@ -1027,6 +1015,18 @@ View = {
     contentNode : null
 };
 
+/**
+ * Access key that will focus on the search field when activated ('s').
+ * To activate in Mozilla Firefox 2.0 or later press Alt+Shift+S.
+ */
+View.searchAccessKey = 's';
+
+/**
+ * Access key that will clear the search field when activated ('a').
+ * To activate in Mozilla Firefox 2.0 or later press Alt+Shift+A.
+ */
+View.eraseAccessKey = 'a';
+
 View.initialise = function (eventHandlers) {
     this._create(eventHandlers);
 };
@@ -1108,8 +1108,8 @@ View._createSearchField = function (eventHandlers) {
     s.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
     s.addEventListener('onchange', eventHandlers.searchFieldChanged, false);
     s.addEventListener('focus', eventHandlers.searchFieldFocus, false);
-    if (SEARCH_ACCESS_KEY) {
-        s.setAttribute('accesskey', SEARCH_ACCESS_KEY);
+    if (this.searchAccessKey) {
+        s.setAttribute('accesskey', this.searchAccessKey);
     }
     this._watch(s, eventHandlers.searchFieldChanged, 200);
     return s;
@@ -1123,8 +1123,8 @@ View._createEraseButton = function (eventHandlers) {
     e.setAttribute('src', iconErase);
     e.setAttribute('style', 'margin-left: 2px');
     e.addEventListener('click', eventHandlers.eraseButtonClick, false);
-    if (ERASE_ACCESS_KEY) {
-        e.setAttribute('accesskey', ERASE_ACCESS_KEY);
+    if (this.eraseAccessKey) {
+        e.setAttribute('accesskey', this.eraseAccessKey);
     }
     return e;
 };
