@@ -470,7 +470,8 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
  * @class Frames (undocumented).
  */
 Frames = {
-    previousURLOpenedInSummaryFrame : null
+    internalURLOpenedInSummaryFrame : null,
+    frames : {}
 };
 
 Frames.getAllPackagesFrame = function () {
@@ -495,26 +496,34 @@ Frames.getSummaryFrame = function () {
     return this._getFrame('classFrame');
 };
 
-Frames.openInSummaryFrame = function (url, reload) {
-    if (reload || this.previousURLOpenedInSummaryFrame === null || url !== this.previousURLOpenedInSummaryFrame) {
+Frames.openInternalLinkInSummaryFrame = function (url) {
+    if (!this.internalURLOpenedInSummaryFrame || url !== this.internalURLOpenedInSummaryFrame) {
         var summaryFrame = this.getSummaryFrame();
         if (summaryFrame) {
-            this.previousURLOpenedInSummaryFrame = url;
+            this.internalURLOpenedInSummaryFrame = url;
             summaryFrame.location.href = url;
         }
     }
-}
+};
+
+Frames.openExternalLinkInSummaryFrame = function (url) {
+    this.internalURLOpenedInSummaryFrame = url;
+    var summaryFrame = this.getSummaryFrame();
+    if (summaryFrame) {
+        summaryFrame.location.href = url;
+    }
+};
 
 Frames._getFrame = function (name) {
-    if (this[name]) {
-        return this[name];
+    if (this.frames[name]) {
+        return this.frames[name];
     }
     var frame;
     var i;
     for (i = 0; i < parent.frames.length; i++) {
         frame = parent.frames[i];
         if (frame && frame.name === name && frame.document) {
-            this[name] = frame;
+            this.frames[name] = frame;
             return frame;
         }
     }
@@ -1732,7 +1741,7 @@ Search.getTopLinkURL = function () {
 Search._autoOpen = function () {
     var url = this.getTopLinkURL();
     if (url && UserPreference.AUTO_OPEN.getValue()) {
-        Frames.openInSummaryFrame(url);
+        Frames.openInternalLinkInSummaryFrame(url);
     }
 };
 
@@ -2001,7 +2010,7 @@ Search.Menu.perform = function (searchContext, searchString) {
         if (textNode
                 && textNode.nodeType === 3 /* Node.TEXT_NODE */
                 && textNode.nodeValue.indexOf('@' + searchString) === 0) {
-            Frames.openInSummaryFrame(anchorNode.getAttribute('href'), true);
+            Frames.openExternalLinkInSummaryFrame(anchorNode.getAttribute('href'));
             Search.perform();
             return;
         }
@@ -2511,7 +2520,7 @@ EventHandlers._returnKeyPressed = function (controlModifier) {
         if (controlModifier) {
             window.open(url);
         } else {
-            Frames.openInSummaryFrame(url);
+            Frames.openInternalLinkInSummaryFrame(url);
         }
     }
 };
