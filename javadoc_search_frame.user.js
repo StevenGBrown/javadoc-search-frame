@@ -1056,7 +1056,9 @@ View.getContentNode = function () {
 };
 
 View.setSearchFieldValue = function (v) {
-    this.searchField.value = v;
+    if (this.searchField.value !== v) {
+        this.searchField.value = v;
+    }
 };
 
 View.getSearchFieldValue = function () {
