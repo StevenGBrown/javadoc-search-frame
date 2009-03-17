@@ -1412,30 +1412,59 @@ AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
 AnchorsLoader = {
     request : null,
     classLink : null,
-    anchorLinks : null
+    anchorLinks : null,
+    bytesDownloaded : 0
 };
 
-AnchorsLoader.load = function (classLink, callbacks) {
-    if (this.classLink === classLink && this.anchorLinks) {
-        callbacks.alreadyLoaded(this.anchorLinks);
-        return;
-    }
-    callbacks.loading(classLink);
+AnchorsLoader.onprogress = null;
+
+AnchorsLoader.load = function (classLink) {
     if (this.classLink === classLink) {
+        // Already loading this class link.
         return;
     }
+    this.cancel();
     this.classLink = classLink;
     this.anchorLinks = null;
     var anchorsLoader = this;
     var request = new XMLHttpRequest();
-    request.open('GET', classLink.getUrl());
-    request.onreadystatechange = function () { 
-        if (request.readyState === 4 && request.responseText) { 
-            anchorsLoader._completed(request.responseText, classLink, callbacks.loadingComplete);
-        }
+    request.onprogress = function (e) {
+        anchorsLoader._onprogress(e);
     };
-    request.send();
+    request.open('GET', classLink.getUrl());
+    request.onload = function (e) {
+        anchorsLoader._onload(e);
+    };
+    request.onerror = function (e) {
+        anchorsLoader._onerror(e);
+    };
+    request.overrideMimeType('text/plain; charset=x-user-defined');
+    request.send(null);
     this.request = request;
+};
+
+AnchorsLoader.isComplete = function () {
+    return this.anchorLinks !== null;
+};
+
+AnchorsLoader.getStatus = function () {
+    if (this.bytesDownloaded === -1) {
+        return 'ERROR';
+    }
+    if (this.bytesDownloaded > 1048576) {
+        return 'loading... (' + Math.floor(this.bytesDownloaded / 1048576) + ' MB)';
+    }
+    if (this.bytesDownloaded > 1024) {
+        return 'loading... (' + Math.floor(this.bytesDownloaded / 1024) + ' kB)';
+    }
+    if (this.bytesDownloaded > 0) {
+        return 'loading... (' + this.bytesDownloaded + ' bytes)';
+    }
+    return 'loading...';
+};
+
+AnchorsLoader.getAnchorLinks = function () {
+    return this.anchorLinks;
 };
 
 AnchorsLoader.cancel = function () {
@@ -1445,12 +1474,23 @@ AnchorsLoader.cancel = function () {
     this.request = null;
     this.classLink = null;
     this.anchorLinks = null;
+    this.bytesDownloaded = 0;
 };
 
-AnchorsLoader._completed = function (responseText, classLink, loadingCompleteCallback) {
-    var names = this._getAnchorNames(responseText);
-    this.anchorLinks = this._createAnchorLinkArray(classLink.getUrl(), names);
-    loadingCompleteCallback(this.anchorLinks);
+AnchorsLoader._onprogress = function (e) {
+    this.bytesDownloaded = e.position;
+    this.onprogress();
+};
+
+AnchorsLoader._onload = function (e) {
+    var names = this._getAnchorNames(this.request.responseText);
+    this.anchorLinks = this._createAnchorLinkArray(this.classLink.getUrl(), names);
+    this.onprogress();
+};
+
+AnchorsLoader._onerror = function (e) {
+    this.bytesDownloaded = -1;
+    this.onprogress();
 };
 
 AnchorsLoader._createAnchorLinkArray = function (baseurl, names) {
@@ -1927,22 +1967,21 @@ Search.Anchors.perform = function (searchContext, searchString) {
         return;
     }
 
-    var searchAnchors = this;
-    AnchorsLoader.load(topClassLink, {
-        alreadyLoaded : function (anchorLinks) {
-            var condition = RegexLibrary.createCondition(searchString);
-            searchAnchors._append(searchContext, topClassLink, anchorLinks, condition);
-        },
-        loading : function () {
-            searchContext.getContentNodeHTML = function () {
-                return topClassLink.getHTML() + '<p>loading...</p>';
-            };
-            searchContext.anchorLinksLoading = true;
-        },
-        loadingComplete : function () {
-            Search.perform({forceUpdate : true});
-        }
-    });
+    AnchorsLoader.onprogress = function () {
+        Search.perform({forceUpdate : true, suppressLogMessage : true});
+    };
+
+    AnchorsLoader.load(topClassLink);
+    if (AnchorsLoader.isComplete()) {
+        var anchorLinks = AnchorsLoader.getAnchorLinks();
+        var condition = RegexLibrary.createCondition(searchString);
+        this._append(searchContext, topClassLink, anchorLinks, condition);
+    } else {
+        searchContext.getContentNodeHTML = function () {
+            return topClassLink.getHTML() + '<p>' + AnchorsLoader.getStatus() + '</p>';
+        };
+        searchContext.anchorLinksLoading = true;
+    }
 };
 
 Search.Anchors._append = function (searchContext, topClassLink, anchorLinks, condition) {
