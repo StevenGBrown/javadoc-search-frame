@@ -2050,7 +2050,6 @@ Search.Menu.perform = function (searchContext, searchString) {
                 && textNode.nodeType === 3 /* Node.TEXT_NODE */
                 && textNode.nodeValue.indexOf('@' + searchString) === 0) {
             Frames.openExternalLinkInSummaryFrame(anchorNode.getAttribute('href'));
-            Search.perform();
             return;
         }
     }
