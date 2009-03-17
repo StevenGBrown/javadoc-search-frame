@@ -507,7 +507,7 @@ Frames.openInternalLinkInSummaryFrame = function (url) {
 };
 
 Frames.openExternalLinkInSummaryFrame = function (url) {
-    this.internalURLOpenedInSummaryFrame = url;
+    this.internalURLOpenedInSummaryFrame = null;
     var summaryFrame = this.getSummaryFrame();
     if (summaryFrame) {
         summaryFrame.location.href = url;
