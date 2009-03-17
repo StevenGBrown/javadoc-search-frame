@@ -470,8 +470,7 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
  * @class Frames (undocumented).
  */
 Frames = {
-    internalURLOpenedInSummaryFrame : null,
-    frames : {}
+    framesByName : {}
 };
 
 Frames.getAllPackagesFrame = function () {
@@ -497,17 +496,13 @@ Frames.getSummaryFrame = function () {
 };
 
 Frames.openInternalLinkInSummaryFrame = function (url) {
-    if (!this.internalURLOpenedInSummaryFrame || url !== this.internalURLOpenedInSummaryFrame) {
-        var summaryFrame = this.getSummaryFrame();
-        if (summaryFrame) {
-            this.internalURLOpenedInSummaryFrame = url;
-            summaryFrame.location.href = url;
-        }
+    var summaryFrame = this.getSummaryFrame();
+    if (summaryFrame && summaryFrame.location != url) {
+        summaryFrame.location.href = url;
     }
 };
 
 Frames.openExternalLinkInSummaryFrame = function (url) {
-    this.internalURLOpenedInSummaryFrame = null;
     var summaryFrame = this.getSummaryFrame();
     if (summaryFrame) {
         summaryFrame.location.href = url;
@@ -515,15 +510,15 @@ Frames.openExternalLinkInSummaryFrame = function (url) {
 };
 
 Frames._getFrame = function (name) {
-    if (this.frames[name]) {
-        return this.frames[name];
+    if (this.framesByName[name]) {
+        return this.framesByName[name];
     }
     var frame;
     var i;
     for (i = 0; i < parent.frames.length; i++) {
         frame = parent.frames[i];
         if (frame && frame.name === name && frame.document) {
-            this.frames[name] = frame;
+            this.framesByName[name] = frame;
             return frame;
         }
     }
