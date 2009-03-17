@@ -2036,6 +2036,9 @@ Search.Menu.perform = function (searchContext, searchString) {
 
     var node = document.createElement('p');
     node.innerHTML = menu;
+    // It is necessary to add the context node to the document for the
+    // document.evaluate function to return any results in Firefox 1.5.
+    document.body.appendChild(node);
     var xpathResult = document.evaluate('//a', node, null,
                                         XPathResult.ANY_TYPE, null);
     var anchorNode;
@@ -2045,9 +2048,10 @@ Search.Menu.perform = function (searchContext, searchString) {
                 && textNode.nodeType === 3 /* Node.TEXT_NODE */
                 && textNode.nodeValue.indexOf('@' + searchString) === 0) {
             Frames.openExternalLinkInSummaryFrame(anchorNode.getAttribute('href'));
-            return;
+            break;
         }
     }
+    document.body.removeChild(node);
 };
 
 Search.Menu._createMenu = function (topClassLink, topAnchorLink) {
