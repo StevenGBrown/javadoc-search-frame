@@ -470,7 +470,8 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
  * @class Frames (undocumented).
  */
 Frames = {
-    framesByName : {}
+    framesByName : {},
+    initialHrefOfSummaryFrame : null
 };
 
 Frames.getAllPackagesFrame = function () {
@@ -492,17 +493,36 @@ Frames.hideAllPackagesFrame = function () {
 };
 
 Frames.getSummaryFrame = function () {
-    return this._getFrame('classFrame');
-};
-
-Frames.openInternalLinkInSummaryFrame = function (url) {
-    var summaryFrame = this.getSummaryFrame();
-    if (summaryFrame && summaryFrame.location != url) {
-        summaryFrame.location.href = url;
+    var summaryFrame = this._getFrame('classFrame');
+    if (!this.initialHrefOfSummaryFrame) {
+        this.initialHrefOfSummaryFrame = summaryFrame.location.href;
     }
+    return summaryFrame;
 };
 
-Frames.openExternalLinkInSummaryFrame = function (url) {
+Frames.setSummaryFrameContent = function (createContent) {
+    var summaryFrame = Frames.getSummaryFrame();
+    var initialHrefOfSummaryFrame = this.initialHrefOfSummaryFrame;
+    var intervalIndex = 0;
+    var setIntervalAction = function () {
+        if (intervalIndex == 1) {
+            summaryFrame.location.href = initialHrefOfSummaryFrame;
+        }
+        intervalIndex++;
+        var summaryFrameDocument = summaryFrame.document;
+        if (!summaryFrameDocument) {
+            return;
+        }
+        while (summaryFrameDocument.body.firstChild) {
+            summaryFrameDocument.body.removeChild(summaryFrameDocument.body.firstChild);
+        }
+        createContent(summaryFrame.document);
+        clearInterval(intervalId);
+    };
+    var intervalId = setInterval(setIntervalAction, 50);
+};
+
+Frames.openLinkInSummaryFrame = function (url) {
     var summaryFrame = this.getSummaryFrame();
     if (summaryFrame) {
         summaryFrame.location.href = url;
@@ -818,31 +838,26 @@ WebPage.UNIT_TEST_RESULTS = {
  * @private
  */
 WebPage._open = function (page) {
-    var summaryFrame = Frames.getSummaryFrame();
-    var pageDocument = summaryFrame.document;
+    Frames.setSummaryFrameContent(function(pageDocument) {
+        var headerElement = pageDocument.createElement('p');
+        headerElement.innerHTML =
+                '<table width="100%"><tr><td align="left">' +
+                '<h2>' + page.title + '</h2>' +
+                '</td><td align="right">' +
+                '<a href="' + SCRIPT_META_DATA.homepage + '">' + SCRIPT_META_DATA.name + '</a><br/>' +
+                '<i>' + SCRIPT_META_DATA.version + '</i>' +
+                '</td></tr></table>' +
+                '<hr/>';
+        pageDocument.body.appendChild(headerElement);
 
-    while (pageDocument.body.firstChild) {
-        pageDocument.body.removeChild(pageDocument.body.firstChild);
-    }
+        page.getContents(pageDocument).forEach(function (pageElement) {
+            pageDocument.body.appendChild(pageElement);
+        });
 
-    var headerElement = pageDocument.createElement('p');
-    headerElement.innerHTML =
-            '<table width="100%"><tr><td align="left">' +
-            '<h2>' + page.title + '</h2>' +
-            '</td><td align="right">' +
-            '<a href="' + SCRIPT_META_DATA.homepage + '">' + SCRIPT_META_DATA.name + '</a><br/>' +
-            '<i>' + SCRIPT_META_DATA.version + '</i>' +
-            '</td></tr></table>' +
-            '<hr/>';
-    pageDocument.body.appendChild(headerElement);
-
-    page.getContents(pageDocument).forEach(function (pageElement) {
-        pageDocument.body.appendChild(pageElement);
+        if (page.registerEventListeners) {
+            page.registerEventListeners(pageDocument);
+        }
     });
-
-    if (page.registerEventListeners) {
-        page.registerEventListeners(pageDocument);
-    }
 };
 
 
@@ -1776,7 +1791,7 @@ Search.getTopLinkURL = function () {
 Search._autoOpen = function () {
     var url = this.getTopLinkURL();
     if (url && UserPreference.AUTO_OPEN.getValue()) {
-        Frames.openInternalLinkInSummaryFrame(url);
+        Frames.openLinkInSummaryFrame(url);
     }
 };
 
@@ -2047,7 +2062,7 @@ Search.Menu.perform = function (searchContext, searchString) {
         if (textNode
                 && textNode.nodeType === 3 /* Node.TEXT_NODE */
                 && textNode.nodeValue.indexOf('@' + searchString) === 0) {
-            Frames.openExternalLinkInSummaryFrame(anchorNode.getAttribute('href'));
+            Frames.openLinkInSummaryFrame(anchorNode.getAttribute('href'));
             break;
         }
     }
@@ -2557,7 +2572,7 @@ EventHandlers._returnKeyPressed = function (controlModifier) {
         if (controlModifier) {
             window.open(url);
         } else {
-            Frames.openInternalLinkInSummaryFrame(url);
+            Frames.openLinkInSummaryFrame(url);
         }
     }
 };
