@@ -471,7 +471,8 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
  */
 Frames = {
     framesByName : {},
-    initialHrefOfSummaryFrame : null
+    initialHrefOfSummaryFrame : null,
+    summaryFrameContentLoading : false
 };
 
 Frames.getAllPackagesFrame = function () {
@@ -501,12 +502,15 @@ Frames.getSummaryFrame = function () {
 };
 
 Frames.setSummaryFrameContent = function (createContent) {
-    var summaryFrame = Frames.getSummaryFrame();
-    var initialHrefOfSummaryFrame = this.initialHrefOfSummaryFrame;
+    if (this.summaryFrameContentLoading) {
+        return;
+    }
     var intervalIndex = 0;
+    var frames = this;
     var setIntervalAction = function () {
+        var summaryFrame = frames.getSummaryFrame();
         if (intervalIndex == 1) {
-            summaryFrame.location.href = initialHrefOfSummaryFrame;
+            summaryFrame.location.href = frames.initialHrefOfSummaryFrame;
         }
         intervalIndex++;
         var summaryFrameDocument = summaryFrame.document;
@@ -518,8 +522,10 @@ Frames.setSummaryFrameContent = function (createContent) {
         }
         createContent(summaryFrame.document);
         clearInterval(intervalId);
+        frames.summaryFrameContentLoading = false;
     };
     var intervalId = setInterval(setIntervalAction, 50);
+    this.summaryFrameContentLoading = true;
 };
 
 Frames.openLinkInSummaryFrame = function (url) {
