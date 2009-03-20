@@ -60,7 +60,7 @@ def transformScriptHeader(header):
 
   # Determine the release version.
   today = datetime.date.today()
-  version = today.strftime('%d' + getNumberPostfix(today.day) + ' %B %Y')
+  version = today.strftime('%d' + getOrdinalIndicator(today.day) + ' %B %Y')
 
   # Set the release version in the Greasemonkey metadata block.
   header = re.compile(r'// @version       DEVELOPMENT').sub(
@@ -92,8 +92,8 @@ def transformScriptBody(body):
   return body
 
 
-# Get the postfix to use when displaying the given number, i.e. 1st, 2nd, 3rd.
-def getNumberPostfix(number):
+# Get the ordinal indicator for the given number.
+def getOrdinalIndicator(number):
 
   if (number < 10 or number > 20):
     leastSignificantDigit = number % 10
