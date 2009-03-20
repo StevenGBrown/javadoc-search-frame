@@ -495,7 +495,7 @@ Frames.hideAllPackagesFrame = function () {
 
 Frames.getSummaryFrame = function () {
     var summaryFrame = this._getFrame('classFrame');
-    if (!this.initialHrefOfSummaryFrame) {
+    if (summaryFrame && !this.initialHrefOfSummaryFrame) {
         this.initialHrefOfSummaryFrame = summaryFrame.location.href;
     }
     return summaryFrame;
