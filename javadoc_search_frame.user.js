@@ -2136,10 +2136,12 @@ function init() {
     var initStopWatch = new StopWatch();
 
     // If running Google Chrome, check that this is the correct document. This
-    // is necessary since, as of January 2009, Google Chrome ignores the
+    // is necessary since, as of March 2009, Google Chrome ignores the
     // @include metadata tag.
     var browserIsChrome = navigator.userAgent.toLowerCase().indexOf('chrome') !== -1;
-    if (browserIsChrome && !endsWith(document.location.toString(), '/allclasses-frame.html')) {
+    if (browserIsChrome && !(
+            endsWith(document.location.toString(), '/allclasses-frame.html') ||
+            endsWith(document.location.toString(), '/package-frame.html'))) {
         return;
     }
 
