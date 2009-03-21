@@ -845,17 +845,35 @@ WebPage.UNIT_TEST_RESULTS = {
  */
 WebPage._open = function (page) {
     Frames.setSummaryFrameContent(function(pageDocument) {
-        var headerElement = pageDocument.createElement('p');
-        headerElement.innerHTML =
-                '<table width="100%"><tr><td align="left">' +
-                '<h2>' + page.title + '</h2>' +
-                '</td><td align="right">' +
-                '<a href="' + SCRIPT_META_DATA.homepage + '">' + SCRIPT_META_DATA.name + '</a><br/>' +
-                '<i>' + SCRIPT_META_DATA.version + '</i>' +
-                '</td></tr></table>' +
-                '<hr/>';
-        pageDocument.body.appendChild(headerElement);
+        var tableElement = pageDocument.createElement('table');
+        tableElement.setAttribute('width', '100%');
+        tableElement.style.border = 'none';
+        var tableRowElement = pageDocument.createElement('tr');
+        tableRowElement.style.border = 'none';
+        var tableDataCellElementOne = pageDocument.createElement('td');
+        tableDataCellElementOne.setAttribute('align', 'left');
+        tableDataCellElementOne.style.border = 'none';
+        var headerElement = pageDocument.createElement('h2');
+        headerElement.textContent = page.title;
+        var tableDataCellElementTwo = pageDocument.createElement('td');
+        tableDataCellElementTwo.setAttribute('align', 'right');
+        tableDataCellElementTwo.style.border = 'none';
+        var anchorElement = pageDocument.createElement('a');
+        anchorElement.setAttribute('href', SCRIPT_META_DATA.homepage);
+        anchorElement.textContent = SCRIPT_META_DATA.homepage;
+        var lineBreakElement = pageDocument.createElement('br');
+        var italicElement = pageDocument.createElement('i');
+        italicElement.textContent = SCRIPT_META_DATA.version;
 
+        tableElement.appendChild(tableRowElement);
+        tableRowElement.appendChild(tableDataCellElementOne);
+        tableDataCellElementOne.appendChild(headerElement);
+        tableRowElement.appendChild(tableDataCellElementTwo);
+        [anchorElement, lineBreakElement, italicElement].forEach(function (element) {
+            tableDataCellElementTwo.appendChild(element);
+        });
+
+        pageDocument.body.appendChild(tableElement);
         page.getContents(pageDocument).forEach(function (pageElement) {
             pageDocument.body.appendChild(pageElement);
         });
