@@ -1902,36 +1902,42 @@ Search.PackagesAndClasses._getBestMatch = function (searchString, links) {
     if (caseSensitiveExactMatchLinks.length > 0) {
         exactMatchLinks = caseSensitiveExactMatchLinks;
     }
-    // If there is more than one exact match, choose the link with the shortest
-    // name to be the best match.
-    var bestMatch = null;
-    var bestMatchNameLength;
+    // Keep only the links with the lowest package depth.
+    var bestMatchLinks = [];
+    var bestMatchPackageDepth;
     var name;
+    var packageDepth;
     exactMatchLinks.forEach(function (link) {
         name = (link.getType() === LinkType.PACKAGE ? link.getPackageName() : link.getCanonicalName());
-        if (!bestMatch || name.length < bestMatchNameLength) {
-            bestMatch = link;
-            bestMatchNameLength = name.length;
+        packageDepth = name.split('.').length;
+        if (!bestMatchPackageDepth || packageDepth < bestMatchPackageDepth) {
+            bestMatchLinks = [link];
+            bestMatchPackageDepth = packageDepth;
+        } else if (packageDepth === bestMatchPackageDepth) {
+            bestMatchLinks.push(link);
         }
     });
-    return bestMatch;
+    // Finally, select the first link from the remaining matches to be the best match.
+    return bestMatchLinks.length > 0 ? bestMatchLinks[0] : null;
 };
 
 UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(searchString, links)', function () {
+    var hudsonPackage = new PackageLink('hudson');
     var javaIoPackage = new PackageLink('java.io');
     var javaLangPackage = new PackageLink('java.lang');
+    var javaUtilListClass = new ClassLink(LinkType.INTERFACE, 'java.util', 'List');
+    var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS, 'hudson.model', 'Hudson');
+    var javaAwtListClass = new ClassLink(LinkType.CLASS, 'java.awt', 'List');
     var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
     var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
     var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
     var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
     var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
-    var hudsonPackage = new PackageLink('hudson');
-    var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS, 'hudson.model', 'Hudson');
 
-    var allLinks = [ javaIoPackage, javaLangPackage, javaIoCloseableClass,
-        javaLangObjectClass, javaxSwingBorderFactoryClass,
-        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass,
-        hudsonPackage, hudsonModelHudsonClass ];
+    var allLinks = [ hudsonPackage, javaIoPackage, javaLangPackage,
+        javaUtilListClass, hudsonModelHudsonClass, javaAwtListClass,
+        javaIoCloseableClass, javaLangObjectClass, javaxSwingBorderFactoryClass,
+        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
 
     var assertThatBestMatchFor = function (searchString, searchResult) {
         assertThat('Best match for: ' + searchString,
@@ -1954,6 +1960,7 @@ UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(searchStr
     assertThatBestMatchFor('javax.swing.border.A', is(null));
     assertThatBestMatchFor('hudson', is(hudsonPackage));
     assertThatBestMatchFor('Hudson', is(hudsonModelHudsonClass));
+    assertThatBestMatchFor('list', is(javaUtilListClass));
 });
 
 Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
