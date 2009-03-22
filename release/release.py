@@ -38,29 +38,31 @@ import datetime, io, re
 # Main function
 def main():
 
-  filename = 'javadoc_search_frame.user.js';
+  filename = 'javadoc_search_frame';
+  extension = '.user.js'
+  releaseDate = datetime.date.today()
 
   # Read the script from the parent directory
-  script = io.open('../' + filename).read()
+  script = io.open('../' + filename + extension).read()
   splitResult = re.compile(r'(^.*?\n\*/)', re.DOTALL).split(script)
   scriptHeader, scriptBody = splitResult[1:]
 
   # Transform the script contents
-  releaseScriptHeader = transformScriptHeader(scriptHeader)
+  releaseScriptHeader = transformScriptHeader(scriptHeader, releaseDate)
   releaseScriptBody = transformScriptBody(scriptBody)
 
   # Write the script to a new file in the current directory
   releaseScript = releaseScriptHeader + releaseScriptBody
-  io.open(filename, 'w', newline='\n').write(releaseScript)
+  releaseScriptFilename = filename + '_' + releaseDate.strftime('%Y%m%d') + extension
+  io.open(releaseScriptFilename, 'w', newline='\n').write(releaseScript)
 
 
 # Transform the script header. This header consists of the Greasemonkey
 # metadata block, the SCRIPT_META_DATA Javascript variable and the license.
-def transformScriptHeader(header):
+def transformScriptHeader(header, releaseDate):
 
   # Determine the release version.
-  today = datetime.date.today()
-  version = today.strftime('%d' + getOrdinalIndicator(today.day) + ' %B %Y')
+  version = releaseDate.strftime('%d' + getOrdinalIndicator(releaseDate.day) + ' %B %Y')
 
   # Set the release version in the Greasemonkey metadata block.
   header = re.compile(r'// @version       DEVELOPMENT').sub(
