@@ -66,6 +66,23 @@ var ALL_PACKAGE_AND_CLASS_LINKS = [];
 
 /*
  * ----------------------------------------------------------------------------
+ * BROWSER DETECTION
+ * ----------------------------------------------------------------------------
+ */
+
+Browser = {};
+
+Browser.isChrome = function () {
+    return navigator.userAgent.toLowerCase().indexOf('chrome') !== -1;
+};
+
+Browser.isChromeVersionOne = function () {
+    return navigator.userAgent.toLowerCase().indexOf('chrome/1') !== -1;
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
  * STOPWATCH
  * ----------------------------------------------------------------------------
  */
@@ -361,7 +378,7 @@ UserPreference = function (key, defaultValue) {
  */
 UserPreference.canGet = function () {
     try {
-        return Boolean(GM_getValue);
+        return !Browser.isChrome() && Boolean(GM_getValue);
     } catch (ex) {
         return false;
     }
@@ -372,7 +389,7 @@ UserPreference.canGet = function () {
  */
 UserPreference.canSet = function () {
     try {
-        return Boolean(GM_setValue);
+        return !Browser.isChrome() && Boolean(GM_setValue);
     } catch (ex) {
         return false;
     }
@@ -2160,11 +2177,9 @@ Search.Menu._getMenuReplacement = function () {
 function init() {
     var initStopWatch = new StopWatch();
 
-    // If running Google Chrome, check that this is the correct document. This
-    // is necessary since, as of March 2009, Google Chrome ignores the
-    // @include metadata tag.
-    var browserIsChrome = navigator.userAgent.toLowerCase().indexOf('chrome') !== -1;
-    if (browserIsChrome && !(
+    // Google Chrome version 1 ignores the @include metadata tag, so check that
+    // this is the correct document.
+    if (Browser.isChromeVersionOne() && !(
             endsWith(document.location.toString(), '/allclasses-frame.html') ||
             endsWith(document.location.toString(), '/package-frame.html'))) {
         return;
