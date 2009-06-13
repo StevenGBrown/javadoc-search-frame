@@ -72,10 +72,6 @@ var ALL_PACKAGE_AND_CLASS_LINKS = [];
 
 Browser = {};
 
-Browser.isChrome = function () {
-    return navigator.userAgent.toLowerCase().indexOf('chrome') !== -1;
-};
-
 Browser.isChromeVersionOne = function () {
     return navigator.userAgent.toLowerCase().indexOf('chrome/1') !== -1;
 };
@@ -378,7 +374,8 @@ UserPreference = function (key, defaultValue) {
  */
 UserPreference.canGet = function () {
     try {
-        return !Browser.isChrome() && Boolean(GM_getValue);
+        return Boolean(GM_getValue) &&
+                GM_getValue('test', 'defaultValue') === 'defaultValue';
     } catch (ex) {
         return false;
     }
@@ -389,7 +386,7 @@ UserPreference.canGet = function () {
  */
 UserPreference.canSet = function () {
     try {
-        return !Browser.isChrome() && Boolean(GM_setValue);
+        return Boolean(GM_setValue);
     } catch (ex) {
         return false;
     }
