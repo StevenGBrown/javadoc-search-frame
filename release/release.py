@@ -76,7 +76,7 @@ def transformScriptHeader(header, releaseDate):
 
 
 # Transform the script body (the remainder of the script not including the
-# header) by removing excess commenting and whitespace.
+# header) by removing commenting. This is done to reduce the file size.
 def transformScriptBody(body):
 
   # Remove block comments
@@ -85,10 +85,8 @@ def transformScriptBody(body):
   # Remove single-line comments
   body = re.compile(r'\n *//.*').sub('', body)
 
-  # Remove leading whitespace
-  body = re.compile(r'\n *').sub('\n', body)
-
   # Remove excess newline characters
+  # These may be left-over after removing the comments
   body = re.compile(r'\n{2,}').sub('\n\n', body)
 
   return body
