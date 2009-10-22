@@ -177,24 +177,20 @@ UnitTestSuite.testFunctionFor = function (functionUnderTest, unitTestFunction) {
  * @returns {UnitTestResult} the result of running this suite
  */
 UnitTestSuite.run = function () {
-    var resultsByFunctionUnderTest = [];
+    this.assertionsCount = 0;
+    this.failures = [];
 
     var iteration = function (unitTestFunction) {
-        this.results = [];
+        this.unitTestFunctionName = unitTestFunction.name;
         try {
             unitTestFunction.run();
         } catch (ex) {
-            this.results.push({
-                success:false,
-                exception:ex});
+            this.failures.push(new UnitTestExceptionThrownFailure(this.unitTestFunctionName, ex));
         }
-        resultsByFunctionUnderTest.push({
-            functionUnderTest:unitTestFunction.name,
-            results:this.results});
     };
 
     this.unitTestFunctions.forEach(iteration, this);
-    return new UnitTestResult(resultsByFunctionUnderTest);
+    return new UnitTestResult(this.assertionsCount, this.failures);
 };
 
 /**
@@ -205,13 +201,11 @@ UnitTestSuite.run = function () {
  * @param expected the expected value
  */
 UnitTestSuite.assertThat = function (description, actual, expected) {
-    var result = {
-        success:UnitTestSuite._equals(expected, actual),
-        description:description,
-        actual:actual,
-        expected:expected,
-        exception:null};
-    UnitTestSuite.results.push(result);
+    if (!UnitTestSuite._equals(expected, actual)) {
+        var failure = new UnitTestAssertionFailure(UnitTestSuite.unitTestFunctionName, description, actual, expected);
+        UnitTestSuite.failures.push(failure);
+    }
+    UnitTestSuite.assertionsCount++;
 };
 
 /**
@@ -295,21 +289,9 @@ var is = UnitTestSuite.is;
  * Create a new UnitTestResult.
  * @class Unit test result; returned by {@link UnitTestSuite#run}.
  */
-UnitTestResult = function (resultsByFunctionUnderTest) {
-    this.resultsByFunctionUnderTest = resultsByFunctionUnderTest;
-
-    var results = [];
-    this.resultsByFunctionUnderTest.forEach(function (resultForAFunctionUnderTest) {
-        results = results.concat(resultForAFunctionUnderTest.results);
-    });
-
-    this.numberOfAssertions = results.length;
-    this.numberOfFailedAssertions = results.filter(function (result) {
-        return !result.success;
-    }).length;
-    this.exceptionThrown = results.some(function (result) {
-        return result.exception;
-    });
+UnitTestResult = function (numberOfAssertions, failures) {
+    this.numberOfAssertions = numberOfAssertions;
+    this.failures = failures;
 };
 
 /**
@@ -320,35 +302,55 @@ UnitTestResult.prototype.getNumberOfAssertions = function () {
 };
 
 /**
- * @returns the number of failed assertions made by the unit test
+ * @returns the number of passed assertions made by the unit test
  */
-UnitTestResult.prototype.getNumberOfFailedAssertions = function () {
-    return this.numberOfFailedAssertions;
+UnitTestResult.prototype.getNumberOfPassedAssertions = function () {
+    return this.numberOfAssertions - this.failures.length;
 };
 
 /**
- * @returns true if an exception was thrown during execution of the unit test,
- * false otherwise
+ * @returns {Array} the details of the unit test failures
  */
-UnitTestResult.prototype.wasExceptionThrown = function () {
-    return this.exceptionThrown;
+UnitTestResult.prototype.getFailures = function () {
+    return this.failures;
 };
 
-/**
- * Determine if the unit test failed.
- * @returns {Boolean} true if at least one assertion failed, false otherwise
- */
-UnitTestResult.prototype.failed = function () {
-    return this.getNumberOfFailedAssertions() > 0;
-};
 
 /**
- * Get detailed results of running the unit test.
- * @returns {Array} the detailed results of running the unit test
+ * Create a new UnitTestAssertionFailure.
+ * @class A unit test failure due to a failed assertion.
  */
-UnitTestResult.prototype.getResultsByFunctionUnderTest = function () {
-    return this.resultsByFunctionUnderTest;
-};
+UnitTestAssertionFailure = function (functionUnderTestName, description, actual, expected) {
+    this.functionUnderTestName = functionUnderTestName;
+    this.description = description;
+    this.actual = actual;
+    this.expected = expected;
+}
+
+/**
+ * @returns a description of this unit test failure
+ */
+UnitTestAssertionFailure.prototype.toString = function () {
+    return this.functionUnderTestName + '\n' + this.description + '\n'
+            + 'Expected "' + this.expected + '" but was "' + this.actual + '"';
+}
+
+
+/**
+ * Create a new UnitTestExceptionThrownFailure.
+ * @class A unit test failure due to a thrown exception.
+ */
+UnitTestExceptionThrownFailure = function (functionUnderTestName, exception) {
+    this.functionUnderTestName = functionUnderTestName;
+    this.exception = exception;
+}
+
+/**
+ * @returns a description of this unit test failure
+ */
+UnitTestExceptionThrownFailure.prototype.toString = function () {
+    return this.functionUnderTestName + '\n' + 'Exception thrown: ' + this.exception;
+}
 
 
 /*
@@ -762,100 +764,6 @@ WebPage.SETTINGS = {
 };
 
 /**
- * Unit test results page.
- */
-WebPage.UNIT_TEST_RESULTS = {
-    privateFunctions : {
-        toString : function (obj) {
-            if (obj === undefined) {
-                return 'undefined';
-            }
-            if (obj === null) {
-                return 'null';
-            }
-            var str;
-            if (obj instanceof Array) {
-                str = obj.join('');
-            } else if (obj instanceof String || typeof(obj) ==='string') {
-                str = "'" + obj + "'";
-            } else {
-                str = obj.toString();
-            }
-            str = str.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&lt;br\/&gt;/g, '&lt;br/&gt;<br/>');
-            return str;
-        },
-
-        getSummary : function (unitTestResult) {
-            var failedAssertions = unitTestResult.getNumberOfFailedAssertions();
-            var totalAssertions = unitTestResult.getNumberOfAssertions();
-
-            var summary = navigator.userAgent + '<br/>\n';
-            if (unitTestResult.wasExceptionThrown()) {
-                summary += '<font color=red>\nUnit test failed.\n</font>\n';
-            } else if (unitTestResult.failed()) {
-                summary += '<font color=red>\n' + failedAssertions + ' assertion failure' +
-                           (failedAssertions === 1 ? '' : 's') +
-                           ' (' + totalAssertions + ' assertions in total).\n</font>\n';
-            } else {
-                summary += '<font color=lime>\nAll ' + totalAssertions + ' assertions passed.\n</font>\n';
-            }
-            summary += '<hr/>\n';
-            return summary;
-        },
-
-        getResult : function (result) {
-            if (result.exception) {
-                return '<p><b>Exception:</b></p>\n' +
-                       '<p>' + result.exception + '</p>\n';
-            } else {
-                return '<p><b>' + result.description + '</b></p>' +
-                       '<p>expected</p><p>' + this.toString(result.expected) + '</p>' +
-                       '<p>but was</p><p>' + this.toString(result.actual) + '</p>\n';
-            }
-        },
-
-        getResultsForFunctionUnderTest : function (functionUnderTest, results) {
-            var failure = results.some(function (result) {
-                return !result.success;
-            });
-            var resultsText = '';
-            if (failure) {
-                resultsText += '<h2>' + functionUnderTest + '</h2>\n';
-                results.forEach(function (result) {
-                    if (!result.success) {
-                        resultsText += this.getResult(result);
-                    }
-                }, this);
-                resultsText += '<hr/>\n';
-            }
-            return resultsText;
-        }
-    },
-
-    title : 'Unit Test Results',
-
-    getContents : function (pageDocument) {
-        var unitTestResult = UnitTestSuite.run();
-        var resultsText = '';
-        resultsText += this.privateFunctions.getSummary(unitTestResult);
-
-        var resultsByFunctionUnderTest = unitTestResult.getResultsByFunctionUnderTest();
-        resultsByFunctionUnderTest.forEach(function (resultForFunctionUnderTest) {
-            resultsText += this.privateFunctions.getResultsForFunctionUnderTest(
-                    resultForFunctionUnderTest.functionUnderTest, resultForFunctionUnderTest.results);
-        }, this);
-
-        var contentsElement = pageDocument.createElement('p');
-        contentsElement.innerHTML = resultsText;
-        return [contentsElement];
-    },
-
-    open : function () {
-        WebPage._open(this);
-    }
-};
-
-/**
  * Open the given page.
  * @private
  */
@@ -1081,8 +989,6 @@ ClassLink.prototype.toString = function () {
  */
 View = {
     searchField : null,
-    unitTestFailedWarningParent : null,
-    unitTestFailedWarning : null,
     contentNodeParent : null,
     contentNode : null
 };
@@ -1130,12 +1036,6 @@ View.focusOnSearchField = function () {
     }
 };
 
-View.warnOfFailedUnitTest = function () {
-    if (Frames.getSummaryFrame()) {
-        this.unitTestFailedWarningParent.appendChild(this.unitTestFailedWarning);
-    }
-};
-
 View._create = function (eventHandlers) {
     var tableElement = document.createElement('table');
     var tableRowElementOne = document.createElement('tr');
@@ -1148,10 +1048,6 @@ View._create = function (eventHandlers) {
     var settingsLink = this._createSettingsLink(eventHandlers);
     this.contentNodeParent = tableRowElementTwo;
     this.contentNode = tableDataCellElementTwo;
-    if (Frames.getSummaryFrame()) {
-        this.unitTestFailedWarning = this._createUnitTestFailedWarning(eventHandlers);
-        this.unitTestFailedWarningParent = tableDataCellElementOne;
-    }
 
     tableElement.appendChild(tableRowElementOne);
     tableRowElementOne.appendChild(tableDataCellElementOne);
@@ -1212,21 +1108,6 @@ View._createSettingsLink = function (eventHandlers) {
     fontElement.setAttribute('size', '-2');
     fontElement.appendChild(anchorElement);
     return fontElement;
-};
-
-View._createUnitTestFailedWarning = function (eventHandlers) {
-    var anchorElement = document.createElement('a');
-    anchorElement.setAttribute('href', 'javascript:void(0);');
-    anchorElement.textContent = 'Unit test failed. Click here for details.';
-    anchorElement.addEventListener('click', eventHandlers.unitTestResultsLinkClicked, false);
-    var fontElement = document.createElement('font');
-    fontElement.setAttribute('size', '-2');
-    fontElement.appendChild(anchorElement);
-    var italicElement = document.createElement('i');
-    italicElement.appendChild(fontElement);
-    var paragraphElement = document.createElement('p');
-    paragraphElement.appendChild(italicElement);
-    return paragraphElement;
 };
 
 View._watch = function (element, callback, msec) {
@@ -2218,9 +2099,6 @@ function init() {
     // Run the unit test.
     var unitTestStopWatch = new StopWatch();
     var unitTestResults = UnitTestSuite.run();
-    if (unitTestResults.failed()) {
-        View.warnOfFailedUnitTest();
-    }
     unitTestStopWatch.stop();
 
     // Hide the package list frame.
@@ -2235,17 +2113,28 @@ function init() {
     View.focusOnSearchField();
     focusSearchFieldStopWatch.stop();
 
+    // Log a startup message, including timing information.
     Log.message('\n' +
+        SCRIPT_META_DATA.name + ' : ' + SCRIPT_META_DATA.version + '\n' +
+        SCRIPT_META_DATA.homepage + '\n' +
+        navigator.userAgent + '\n' +
+        '\n' +
         'initialised in ' + initStopWatch.timeElapsed() + ' total\n' +
         '- contents of existing frames retrieved in ' + retrieveInnerHtmlStopWatch.timeElapsed() + '\n' +
         '- search list constructed in ' + searchListStopWatch.timeElapsed() + '\n' +
         '- container initialised in ' + initContainerStopWatch.timeElapsed() + '\n' +
         '- initial search performed in ' + initialSearchStopWatch.timeElapsed() + '\n' +
-        '- unit test run in ' + unitTestStopWatch.timeElapsed() + '\n' +
+        '- unit test run in ' + unitTestStopWatch.timeElapsed() +
+            ' (' + unitTestResults.getNumberOfPassedAssertions() + ' of ' + unitTestResults.getNumberOfAssertions() + ' assertions passed)\n' +
         (hidePackageFrameStopWatch ?
             '- package frame hidden in ' + hidePackageFrameStopWatch.timeElapsed() + '\n' : '') +
         '- search field given focus in ' + focusSearchFieldStopWatch.timeElapsed() + '\n'
     );
+
+    // Log all unit test failures.
+    unitTestResults.getFailures().forEach(function (unitTestFailure) {
+        Log.message(unitTestFailure + '\n');
+    });
 }
 
 /**
@@ -2601,11 +2490,6 @@ EventHandlers.eraseButtonClick = function () {
 
 EventHandlers.settingsLinkClicked = function (event) {
     WebPage.SETTINGS.open();
-    event.preventDefault();
-};
-
-EventHandlers.unitTestResultsLinkClicked = function (event) {
-    WebPage.UNIT_TEST_RESULTS.open();
     event.preventDefault();
 };
 
