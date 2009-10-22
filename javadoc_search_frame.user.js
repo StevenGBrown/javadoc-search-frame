@@ -2065,17 +2065,16 @@ function init() {
         return;
     }
 
-    // Retrieve the innerHTML of the package and class frames.
+    // Retrieve the innerHTML of the class frame.
     var retrieveInnerHtmlStopWatch = new StopWatch();
-    var packagesInnerHTML = getPackagesInnerHtml();
     var classesInnerHTML = getClassesInnerHtml();
     retrieveInnerHtmlStopWatch.stop();
 
     // Initialise stored package and class links.
     var searchListStopWatch = new StopWatch();
-    var packageLinks = getPackageLinks(packagesInnerHTML);
     var classLinks = getClassLinks(classesInnerHTML);
     if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
+        var packageLinks = getPackageLinks(classLinks);
         ALL_PACKAGE_AND_CLASS_LINKS = packageLinks.concat(classLinks);
     } else {
         ALL_PACKAGE_AND_CLASS_LINKS = classLinks;
@@ -2120,7 +2119,7 @@ function init() {
         navigator.userAgent + '\n' +
         '\n' +
         'initialised in ' + initStopWatch.timeElapsed() + ' total\n' +
-        '- contents of existing frames retrieved in ' + retrieveInnerHtmlStopWatch.timeElapsed() + '\n' +
+        '- contents of existing frame retrieved in ' + retrieveInnerHtmlStopWatch.timeElapsed() + '\n' +
         '- search list constructed in ' + searchListStopWatch.timeElapsed() + '\n' +
         '- container initialised in ' + initContainerStopWatch.timeElapsed() + '\n' +
         '- initial search performed in ' + initialSearchStopWatch.timeElapsed() + '\n' +
@@ -2138,104 +2137,60 @@ function init() {
 }
 
 /**
- * @return the inner HTML of the body element of the package list frame, or undefined if the element does not exist
- */
-function getPackagesInnerHtml() {
-    var allPackagesFrame = Frames.getAllPackagesFrame();
-    var packagesInnerHTML;
-    if (allPackagesFrame && allPackagesFrame.document.body) {
-        packagesInnerHTML = allPackagesFrame.document.body.innerHTML;
-    }
-    return packagesInnerHTML;
-}
-
-/**
- * Parse packages from the inner HTML of the body element of the packages list
- * frame.
- * 
- * Assumptions:
- * - Double-quotes are used to declare the target attribute.
+ * Parse packages from the given array of {@ClassLink} objects.
  * 
  * @param packagesInnerHTML the inner HTML of the body element of the packages
  *                          list frame
  * @returns an array of {@PackageLink} objects
  */
-function getPackageLinks(packagesInnerHTML) {
-    if (!packagesInnerHTML) {
-        return [];
-    }
-
+function getPackageLinks(classLinks) {
     var packageLinks = [];
-    var html;
-    var link;
-    var matches;
-    var packagesRegex = /<a[^>]+>([^<]+)<\/a\s*>/gi;
+    var packageLinksAdded = {};
+    var packageName;
+    var packageUrl;
 
-    while ((matches = packagesRegex.exec(packagesInnerHTML)) !== null) {
-        if (matches[1] !== 'All Classes') {
-            html = matches[0]
-                    .replace(/package-frame.html/gi, 'package-summary.html')
-                    .replace(/target\s*=\s*"packageFrame"/gi, 'target="classFrame"');
-            link = new PackageLink(matches[1], html);
-            packageLinks.push(link);
+    classLinks.forEach(function (classLink) {
+        packageName = classLink.getPackageName();
+        if (!packageLinksAdded[packageName]) {
+            packageUrl = '<A HREF="' + packageName.replace(/\./g, '/') + '/package-summary.html" target="classFrame">' + packageName + '</A>';
+            packageLinks.push(new PackageLink(packageName, packageUrl));
+            packageLinksAdded[packageName] = true;
         }
-    }
+    });
 
+    packageLinks.sort(function (packageLinkOne, packageLinkTwo) {
+        var packageNameOneComponents = packageLinkOne.getPackageName().split(/\./);
+        var packageNameTwoComponents = packageLinkTwo.getPackageName().split(/\./);
+        var smallerLength = Math.min(packageNameOneComponents.length, packageNameTwoComponents.length);
+        for (i = 0; i < smallerLength; i++) {
+            if (packageNameOneComponents[i] < packageNameTwoComponents[i]) {
+                return -1;
+            }
+            if (packageNameOneComponents[i] > packageNameTwoComponents[i]) {
+                return 1;
+            }
+        }
+        return packageNameOneComponents.length - packageNameTwoComponents.length;
+    });
     return packageLinks;
 }
 
-UnitTestSuite.testFunctionFor('getPackageLinks(packagesInnerHTML)', function () {
+UnitTestSuite.testFunctionFor('getPackageLinks(classLinks)', function () {
 
-    var packagePath = 'java/applet/';
-    var package = 'java.applet';
+    var classLinks = [
+            new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder', ''),
+            new ClassLink(LinkType.CLASS, 'java.awt', 'Button', ''),
+            new ClassLink(LinkType.CLASS, 'javax.swing', 'SwingWorker', '')
+    ];
 
-    var lowerCaseHtml =
-            '<a href="' + packagePath + 'package-frame.html" target="packageFrame">' + package + '</a>';
-    var lowerCaseLink = new PackageLink(package,
-            '<a href="' + packagePath + 'package-summary.html" target="classFrame">' + package + '</a>');
-    assertThat('lowercase html tags',
-            getPackageLinks(lowerCaseHtml), is([lowerCaseLink]));
+    var expectedPackageLinks = [
+            new PackageLink('java.awt', '<A HREF="java/awt/package-summary.html" target="classFrame">java.awt</A>'),
+            new PackageLink('javax.swing', '<A HREF="javax/swing/package-summary.html" target="classFrame">javax.swing</A>'),
+            new PackageLink('javax.swing.border', '<A HREF="javax/swing/border/package-summary.html" target="classFrame">javax.swing.border</A>')
+    ];
 
-    var upperCaseHtml =
-            '<A HREF="' + packagePath + 'package-frame.html" TARGET="packageFrame">' + package + '</A>';
-    var upperCaseLink = new PackageLink(package,
-            '<A HREF="' + packagePath + 'package-summary.html" target="classFrame">' + package + '</A>');
-    assertThat('uppercase html tags',
-            getPackageLinks(upperCaseHtml), is([upperCaseLink]));
-
-    var lowerCaseWithWhitespaceHtml =
-            '<a   href  =  "' + packagePath + 'package-frame.html"   target  =  "packageFrame"  >' +
-            package + '</a  >';
-    var lowerCaseWithWhitespaceLink = new PackageLink(package,
-            '<a   href  =  "' + packagePath + 'package-summary.html"   target="classFrame"  >' +
-            package + '</a  >');
-    assertThat('lowercase html tags with additional whitespace',
-            getPackageLinks(lowerCaseWithWhitespaceHtml),
-            is([lowerCaseWithWhitespaceLink]));
-
-    var upperCaseWithWhitespaceHtml =
-            '<A   HREF  =  "' + packagePath + 'package-frame.html"   TARGET  =  "packageFrame"  >' +
-            package + '</A  >';
-    var upperCaseWithWhitespaceLink = new PackageLink(package,
-            '<A   HREF  =  "' + packagePath + 'package-summary.html"   target="classFrame"  >' +
-            package + '</A  >');
-    assertThat('uppercase html tags with additional whitespace',
-            getPackageLinks(upperCaseWithWhitespaceHtml),
-            is([upperCaseWithWhitespaceLink]));
-
-    // Assert that the All Classes anchor is ignored when looking for packages.
-    assertThat('"All Classes" is not a match (lowercase html tags)',
-            getPackageLinks('<a href="allclasses-frame.html" target="packageFrame">All Classes</a>'),
-            is([]));
-    assertThat('"All Classes" is not a match (uppercase html tags)',
-            getPackageLinks('<A HREF="allclasses-frame.html" TARGET="packageFrame">All Classes</A>'),
-            is([]));
-    assertThat('"All Classes" is not a match (lowercase html tags with additional whitespace)',
-            getPackageLinks('<a   href  =  "allclasses-frame.html"   target="packageFrame"  >All Classes</a  >'),
-            is([]));
-    assertThat('"All Classes" is not a match (uppercase html tags with additional whitespace)',
-            getPackageLinks('<A   HREF  =  "allclasses-frame.html"   target="packageFrame"  >All Classes</A  >'),
-            is([]));
+    assertThat('getPackageLinks([javax.swing.border.AbstractBorder, java.awt.Button, javax.swing.SwingWorker])',
+            getPackageLinks(classLinks), is(expectedPackageLinks));
 });
 
 /**
