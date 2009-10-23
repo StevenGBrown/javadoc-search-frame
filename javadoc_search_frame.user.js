@@ -486,7 +486,7 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
  * @class Frames (undocumented).
  */
 Frames = {
-  framesByName : {}
+  siblingFramesByName : {}
 };
 
 /**
@@ -512,6 +512,10 @@ Frames.hideAllPackagesFrame = function () {
   return false;
 };
 
+/**
+ * Open the given URL in the summary frame.
+ * @param url
+ */
 Frames.openLinkInSummaryFrame = function (url) {
   var summaryFrame = this._getFrame('classFrame');
   if (summaryFrame) {
@@ -519,9 +523,15 @@ Frames.openLinkInSummaryFrame = function (url) {
   }
 };
 
+/**
+ * Get the frame with the given name. This frame will share a parent with the
+ * current frame.
+ * @param name
+ * @returns the frame, or null if it could not be found
+ */
 Frames._getFrame = function (name) {
-  if (this.framesByName[name]) {
-    return this.framesByName[name];
+  if (this.siblingFramesByName[name]) {
+    return this.siblingFramesByName[name];
   }
   var frame;
   var i;
@@ -529,7 +539,7 @@ Frames._getFrame = function (name) {
     for (i = 0; i < parent.frames.length; i++) {
       frame = parent.frames[i];
       if (frame && frame.name === name && frame.document) {
-        this.framesByName[name] = frame;
+        this.siblingFramesByName[name] = frame;
         return frame;
       }
     }
