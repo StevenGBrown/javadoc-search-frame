@@ -483,7 +483,7 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
  */
 
 /**
- * @class Frames (undocumented).
+ * @class Provides functions to interact with other frames.
  */
 Frames = {
   siblingFramesByName : {}
