@@ -572,19 +572,14 @@ Frames._getFrame = function (name) {
 
 /*
  * ----------------------------------------------------------------------------
- * INTERNAL WEB PAGES
+ * SETTINGS PAGE
  * ----------------------------------------------------------------------------
  */
 
 /**
- * @class Namespace for storing the internal web pages of this script.
+ * @class The settings page.
  */
-WebPage = {};
-
-/**
- * Settings page.
- */
-WebPage.SETTINGS = {
+SettingsPage = {
   privateFunctions : {
     createTable : function (pageDocument, title, subTitle, contents) {
       var tableElement = pageDocument.createElement('table');
@@ -721,8 +716,6 @@ WebPage.SETTINGS = {
     }
   },
 
-  title : 'Settings',
-
   getContents : function (pageDocument) {
     var instructionsElement = this.privateFunctions.getInstructions(pageDocument);
     var autoOpenElement = this.privateFunctions.booleanOption(
@@ -757,17 +750,14 @@ WebPage.SETTINGS = {
     this.privateFunctions.registerMenuOptionEventListeners(pageDocument, UserPreference.CLASS_MENU);
     this.privateFunctions.registerMenuOptionEventListeners(pageDocument, UserPreference.PACKAGE_MENU);
   },
-
-  open : function () {
-    WebPage._open(this);
-  }
 };
 
 /**
- * Open the given page.
- * @private
+ * Open the settings page.
  */
-WebPage._open = function (page) {
+SettingsPage.open = function () {
+  var page = this;
+
   Frames.setSummaryFrameContent(function(pageDocument) {
     var tableElement = pageDocument.createElement('table');
     tableElement.setAttribute('width', '100%');
@@ -778,7 +768,7 @@ WebPage._open = function (page) {
     tableDataCellElementOne.setAttribute('align', 'left');
     tableDataCellElementOne.style.border = 'none';
     var headerElement = pageDocument.createElement('h2');
-    headerElement.textContent = page.title;
+    headerElement.textContent = 'Settings';
     var tableDataCellElementTwo = pageDocument.createElement('td');
     tableDataCellElementTwo.setAttribute('align', 'right');
     tableDataCellElementTwo.style.border = 'none';
@@ -802,9 +792,7 @@ WebPage._open = function (page) {
       pageDocument.body.appendChild(pageElement);
     });
 
-    if (page.registerEventListeners) {
-      page.registerEventListeners(pageDocument);
-    }
+    page.registerEventListeners(pageDocument);
   });
 };
 
@@ -1102,7 +1090,7 @@ View._createEraseButton = function (eventHandlers) {
 View._createSettingsLink = function (eventHandlers) {
   var anchorElement = document.createElement('a');
   anchorElement.setAttribute('href', 'javascript:void(0);');
-  anchorElement.textContent = WebPage.SETTINGS.title;
+  anchorElement.textContent = 'Settings';
   anchorElement.addEventListener('click', eventHandlers.settingsLinkClicked, false);
   var fontElement = document.createElement('font');
   fontElement.setAttribute('size', '-2');
@@ -2443,7 +2431,7 @@ EventHandlers.eraseButtonClick = function () {
 };
 
 EventHandlers.settingsLinkClicked = function (event) {
-  WebPage.SETTINGS.open();
+  SettingsPage.open();
   event.preventDefault();
 };
 
