@@ -489,22 +489,27 @@ Frames = {
   framesByName : {}
 };
 
-Frames.getAllPackagesFrame = function () {
-  return this._getFrame('packageListFrame');
-};
-
+/**
+ * Hide the packages frame. If the packages frame does not exist, calling this
+ * function will have no effect.
+ * @returns true if the packages frame was hidden, false otherwise
+ */
 Frames.hideAllPackagesFrame = function () {
-  var framesets = parent.document.getElementsByTagName('frameset');
-  if (framesets) {
-    var frameset = framesets[1];
-    if (frameset) {
-      frameset.setAttribute('rows', '0,*');
-      frameset.setAttribute('border', 0);
-      frameset.setAttribute('frameborder', 0);
-      frameset.setAttribute('framespacing', 0);
-      scroll(0, 0);
+  if (this._getFrame('packageListFrame')) {
+    var framesets = parent.document.getElementsByTagName('frameset');
+    if (framesets) {
+      var frameset = framesets[1];
+      if (frameset) {
+        frameset.setAttribute('rows', '0,*');
+        frameset.setAttribute('border', 0);
+        frameset.setAttribute('frameborder', 0);
+        frameset.setAttribute('framespacing', 0);
+        scroll(0, 0);
+      }
     }
+    return true;
   }
+  return false;
 };
 
 Frames.openLinkInSummaryFrame = function (url) {
@@ -2029,9 +2034,9 @@ function init() {
   unitTestStopWatch.stop();
 
   // Hide the package list frame.
-  if (Frames.getAllPackagesFrame() && UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
+  if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
     var hidePackageFrameStopWatch = new StopWatch();
-    Frames.hideAllPackagesFrame();
+    var packageFrameHidden = Frames.hideAllPackagesFrame();
     hidePackageFrameStopWatch.stop();
   }
 
@@ -2053,7 +2058,7 @@ function init() {
     '- initial search performed in ' + initialSearchStopWatch.timeElapsed() + '\n' +
     '- unit test run in ' + unitTestStopWatch.timeElapsed() +
       ' (' + unitTestResults.getNumberOfPassedAssertions() + ' of ' + unitTestResults.getNumberOfAssertions() + ' assertions passed)\n' +
-    (hidePackageFrameStopWatch ?
+    (packageFrameHidden ?
       '- package frame hidden in ' + hidePackageFrameStopWatch.timeElapsed() + '\n' : '') +
     '- search field given focus in ' + focusSearchFieldStopWatch.timeElapsed() + '\n'
   );
