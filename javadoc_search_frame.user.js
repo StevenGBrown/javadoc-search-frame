@@ -355,6 +355,59 @@ UnitTestExceptionThrownFailure.prototype.toString = function () {
 
 /*
  * ----------------------------------------------------------------------------
+ * STORAGE
+ * ----------------------------------------------------------------------------
+ */
+
+/**
+ * @class Provides local storage functionality, which is used to implement {UserPreference}.
+ */
+Storage = {};
+
+/**
+ * @returns {Boolean} true if retrieval of stored data is supported, false otherwise
+ */
+Storage.canGet = function () {
+  try {
+    return Boolean(GM_getValue) &&
+        GM_getValue('test', 'defaultValue') === 'defaultValue';
+  } catch (ex) {
+    return false;
+  }
+};
+
+/**
+ * Retrieve a value based on a key.
+ * @param the key
+ * @returns the value
+ */
+Storage.get = function (key) {
+  return GM_getValue(key);
+};
+
+/**
+ * @returns {Boolean} true if modification of stored data is supported, false otherwise
+ */
+Storage.canSet = function () {
+  try {
+    return Boolean(GM_setValue);
+  } catch (ex) {
+    return false;
+  }
+};
+
+/**
+ * Store a value based on a key.
+ * @param key the key
+ * @param value the value
+ */
+Storage.set = function (key, value) {
+  GM_setValue(key, newValue);
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
  * USER PREFERENCES
  * ----------------------------------------------------------------------------
  */
@@ -372,34 +425,11 @@ UserPreference = function (key, defaultValue) {
 };
 
 /**
- * @returns {Boolean} true if user preference values can be retrieved, false otherwise
- */
-UserPreference.canGet = function () {
-  try {
-    return Boolean(GM_getValue) &&
-        GM_getValue('test', 'defaultValue') === 'defaultValue';
-  } catch (ex) {
-    return false;
-  }
-};
-
-/**
- * @returns {Boolean} true if user preference values can be set, false otherwise
- */
-UserPreference.canSet = function () {
-  try {
-    return Boolean(GM_setValue);
-  } catch (ex) {
-    return false;
-  }
-};
-
-/**
  * @returns {Boolean} true if user preferences can be both retrieved and set,
  *                    false otherwise
  */
 UserPreference.canGetAndSet = function () {
-  return UserPreference.canGet() && UserPreference.canSet();
+  return Storage.canGet() && Storage.canSet();
 };
 
 /**
@@ -410,20 +440,21 @@ UserPreference.prototype.getKey = function () {
 };
 
 /**
+ * Retrieve the current value of this user preference.
  * @returns the value of this user preference. If the preference cannot be
  *          retrieved or has not yet been configured, the default value is
  *          returned
- * @see UserPreference.canGet
+ * @see UserPreference.canGetAndSet
  */
 UserPreference.prototype.getValue = function () {
   var value;
-  if (UserPreference.canGet()) {
-    value = GM_getValue(this.key);
+  if (Storage.canGet()) {
+    value = Storage.get(this.key);
+    if (value) {
+      return value;
+    }
   }
-  if (value === undefined) {
-    value = this.defaultValue;
-  }
-  return value;
+  return this.defaultValue;
 };
 
 /**
@@ -436,10 +467,10 @@ UserPreference.prototype.getDefaultValue = function () {
 /**
  * Set this user preference to a new value.
  * @throws an exception if this user preference cannot be set
- * @see UserPreference.canSet
+ * @see UserPreference.canGetAndSet
  */
 UserPreference.prototype.setValue = function (newValue) {
-  GM_setValue(this.key, newValue);
+  Storage.set(this.key, newValue);
 };
 
 
