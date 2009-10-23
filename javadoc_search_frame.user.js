@@ -802,7 +802,7 @@ LinkType.values = function () {
  */
 
 function parseURL(anchorElementHTML) {
-  var rx = /href\s*=\s*(?:"|')([^"']+)(?:"|')/;
+  var rx = /href\s*=\s*(?:"|')([^"']+)(?:"|')/i;
   var matches;
   if ((matches = rx.exec(anchorElementHTML)) !== null) {
     var relativeURL = matches[1];
