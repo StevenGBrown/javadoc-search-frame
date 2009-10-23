@@ -402,7 +402,7 @@ Storage.canSet = function () {
  * @param value the value
  */
 Storage.set = function (key, value) {
-  GM_setValue(key, newValue);
+  GM_setValue(key, value);
 };
 
 
