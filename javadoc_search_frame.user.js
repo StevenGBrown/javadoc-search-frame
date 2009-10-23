@@ -450,7 +450,13 @@ UserPreference.prototype.getValue = function () {
   var value;
   if (Storage.canGet()) {
     value = Storage.get(this.key);
-    if (value) {
+    if (value === 'true') {
+      return true;
+    }
+    if (value === 'false') {
+      return false;
+    }
+    if (value !== undefined && value !== null) {
       return value;
     }
   }
