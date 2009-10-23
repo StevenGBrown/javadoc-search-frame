@@ -486,9 +486,7 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
  * @class Frames (undocumented).
  */
 Frames = {
-  framesByName : {},
-  initialHrefOfSummaryFrame : null,
-  summaryFrameContentLoading : false
+  framesByName : {}
 };
 
 Frames.getAllPackagesFrame = function () {
@@ -509,43 +507,8 @@ Frames.hideAllPackagesFrame = function () {
   }
 };
 
-Frames.getSummaryFrame = function () {
-  var summaryFrame = this._getFrame('classFrame');
-  if (summaryFrame && !this.initialHrefOfSummaryFrame) {
-    this.initialHrefOfSummaryFrame = summaryFrame.location.href;
-  }
-  return summaryFrame;
-};
-
-Frames.setSummaryFrameContent = function (createContent) {
-  if (this.summaryFrameContentLoading) {
-    return;
-  }
-  var intervalIndex = 0;
-  var frames = this;
-  var setIntervalAction = function () {
-    var summaryFrame = frames.getSummaryFrame();
-    if (intervalIndex == 1) {
-      summaryFrame.location.href = frames.initialHrefOfSummaryFrame;
-    }
-    intervalIndex++;
-    var summaryFrameDocument = summaryFrame.document;
-    if (!summaryFrameDocument) {
-      return;
-    }
-    while (summaryFrameDocument.body.firstChild) {
-      summaryFrameDocument.body.removeChild(summaryFrameDocument.body.firstChild);
-    }
-    createContent(summaryFrame.document);
-    clearInterval(intervalId);
-    frames.summaryFrameContentLoading = false;
-  };
-  var intervalId = setInterval(setIntervalAction, 50);
-  this.summaryFrameContentLoading = true;
-};
-
 Frames.openLinkInSummaryFrame = function (url) {
-  var summaryFrame = this.getSummaryFrame();
+  var summaryFrame = this._getFrame('classFrame');
   if (summaryFrame) {
     summaryFrame.location.href = url;
   }
@@ -669,21 +632,26 @@ SettingsPage = {
           restoreDefaultButtonHTML);
     },
 
-    getInstructions : function (pageDocument) {
-      var instructionsElement = pageDocument.createElement('p');
-      if (UserPreference.canGetAndSet()) {
-        instructionsElement.innerHTML =
-            'Changes to these preferences will take effect the next time a ' +
-            'Javadoc page in opened in your browser. Alternatively, refresh ' +
-            'a currently open Javadoc page to have these preferences take ' +
-            'effect immediately.';
-      } else {
-        instructionsElement.innerHTML =
-            'Settings cannot be configured. The <code>GM_getValue</code> and ' +
-            '<code>GM_setValue</code> functions are not supported by your browser.';
-        instructionsElement.style.color = 'red';
+    getBackAnchor : function (pageDocument) {
+      var backAnchorElement = pageDocument.createElement('a');
+      backAnchorElement.setAttribute('href', location.href);
+      backAnchorElement.textContent = '<< Back';
+      return backAnchorElement;
+    },
+
+    getHeader : function (pageDocument) {
+      var headerElement = pageDocument.createElement('h2');
+      headerElement.textContent = 'Settings';
+      return headerElement;
+    },
+
+    getErrorMessageIfSettingsNotAvailable : function (pageDocument) {
+      var errorMessageElement = pageDocument.createElement('p');
+      if (!UserPreference.canGetAndSet()) {
+        errorMessageElement.innerHTML = 'Settings cannot be configured.';
+        errorMessageElement.style.color = 'red';
       }
-      return instructionsElement;
+      return errorMessageElement;
     },
 
     registerBooleanOptionEventListeners : function (pageDocument, preference) {
@@ -717,7 +685,9 @@ SettingsPage = {
   },
 
   getContents : function (pageDocument) {
-    var instructionsElement = this.privateFunctions.getInstructions(pageDocument);
+    var backAnchorElement = this.privateFunctions.getBackAnchor(pageDocument);
+    var headerElement = this.privateFunctions.getHeader(pageDocument);
+    var errorMessageElement = this.privateFunctions.getErrorMessageIfSettingsNotAvailable(pageDocument);
     var autoOpenElement = this.privateFunctions.booleanOption(
         pageDocument, UserPreference.AUTO_OPEN, 'Automatic Opening of Links',
         'On. Automatically open the first package, class or method in the list after each search.',
@@ -736,7 +706,9 @@ SettingsPage = {
         'at the top of the search list.');
 
     return [
-      instructionsElement,     pageDocument.createElement('p'),
+      backAnchorElement,       pageDocument.createElement('p'),
+      headerElement,           pageDocument.createElement('p'),
+      errorMessageElement,     pageDocument.createElement('p'),
       autoOpenElement,         pageDocument.createElement('p'),
       hidePackageFrameElement, pageDocument.createElement('p'),
       classMenuElement,        pageDocument.createElement('p'),
@@ -756,44 +728,15 @@ SettingsPage = {
  * Open the settings page.
  */
 SettingsPage.open = function () {
-  var page = this;
+  while (document.body.firstChild) {
+    document.body.removeChild(document.body.firstChild);
+  }
 
-  Frames.setSummaryFrameContent(function(pageDocument) {
-    var tableElement = pageDocument.createElement('table');
-    tableElement.setAttribute('width', '100%');
-    tableElement.style.border = 'none';
-    var tableRowElement = pageDocument.createElement('tr');
-    tableRowElement.style.border = 'none';
-    var tableDataCellElementOne = pageDocument.createElement('td');
-    tableDataCellElementOne.setAttribute('align', 'left');
-    tableDataCellElementOne.style.border = 'none';
-    var headerElement = pageDocument.createElement('h2');
-    headerElement.textContent = 'Settings';
-    var tableDataCellElementTwo = pageDocument.createElement('td');
-    tableDataCellElementTwo.setAttribute('align', 'right');
-    tableDataCellElementTwo.style.border = 'none';
-    var anchorElement = pageDocument.createElement('a');
-    anchorElement.setAttribute('href', SCRIPT_META_DATA.homepage);
-    anchorElement.textContent = SCRIPT_META_DATA.homepage;
-    var lineBreakElement = pageDocument.createElement('br');
-    var italicElement = pageDocument.createElement('i');
-    italicElement.textContent = SCRIPT_META_DATA.version;
-
-    tableElement.appendChild(tableRowElement);
-    tableRowElement.appendChild(tableDataCellElementOne);
-    tableDataCellElementOne.appendChild(headerElement);
-    tableRowElement.appendChild(tableDataCellElementTwo);
-    [anchorElement, lineBreakElement, italicElement].forEach(function (element) {
-      tableDataCellElementTwo.appendChild(element);
-    });
-
-    pageDocument.body.appendChild(tableElement);
-    page.getContents(pageDocument).forEach(function (pageElement) {
-      pageDocument.body.appendChild(pageElement);
-    });
-
-    page.registerEventListeners(pageDocument);
+  this.getContents(document).forEach(function (pageElement) {
+    document.body.appendChild(pageElement);
   });
+
+  this.registerEventListeners(document);
 };
 
 
@@ -1042,9 +985,7 @@ View._create = function (eventHandlers) {
   tableDataCellElementOne.appendChild(this.searchField);
   tableDataCellElementOne.appendChild(eraseButton);
   tableDataCellElementOne.appendChild(document.createElement('br'));
-  if (Frames.getSummaryFrame()) {
-    tableDataCellElementOne.appendChild(settingsLink);
-  }
+  tableDataCellElementOne.appendChild(settingsLink);
   tableElement.appendChild(tableRowElementTwo);
   tableRowElementTwo.appendChild(tableDataCellElementTwo);
 
