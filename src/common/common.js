@@ -119,31 +119,7 @@ StopWatch.prototype.timeElapsed = function () {
  * ----------------------------------------------------------------------------
  */
 
-/**
- * @class Error Console logging utility.
- */
-Log = {
-  gmLogAvailable : function () {
-    try {
-      return GM_log;
-    } catch (ex) {
-      return false;
-    }
-  }()
-};
-
-/**
- * Log the given object to the Error Console as a message.
- */
-Log.message = function (logMessage) {
-  if (this.gmLogAvailable) {
-    // Greasemonkey logging function.
-    GM_log(logMessage);
-  } else {
-    // Firebug or Google Chrome logging function.
-    console.log(logMessage);
-  }
-};
+#INCLUDE Log.js
 
 
 /*
@@ -355,51 +331,7 @@ UnitTestExceptionThrownFailure.prototype.toString = function () {
  * ----------------------------------------------------------------------------
  */
 
-/**
- * @class Provides local storage functionality, which is used to implement {UserPreference}.
- */
-Storage = {};
-
-/**
- * @returns {Boolean} true if retrieval of stored data is supported, false otherwise
- */
-Storage.canGet = function () {
-  try {
-    return Boolean(GM_getValue) &&
-        GM_getValue('test', 'defaultValue') === 'defaultValue';
-  } catch (ex) {
-    return false;
-  }
-};
-
-/**
- * Retrieve a value based on a key.
- * @param the key
- * @returns the value
- */
-Storage.get = function (key) {
-  return GM_getValue(key);
-};
-
-/**
- * @returns {Boolean} true if modification of stored data is supported, false otherwise
- */
-Storage.canSet = function () {
-  try {
-    return Boolean(GM_setValue);
-  } catch (ex) {
-    return false;
-  }
-};
-
-/**
- * Store a value based on a key.
- * @param key the key
- * @param value the value
- */
-Storage.set = function (key, value) {
-  GM_setValue(key, value);
-};
+#INCLUDE Storage.js
 
 
 /*
@@ -515,70 +447,7 @@ UserPreference.CLASS_MENU = new UserPreference('class_menu',
  * ----------------------------------------------------------------------------
  */
 
-/**
- * @class Provides functions to interact with other frames.
- */
-Frames = {
-  siblingFramesByName : {}
-};
-
-/**
- * Hide the packages frame. If the packages frame does not exist, calling this
- * function will have no effect.
- * @returns true if the packages frame was hidden, false otherwise
- */
-Frames.hideAllPackagesFrame = function () {
-  if (this._getFrame('packageListFrame')) {
-    var framesets = parent.document.getElementsByTagName('frameset');
-    if (framesets) {
-      var frameset = framesets[1];
-      if (frameset) {
-        frameset.setAttribute('rows', '0,*');
-        frameset.setAttribute('border', 0);
-        frameset.setAttribute('frameborder', 0);
-        frameset.setAttribute('framespacing', 0);
-        scroll(0, 0);
-      }
-    }
-    return true;
-  }
-  return false;
-};
-
-/**
- * Open the given URL in the summary frame.
- * @param url
- */
-Frames.openLinkInSummaryFrame = function (url) {
-  var summaryFrame = this._getFrame('classFrame');
-  if (summaryFrame) {
-    summaryFrame.location.href = url;
-  }
-};
-
-/**
- * Get the frame with the given name. This frame will share a parent with the
- * current frame.
- * @param name
- * @returns the frame, or null if it could not be found
- */
-Frames._getFrame = function (name) {
-  if (this.siblingFramesByName[name]) {
-    return this.siblingFramesByName[name];
-  }
-  var frame;
-  var i;
-  if (parent) {
-    for (i = 0; i < parent.frames.length; i++) {
-      frame = parent.frames[i];
-      if (frame && frame.name === name && frame.document) {
-        this.siblingFramesByName[name] = frame;
-        return frame;
-      }
-    }
-  }
-  return null;
-};
+#INCLUDE Frames.js
 
 
 /*
