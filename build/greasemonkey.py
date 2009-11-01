@@ -41,7 +41,7 @@ def buildGreasemonkeyUserScript():
   buildDate = datetime.date.today()
 
   script = ''
-  with io.open(sys.path[0] + '/../src/common/common.js') as file:
+  with io.open(sys.path[0] + '/../src/common/allclasses-frame.js') as file:
     script = file.read()
 
   script = includes.insertExternalFiles(script, sys.path[0] + '/../src/greasemonkey/includes')
