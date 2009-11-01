@@ -29,7 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 # Developed with Python v3.0.1
 
 import datetime, io, sys
-from buildlib import metadata
+from buildlib import includes, metadata
 
 
 def buildGreasemonkeyUserScript():
@@ -44,7 +44,8 @@ def buildGreasemonkeyUserScript():
   with io.open(sys.path[0] + '/../src/common/common.js') as file:
     script = file.read()
 
-  script = prependGreasemonkeyMetadataBlock(script, buildDate);
+  script = includes.insertExternalFiles(script, sys.path[0] + '/../src/greasemonkey/includes')
+  script = prependGreasemonkeyMetadataBlock(script, buildDate)
 
   userScriptFilename = 'javadoc_search_frame_' + buildDate.strftime('%Y%m%d') + '.user.js'
   with io.open(userScriptFilename, 'w', newline='\n') as file:
