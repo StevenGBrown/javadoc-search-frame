@@ -40,22 +40,22 @@ def buildGreasemonkeyUserScript():
 
   buildDate = datetime.date.today()
 
-  script = ''
+  userScript = ''
   with io.open(sys.path[0] + '/../src/common/allclasses-frame.js') as file:
-    script = file.read()
+    userScript = file.read()
 
-  script = includes.insertExternalFiles(script, sys.path[0] + '/../src/greasemonkey/includes')
-  script = prependGreasemonkeyMetadataBlock(script, buildDate)
+  userScript = includes.insertExternalFiles(userScript, sys.path[0] + '/../src/greasemonkey/includes')
+  userScript = prependGreasemonkeyMetadataBlock(userScript, buildDate)
 
   userScriptFilename = 'javadoc_search_frame_' + buildDate.strftime('%Y%m%d') + '.user.js'
   with io.open(userScriptFilename, 'w', newline='\n') as file:
-    file.write(script)
+    file.write(userScript)
 
 
-def prependGreasemonkeyMetadataBlock(script, buildDate):
+def prependGreasemonkeyMetadataBlock(userScript, buildDate):
   """Prepend the Greasemonkey metadata block to the given script."""
 
-  scriptMetadata = metadata.read(script)
+  scriptMetadata = metadata.read(userScript)
 
   version = buildDate.strftime('%d' + getOrdinalIndicator(buildDate.day) + ' %B %Y')
   if version[0] == '0':
@@ -74,7 +74,7 @@ def prependGreasemonkeyMetadataBlock(script, buildDate):
       includes +\
       '// ==/UserScript==\n'
 
-  return greasemonkeyMetadataBlock + '\n' + script
+  return greasemonkeyMetadataBlock + '\n' + userScript
 
 
 def getOrdinalIndicator(number):
