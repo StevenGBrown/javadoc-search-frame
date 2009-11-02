@@ -65,7 +65,7 @@ Frames.hideAllPackagesFrame = function () {
 Frames.openLinkInSummaryFrame = function (url) {
   var summaryFrame = this._getFrame('classFrame');
   if (summaryFrame) {
-    window.open(url, "classFrame");
+    window.open(url, 'classFrame');
   } else {
     window.open(url);
   }
