@@ -38,23 +38,28 @@ def buildGoogleChromeExtension():
   This extension will be created in the current working directory.
   """
 
-  contentScript = ''
+  allclassesFrameContentScript = ''
   with io.open(sys.path[0] + '/../src/common/allclasses-frame.js') as file:
-    contentScript = file.read()
+    allclassesFrameContentScript = file.read()
 
-  contentScript = includes.insertExternalFiles(contentScript, sys.path[0] + '/../src/googlechrome/includes')
+  allclassesFrameContentScript = includes.insertExternalFiles(allclassesFrameContentScript, sys.path[0] + '/../src/googlechrome/includes')
 
-  contentScriptFilename = 'allclasses-frame.js'
-  with io.open(contentScriptFilename, 'w', newline='\n') as file:
-    file.write(contentScript)
+  allclassesFrameContentScriptFilename = 'allclasses-frame.js'
+  with io.open(allclassesFrameContentScriptFilename, 'w', newline='\n') as file:
+    file.write(allclassesFrameContentScript)
 
-  createExtensionManifest(contentScript, contentScriptFilename)
+  indexContentScriptFilename = 'index.js'
+  with io.open(indexContentScriptFilename, 'w', newline='\n') as outputFile:
+    with io.open(sys.path[0] + '/../src/googlechrome/index.js') as inputFile:
+      outputFile.write(inputFile.read())
+
+  createExtensionManifest(allclassesFrameContentScript, allclassesFrameContentScriptFilename, indexContentScriptFilename)
 
 
-def createExtensionManifest(contentScript, contentScriptFilename):
+def createExtensionManifest(allclassesFrameContentScript, allclassesFrameContentScriptFilename, indexContentScriptFilename):
   """Create the extension manifest file."""
 
-  scriptMetadata = metadata.read(contentScript)
+  scriptMetadata = metadata.read(allclassesFrameContentScript)
 
   matches = ''
   for match in scriptMetadata['includes']:
@@ -74,7 +79,16 @@ def createExtensionManifest(contentScript, contentScriptFilename):
       matches +\
       '      ],\n' +\
       '      "js": [\n' +\
-      '          "' + contentScriptFilename + '"\n' +\
+      '          "' + allclassesFrameContentScriptFilename + '"\n' +\
+      '      ]\n' +\
+      '    },\n' +\
+      '    {\n' +\
+      '      "matches": [\n' +\
+      '          "http://*/*/index.html",\n' +\
+      '          "file://*/*/index.html"\n' +\
+      '      ],\n' +\
+      '      "js": [\n' +\
+      '          "' + indexContentScriptFilename + '"\n' +\
       '      ]\n' +\
       '    }\n' +\
       '  ],\n' +\
