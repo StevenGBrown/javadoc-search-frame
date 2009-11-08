@@ -14,6 +14,7 @@
           "Frames.js",
           "Log.js",
           "Storage.js",
+          "UserPreference.js",
           "allclasses-frame.js"
       ]
     },
@@ -24,6 +25,7 @@
       ],
       "js": [
           "Storage.js",
+          "UserPreference.js",
           "index.js"
       ]
     }

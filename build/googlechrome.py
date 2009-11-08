@@ -42,7 +42,7 @@ def buildGoogleChromeExtension():
   with io.open(sys.path[0] + '/../src/googlechrome/allclasses-frame.js') as file:
     allclassesFrameContentScript = file.read()
 
-  allclassesFrameContentScript = includes.insertExternalFiles(allclassesFrameContentScript, sys.path[0] + '/../src/common')
+  allclassesFrameContentScript = includes.insertExternalFiles(allclassesFrameContentScript, [sys.path[0] + '/../src/common'])
 
   allclassesFrameContentScriptFilename = 'allclasses-frame.js'
   with io.open(allclassesFrameContentScriptFilename, 'w', newline='\n') as file:
@@ -53,6 +53,7 @@ def buildGoogleChromeExtension():
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Frames.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Log.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Storage.js', '.')
+  shutil.copy(sys.path[0] + '/../src/common/lib/UserPreference.js', '.')
 
 
 if __name__ == "__main__":
