@@ -27,8 +27,7 @@
  */
 
 
-if (localStorage.getItem('hide_package_frame') === 'true') {
-  // Hide the packages frame.
+if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
   var framesets = document.getElementsByTagName('frameset');
   if (framesets) {
     var frameset = framesets[1];
