@@ -28,8 +28,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import io, sys
-from buildlib import includes, metadata
+import io, shutil, sys
+from buildlib import includes
 
 
 def buildGoogleChromeExtension():
@@ -39,66 +39,20 @@ def buildGoogleChromeExtension():
   """
 
   allclassesFrameContentScript = ''
-  with io.open(sys.path[0] + '/../src/common/allclasses-frame.js') as file:
+  with io.open(sys.path[0] + '/../src/googlechrome/allclasses-frame.js') as file:
     allclassesFrameContentScript = file.read()
 
-  allclassesFrameContentScript = includes.insertExternalFiles(allclassesFrameContentScript, sys.path[0] + '/../src/googlechrome/includes')
+  allclassesFrameContentScript = includes.insertExternalFiles(allclassesFrameContentScript, sys.path[0] + '/../src/common')
 
   allclassesFrameContentScriptFilename = 'allclasses-frame.js'
   with io.open(allclassesFrameContentScriptFilename, 'w', newline='\n') as file:
     file.write(allclassesFrameContentScript)
 
-  indexContentScriptFilename = 'index.js'
-  with io.open(indexContentScriptFilename, 'w', newline='\n') as outputFile:
-    with io.open(sys.path[0] + '/../src/googlechrome/index.js') as inputFile:
-      outputFile.write(inputFile.read())
-
-  createExtensionManifest(allclassesFrameContentScript, allclassesFrameContentScriptFilename, indexContentScriptFilename)
-
-
-def createExtensionManifest(allclassesFrameContentScript, allclassesFrameContentScriptFilename, indexContentScriptFilename):
-  """Create the extension manifest file."""
-
-  scriptMetadata = metadata.read(allclassesFrameContentScript)
-
-  matches = ''
-  for match in scriptMetadata['includes']:
-    matches += '          "http://*/' + match + '",\n'
-    matches += '          "file://*/' + match + '",\n'
-  if matches:
-    matches = matches[:-2] + '\n'
-
-  manifestContents =\
-      '{\n' +\
-      '  "name": "' + scriptMetadata['name'] + '",\n' +\
-      '  "version" : "1.0",\n' +\
-      '  "description": "' + scriptMetadata['description'] + '",\n' +\
-      '  "content_scripts": [\n' +\
-      '    {\n' +\
-      '      "matches": [\n' +\
-      matches +\
-      '      ],\n' +\
-      '      "js": [\n' +\
-      '          "' + allclassesFrameContentScriptFilename + '"\n' +\
-      '      ]\n' +\
-      '    },\n' +\
-      '    {\n' +\
-      '      "matches": [\n' +\
-      '          "http://*/*/index.html",\n' +\
-      '          "file://*/*/index.html"\n' +\
-      '      ],\n' +\
-      '      "js": [\n' +\
-      '          "' + indexContentScriptFilename + '"\n' +\
-      '      ]\n' +\
-      '    }\n' +\
-      '  ],\n' +\
-      '  "permissions": [\n' +\
-      '    "tabs"\n' +\
-      '  ]\n' +\
-      '}\n'
-
-  with io.open('manifest.json', 'w', newline='\n') as manifestFile:
-    manifestFile.write(manifestContents)
+  shutil.copy(sys.path[0] + '/../src/googlechrome/index.js', '.')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/manifest.json', '.')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Frames.js', '.')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Log.js', '.')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Storage.js', '.')
 
 
 if __name__ == "__main__":
