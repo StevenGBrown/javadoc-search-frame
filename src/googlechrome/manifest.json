@@ -1,0 +1,34 @@
+{
+  "name": "Javadoc Search Frame",
+  "version" : "1.0",
+  "description": "Incremental search frame for Javadoc packages and classes.",
+  "content_scripts": [
+    {
+      "matches": [
+          "http://*/*/allclasses-frame.html",
+          "file://*/*/allclasses-frame.html",
+          "http://*/*/package-frame.html",
+          "file://*/*/package-frame.html"
+      ],
+      "js": [
+          "Frames.js",
+          "Log.js",
+          "Storage.js",
+          "allclasses-frame.js"
+      ]
+    },
+    {
+      "matches": [
+          "http://*/*/index.html",
+          "file://*/*/index.html"
+      ],
+      "js": [
+          "Storage.js",
+          "index.js"
+      ]
+    }
+  ],
+  "permissions": [
+    "tabs"
+  ]
+}

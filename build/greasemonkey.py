@@ -41,10 +41,11 @@ def buildGreasemonkeyUserScript():
   buildDate = datetime.date.today()
 
   userScript = ''
-  with io.open(sys.path[0] + '/../src/common/allclasses-frame.js') as file:
+  with io.open(sys.path[0] + '/../src/greasemonkey/allclasses-frame.js') as file:
     userScript = file.read()
 
-  userScript = includes.insertExternalFiles(userScript, sys.path[0] + '/../src/greasemonkey/includes')
+  userScript = includes.insertExternalFiles(userScript,
+      [sys.path[0] + '/../src/common', sys.path[0] + '/../src/greasemonkey/lib'])
   userScript = prependGreasemonkeyMetadataBlock(userScript, buildDate)
 
   userScriptFilename = 'javadoc_search_frame_' + buildDate.strftime('%Y%m%d') + '.user.js'

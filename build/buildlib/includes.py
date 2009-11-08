@@ -28,16 +28,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import io, re
+import io, os, re
 
 
-def insertExternalFiles(script, includesDirectory):
+def insertExternalFiles(script, includesDirectories):
   """
   Include external files into the given script.
   For example, if the script contains the line: '#INCLUDE Frames.js', then the
-  file 'Frames.js' will be found in the includesDirectory and inserted in this
-  location. If the inserted file has a license header, it will be removed.
+  file 'Frames.js' will be found in the includes directories and inserted in
+  this location. If the inserted file has a license header, it will be removed.
   """
+
+  includesDirectories = [os.path.normpath(directory) for directory in includesDirectories]
 
   includesRegex = re.compile(r'^#INCLUDE (.*)$', re.MULTILINE)
   licenseHeaderRegex = re.compile(r'^.*?\n\s\*/\n\n(.*)', re.DOTALL)
@@ -46,7 +48,7 @@ def insertExternalFiles(script, includesDirectory):
     includesMatch = includesRegex.search(script)
     if not includesMatch:
       break
-    with io.open(includesDirectory + '/' + includesMatch.group(1)) as includeFile:
+    with io.open(findFile(includesDirectories, includesMatch.group(1))) as includeFile:
       includeFileContents = includeFile.read()
       licenseHeaderMatch = licenseHeaderRegex.match(includeFileContents)
       if licenseHeaderMatch:
@@ -59,3 +61,16 @@ def insertExternalFiles(script, includesDirectory):
           script[includesMatch.end():]
 
   return script
+
+
+def findFile(searchDirectories, filename):
+  """
+  Find a file in the given list of search directories. If found, the absolute
+  path to this file will be returned. Otherwise, a ValueError will be thrown.
+  """
+
+  for directory in searchDirectories:
+    absolutePath = os.path.join(directory, filename)
+    if os.path.exists(absolutePath):
+      return absolutePath
+  raise ValueError(filename + ' not found in ' + str(searchDirectories))
