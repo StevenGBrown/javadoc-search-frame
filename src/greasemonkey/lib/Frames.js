@@ -37,7 +37,6 @@ Frames = {
 /**
  * Hide the packages frame. If the packages frame does not exist, calling this
  * function will have no effect.
- * @returns true if the packages frame was hidden, false otherwise
  */
 Frames.hideAllPackagesFrame = function () {
   if (this._getFrame('packageListFrame')) {
@@ -52,9 +51,7 @@ Frames.hideAllPackagesFrame = function () {
         scroll(0, 0);
       }
     }
-    return true;
   }
-  return false;
 };
 
 /**

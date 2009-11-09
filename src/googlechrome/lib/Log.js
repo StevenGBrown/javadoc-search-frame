@@ -28,13 +28,22 @@
 
 
 /**
- * @class Error Console logging utility.
+ * @class Logging utility.
  */
 Log = {};
 
 /**
- * Log the given object to the Error Console as a message.
+ * Log the given startup message to the Console.
+ * @param logMessage
+ */
+Log.startupMessage = function (logMessage) {
+  console.log(logMessage);
+};
+
+/**
+ * Log the given message to the Console.
+ * @param logMessage
  */
 Log.message = function (logMessage) {
-  console.log(logMessage);
+  console.log('Javadoc Search Frame: ' + logMessage);
 };

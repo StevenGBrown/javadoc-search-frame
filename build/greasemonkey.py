@@ -29,7 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 # Developed with Python v3.0.1
 
 import datetime, io, sys
-from buildlib import includes, metadata
+from buildlib import build_date, includes, inline_includes
 
 
 def buildGreasemonkeyUserScript():
@@ -39,57 +39,29 @@ def buildGreasemonkeyUserScript():
   """
 
   buildDate = datetime.date.today()
+  formattedBuildDate = build_date.format(buildDate)
 
-  userScript = ''
   with io.open(sys.path[0] + '/../src/greasemonkey/allclasses-frame.js') as file:
     userScript = file.read()
 
   userScript = includes.insertExternalFiles(userScript,
       [sys.path[0] + '/../src/common', sys.path[0] + '/../src/common/lib', sys.path[0] + '/../src/greasemonkey/lib'])
-  userScript = prependGreasemonkeyMetadataBlock(userScript, buildDate)
+  userScript = inline_includes.insertValue(userScript, 'buildDate', '\'' + formattedBuildDate + '\'');
+  userScript = prependGreasemonkeyMetadataBlock(userScript, formattedBuildDate)
 
-  userScriptFilename = 'javadoc_search_frame_' + buildDate.strftime('%Y%m%d') + '.user.js'
-  with io.open(userScriptFilename, 'w', newline='\n') as file:
+  with io.open(
+      'javadoc_search_frame_' + buildDate.strftime('%Y%m%d') + '.user.js', 'w', newline='\n') as file:
     file.write(userScript)
 
 
-def prependGreasemonkeyMetadataBlock(userScript, buildDate):
+def prependGreasemonkeyMetadataBlock(userScript, formattedBuildDate):
   """Prepend the Greasemonkey metadata block to the given script."""
 
-  scriptMetadata = metadata.read(userScript)
+  with io.open(sys.path[0] + '/../src/greasemonkey/metadata_block.txt') as file:
+    metadataBlock = file.read()
 
-  version = buildDate.strftime('%d' + getOrdinalIndicator(buildDate.day) + ' %B %Y')
-  if version[0] == '0':
-    version = version[1:]
-  includes = ''
-  for include in scriptMetadata['includes']:
-    includes += '// @include       ' + include + '\n'
-
-  greasemonkeyMetadataBlock =\
-      '// ==UserScript==\n' +\
-      '// @name          ' + scriptMetadata['name'] + '\n' +\
-      '// @namespace     http://userscripts.org/users/46156\n' +\
-      '// @description   ' + scriptMetadata['description'] + '\n' +\
-      '// @homepage      ' + scriptMetadata['homepage'] + '\n' +\
-      '// @version       ' + version + '\n' +\
-      includes +\
-      '// ==/UserScript==\n'
-
-  return greasemonkeyMetadataBlock + '\n' + userScript
-
-
-def getOrdinalIndicator(number):
-  """Return the ordinal indicator for the given number."""
-
-  if (number < 10 or number > 20):
-    leastSignificantDigit = number % 10
-    if (leastSignificantDigit == 1):
-      return 'st'
-    if (leastSignificantDigit == 2):
-      return 'nd'
-    if (leastSignificantDigit == 3):
-      return 'rd'
-  return 'th'
+  metadataBlock = inline_includes.insertValue(metadataBlock, 'buildDate', formattedBuildDate);
+  return metadataBlock + '\n' + userScript
 
 
 if __name__ == "__main__":

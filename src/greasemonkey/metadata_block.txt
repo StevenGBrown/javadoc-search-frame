@@ -1,0 +1,9 @@
+// ==UserScript==
+// @name          Javadoc Search Frame
+// @namespace     http://userscripts.org/users/46156
+// @description   Incremental search frame for Javadoc packages and classes.
+// @homepage      http://code.google.com/p/javadoc-search-frame
+// @version       #INCLUDE buildDate#
+// @include       */allclasses-frame.html
+// @include       */package-frame.html
+// ==/UserScript==

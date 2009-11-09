@@ -35,3 +35,27 @@
 
 
 #INCLUDE main.js
+
+
+/**
+ * Entry point of this script; called when the script has loaded.
+ */
+function main() {
+  // TODO: Read version from the manifest.
+  var version = 'UNKNOWN';
+
+  // Build date of this script. This value is set by the build script.
+  var buildDate = #INCLUDE buildDate#;
+
+  var startupLogMessage =
+      'Javadoc Search Frame for Google Chrome\n' +
+      'Version ' + version + ' (' + buildDate + ')\n' +
+      'http://code.google.com/p/javadoc-search-frame\n' +
+      navigator.userAgent + '\n';
+
+  init(startupLogMessage);
+}
+
+
+// Call the main method.
+main();

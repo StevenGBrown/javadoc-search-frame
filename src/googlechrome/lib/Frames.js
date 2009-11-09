@@ -35,10 +35,9 @@ Frames = {};
 /**
  * Hide the packages frame. If the packages frame does not exist, calling this
  * function will have no effect.
- * @returns true if the packages frame was hidden, false otherwise
  */
 Frames.hideAllPackagesFrame = function () {
-  return false;
+  // Nothing to do. The packages frame is hidden by 'index.js'.
 };
 
 /**

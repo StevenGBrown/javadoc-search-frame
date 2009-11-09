@@ -28,8 +28,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import io, shutil, sys
-from buildlib import includes
+import datetime, io, shutil, sys
+from buildlib import build_date, includes, inline_includes
 
 
 def buildGoogleChromeExtension():
@@ -38,18 +38,20 @@ def buildGoogleChromeExtension():
   This extension will be created in the current working directory.
   """
 
-  allclassesFrameContentScript = ''
+  buildDate = datetime.date.today()
+  formattedBuildDate = build_date.format(buildDate)
+
   with io.open(sys.path[0] + '/../src/googlechrome/allclasses-frame.js') as file:
     allclassesFrameContentScript = file.read()
 
   allclassesFrameContentScript = includes.insertExternalFiles(allclassesFrameContentScript, [sys.path[0] + '/../src/common'])
+  allclassesFrameContentScript = inline_includes.insertValue(allclassesFrameContentScript, 'buildDate', '\'' + formattedBuildDate + '\'');
 
-  allclassesFrameContentScriptFilename = 'allclasses-frame.js'
-  with io.open(allclassesFrameContentScriptFilename, 'w', newline='\n') as file:
+  with io.open('allclasses-frame.js', 'w', newline='\n') as file:
     file.write(allclassesFrameContentScript)
 
-  shutil.copy(sys.path[0] + '/../src/googlechrome/index.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/manifest.json', '.')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/index.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Frames.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Log.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Storage.js', '.')
