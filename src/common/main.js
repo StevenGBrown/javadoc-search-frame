@@ -41,34 +41,9 @@
  */
 
 /**
- * Script metadata.
- * 
- * This variable is read by the build script.
- */
-var SCRIPT_META_DATA = {
-  "name" : "Javadoc Search Frame",
-  "description" : "Incremental search frame for Javadoc packages and classes.",
-  "homepage" : "http://code.google.com/p/javadoc-search-frame",
-  "includes" : ["*/allclasses-frame.html", "*/package-frame.html"]
-};
-
-/**
  * Array of all package and class links.
  */
 var ALL_PACKAGE_AND_CLASS_LINKS = [];
-
-
-/*
- * ----------------------------------------------------------------------------
- * BROWSER DETECTION
- * ----------------------------------------------------------------------------
- */
-
-Browser = {};
-
-Browser.isChromeVersionOne = function () {
-  return navigator.userAgent.toLowerCase().indexOf('chrome/1') !== -1;
-};
 
 
 /*
@@ -253,6 +228,13 @@ var is = UnitTestSuite.is;
 UnitTestResult = function (numberOfAssertions, failures) {
   this.numberOfAssertions = numberOfAssertions;
   this.failures = failures;
+};
+
+/**
+ * @returns true if at least one unit test failed, false otherwise
+ */
+UnitTestResult.prototype.failed = function () {
+  return this.failures.length >= 1;
 };
 
 /**
@@ -1401,9 +1383,7 @@ Search.perform = function (parameters) {
     this.topLink = searchContext.topAnchorLink || searchContext.topClassLink;
 
     if (!suppressLogMessage) {
-      Log.message('\n' +
-        '\'' + entireSearchString + '\' in ' + stopWatch.timeElapsed() + '\n'
-      );
+      Log.message('\'' + entireSearchString + '\' in ' + stopWatch.timeElapsed() + '\n');
     }
 
     this._autoOpen();
@@ -1761,26 +1741,16 @@ Search.Menu._getMenuReplacement = function () {
  */
 
 /**
- * Entry point of this script; called when the script has loaded.
+ * Initialise this script.
+ * @param startupLogMessage message that will be written to the log once the
+ *                          script has been initialised
  */
-function init() {
-  var initStopWatch = new StopWatch();
-
-  // Google Chrome version 1 ignores the @include metadata tag, so check that
-  // this is the correct document.
-  if (Browser.isChromeVersionOne() && !(
-      endsWith(document.location.toString(), '/allclasses-frame.html') ||
-      endsWith(document.location.toString(), '/package-frame.html'))) {
-    return;
-  }
+function init(startupLogMessage) {
 
   // Retrieve the innerHTML of the class frame.
-  var retrieveInnerHtmlStopWatch = new StopWatch();
   var classesInnerHTML = getClassesInnerHtml();
-  retrieveInnerHtmlStopWatch.stop();
 
   // Initialise stored package and class links.
-  var searchListStopWatch = new StopWatch();
   var classLinks = getClassLinks(classesInnerHTML);
   if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
     var packageLinks = getPackageLinks(classLinks);
@@ -1791,53 +1761,35 @@ function init() {
   if (ALL_PACKAGE_AND_CLASS_LINKS.length === 0) {
     return false;
   }
-  searchListStopWatch.stop();
 
   // Initialise class frame.
-  var initContainerStopWatch = new StopWatch();
   View.initialise(EventHandlers);
-  initContainerStopWatch.stop();
 
   // Perform an initial search. This will populate the class frame with the
   // entire list of packages and classes.
-  var initialSearchStopWatch = new StopWatch();
   Search.perform({suppressLogMessage : true});
-  initialSearchStopWatch.stop();
 
   // Run the unit test.
-  var unitTestStopWatch = new StopWatch();
   var unitTestResults = UnitTestSuite.run();
-  unitTestStopWatch.stop();
 
   // Hide the package list frame.
   if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
-    var hidePackageFrameStopWatch = new StopWatch();
-    var packageFrameHidden = Frames.hideAllPackagesFrame();
-    hidePackageFrameStopWatch.stop();
+    Frames.hideAllPackagesFrame();
   }
 
   // Give focus to the search field.
-  var focusSearchFieldStopWatch = new StopWatch();
   View.focusOnSearchField();
-  focusSearchFieldStopWatch.stop();
 
-  // Log a startup message, including timing information.
-  Log.message('\n' +
-    SCRIPT_META_DATA.name + ' : ' + SCRIPT_META_DATA.version + '\n' +
-    SCRIPT_META_DATA.homepage + '\n' +
-    navigator.userAgent + '\n' +
-    '\n' +
-    'initialised in ' + initStopWatch.timeElapsed() + ' total\n' +
-    '- contents of existing frame retrieved in ' + retrieveInnerHtmlStopWatch.timeElapsed() + '\n' +
-    '- search list constructed in ' + searchListStopWatch.timeElapsed() + '\n' +
-    '- container initialised in ' + initContainerStopWatch.timeElapsed() + '\n' +
-    '- initial search performed in ' + initialSearchStopWatch.timeElapsed() + '\n' +
-    '- unit test run in ' + unitTestStopWatch.timeElapsed() +
-      ' (' + unitTestResults.getNumberOfPassedAssertions() + ' of ' + unitTestResults.getNumberOfAssertions() + ' assertions passed)\n' +
-    (packageFrameHidden ?
-      '- package frame hidden in ' + hidePackageFrameStopWatch.timeElapsed() + '\n' : '') +
-    '- search field given focus in ' + focusSearchFieldStopWatch.timeElapsed() + '\n'
-  );
+  // Log the startup message.
+  if (unitTestResults.failed()) {
+    startupLogMessage += 'Unit test FAILED: ';
+  }
+  startupLogMessage +=
+      unitTestResults.getNumberOfPassedAssertions() +
+      ' of ' +
+      unitTestResults.getNumberOfAssertions() +
+      ' unit test assertions passed.\n';
+  Log.startupMessage(startupLogMessage);
 
   // Log all unit test failures.
   unitTestResults.getFailures().forEach(function (unitTestFailure) {
@@ -2179,12 +2131,3 @@ EventHandlers._escapeKeyPressed = function () {
     Search.perform();
   }
 };
-
-
-/*
- * ----------------------------------------------------------------------------
- * Call the init() method when the script has loaded.
- * ----------------------------------------------------------------------------
- */
-
-init();

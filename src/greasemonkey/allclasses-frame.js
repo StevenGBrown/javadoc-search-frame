@@ -69,9 +69,42 @@
  * ----------------------------------------------------------------------------
  */
 
-#INCLUDE UserPreference.js	
+#INCLUDE UserPreference.js
 
 
 #INCLUDE main.js
+
+
+/**
+ * Entry point of this script; called when the script has loaded.
+ */
+function main() {
+
+  var isGoogleChromeVersionOne = navigator.userAgent.toLowerCase().indexOf('chrome/1') !== -1;
+  if (isGoogleChromeVersionOne) {
+    // Google Chrome version 1 ignores the @include metadata tag, so check that
+    // this is the correct document.
+    if (!endsWith(document.location.toString(), '/allclasses-frame.html') &&
+        !endsWith(document.location.toString(), '/package-frame.html')) {
+      return;
+    }
+  }
+
+  // Build date of this script. This value is set by the build script.
+  var buildDate = #INCLUDE buildDate#;
+
+  var startupLogMessage =
+      'Javadoc Search Frame for Greasemonkey\n' +
+      buildDate + '\n' +
+      'http://code.google.com/p/javadoc-search-frame\n' +
+      navigator.userAgent + '\n';
+
+  init(startupLogMessage);
+}
+
+
+// Call the main method.
+main();
+
 
 })();

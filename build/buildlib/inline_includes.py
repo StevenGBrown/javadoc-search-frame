@@ -28,16 +28,15 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import re, json
+import re
 
 
-def read(script):
-  """Read metadata from the given script and return it as a dictionary."""
+def insertValue(script, variableName, variableValue):
+  """
+  Insert a value into the given script.
+  For example, if this function is called with variableName='version' and
+  variableValue='1.0', then any occurances of '#INCLUDE version' in the given
+  script will be replaced with '1.0'.
+  """
 
-  variableName = 'SCRIPT_META_DATA';
-
-  match = re.search(r'var ' + variableName + r' = (\{[^}]*\})', script)
-  if (not match):
-    raise ValueError('script must include a ' + variableName + ' variable')
-  metadataInJsonFormat = match.group(1)
-  return json.loads(metadataInJsonFormat)
+  return re.sub(r'#INCLUDE ' + variableName + '#', variableValue, script)

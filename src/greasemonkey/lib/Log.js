@@ -28,7 +28,7 @@
 
 
 /**
- * @class Error Console logging utility.
+ * @class Logging utility.
  */
 Log = {
   gmLogAvailable : function () {
@@ -41,14 +41,23 @@ Log = {
 };
 
 /**
- * Log the given object to the Error Console as a message.
+ * Log the given startup message to the Error Console.
+ * @param logMessage
+ */
+Log.startupMessage = function (logMessage) {
+  this.message(logMessage);
+};
+
+/**
+ * Log the given message to the Error Console.
+ * @param logMessage
  */
 Log.message = function (logMessage) {
   if (this.gmLogAvailable) {
     // Greasemonkey logging function.
-    GM_log(logMessage);
+    GM_log('\n' + logMessage);
   } else {
     // Firebug or Google Chrome logging function.
-    console.log(logMessage);
+    console.log('\n' + logMessage);
   }
 };
