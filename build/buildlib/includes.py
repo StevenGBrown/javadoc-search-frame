@@ -73,4 +73,4 @@ def findFile(searchDirectories, filename):
     absolutePath = os.path.join(directory, filename)
     if os.path.exists(absolutePath):
       return absolutePath
-  raise ValueError(filename + ' not found in ' + str(searchDirectories))
+  raise ValueError('\'' + filename + '\' not found in ' + str(searchDirectories))
