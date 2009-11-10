@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import datetime, io, shutil, sys
+import datetime, json, io, shutil, sys
 from buildlib import build_date, includes, inline_includes
 
 
@@ -41,10 +41,14 @@ def buildGoogleChromeExtension():
   buildDate = datetime.date.today()
   formattedBuildDate = build_date.format(buildDate)
 
+  with io.open(sys.path[0] + '/../src/googlechrome/manifest.json') as file:
+    version = json.loads(file.read())['version']
+
   with io.open(sys.path[0] + '/../src/googlechrome/allclasses-frame.js') as file:
     allclassesFrameContentScript = file.read()
 
   allclassesFrameContentScript = includes.insertExternalFiles(allclassesFrameContentScript, [sys.path[0] + '/../src/common'])
+  allclassesFrameContentScript = inline_includes.insertValue(allclassesFrameContentScript, 'version', '\'' + version + '\'')
   allclassesFrameContentScript = inline_includes.insertValue(allclassesFrameContentScript, 'buildDate', '\'' + formattedBuildDate + '\'');
 
   with io.open('allclasses-frame.js', 'w', newline='\n') as file:
