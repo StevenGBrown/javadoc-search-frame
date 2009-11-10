@@ -41,8 +41,9 @@
  * Entry point of this script; called when the script has loaded.
  */
 function main() {
-  // TODO: Read version from the manifest.
-  var version = 'UNKNOWN';
+
+  // Version of this script. This value is set by the build script.
+  var version = #INCLUDE version#;
 
   // Build date of this script. This value is set by the build script.
   var buildDate = #INCLUDE buildDate#;
