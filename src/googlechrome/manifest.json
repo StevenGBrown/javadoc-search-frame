@@ -1,6 +1,6 @@
 {
   "name": "Javadoc Search Frame",
-  "version" : "1.0",
+  "version": "1.0",
   "description": "Incremental search frame for Javadoc packages and classes.",
   "content_scripts": [
     {
