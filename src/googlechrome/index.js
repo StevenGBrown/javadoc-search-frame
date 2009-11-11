@@ -30,12 +30,18 @@
 if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
   var framesets = document.getElementsByTagName('frameset');
   if (framesets) {
-    var frameset = framesets[1];
-    if (frameset) {
-      frameset.setAttribute('rows', '0,*');
-      frameset.setAttribute('border', 0);
-      frameset.setAttribute('frameborder', 0);
-      frameset.setAttribute('framespacing', 0);
+    for (var i = 0; i < framesets.length; i++) {
+      var frameset = framesets[i];
+      var framesetChildren = frameset.children;
+      if (framesetChildren &&
+          framesetChildren.length === 2 &&
+          framesetChildren[0].name === 'packageListFrame' &&
+          framesetChildren[1].name === 'packageFrame') {
+        frameset.setAttribute('rows', '0,*');
+        frameset.setAttribute('border', 0);
+        frameset.setAttribute('frameborder', 0);
+        frameset.setAttribute('framespacing', 0);
+      }
     }
   }
 }
