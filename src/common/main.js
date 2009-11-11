@@ -298,14 +298,14 @@ UnitTestExceptionThrownFailure.prototype.toString = function () {
 
 /*
  * ----------------------------------------------------------------------------
- * SETTINGS PAGE
+ * OPTIONS PAGE
  * ----------------------------------------------------------------------------
  */
 
 /**
- * @class The settings page.
+ * @class The options page.
  */
-SettingsPage = {
+OptionsPage = {
   privateFunctions : {
     createTable : function (pageDocument, title, subTitle, contents) {
       var tableElement = pageDocument.createElement('table');
@@ -404,14 +404,14 @@ SettingsPage = {
 
     getHeader : function (pageDocument) {
       var headerElement = pageDocument.createElement('h2');
-      headerElement.textContent = 'Settings';
+      headerElement.textContent = 'Options';
       return headerElement;
     },
 
-    getErrorMessageIfSettingsNotAvailable : function (pageDocument) {
+    getErrorMessageIfOptionsNotAvailable : function (pageDocument) {
       var errorMessageElement = pageDocument.createElement('p');
       if (!UserPreference.canGetAndSet()) {
-        errorMessageElement.innerHTML = 'Settings cannot be configured.';
+        errorMessageElement.innerHTML = 'Options cannot be configured.';
         errorMessageElement.style.color = 'red';
       }
       return errorMessageElement;
@@ -450,7 +450,7 @@ SettingsPage = {
   getContents : function (pageDocument) {
     var backAnchorElement = this.privateFunctions.getBackAnchor(pageDocument);
     var headerElement = this.privateFunctions.getHeader(pageDocument);
-    var errorMessageElement = this.privateFunctions.getErrorMessageIfSettingsNotAvailable(pageDocument);
+    var errorMessageElement = this.privateFunctions.getErrorMessageIfOptionsNotAvailable(pageDocument);
     var autoOpenElement = this.privateFunctions.booleanOption(
         pageDocument, UserPreference.AUTO_OPEN, 'Automatic Opening of Links',
         'On. Automatically open the first package, class or method in the list after each search.',
@@ -488,9 +488,9 @@ SettingsPage = {
 };
 
 /**
- * Open the settings page.
+ * Open the options page.
  */
-SettingsPage.open = function () {
+OptionsPage.open = function () {
   while (document.body.firstChild) {
     document.body.removeChild(document.body.firstChild);
   }
@@ -739,7 +739,7 @@ View._create = function (eventHandlers) {
 
   this.searchField = this._createSearchField(eventHandlers);
   var eraseButton = this._createEraseButton(eventHandlers);
-  var settingsLink = this._createSettingsLink(eventHandlers);
+  var optionsLink = this._createOptionsLink(eventHandlers);
   this.contentNodeParent = tableRowElementTwo;
   this.contentNode = tableDataCellElementTwo;
 
@@ -748,7 +748,7 @@ View._create = function (eventHandlers) {
   tableDataCellElementOne.appendChild(this.searchField);
   tableDataCellElementOne.appendChild(eraseButton);
   tableDataCellElementOne.appendChild(document.createElement('br'));
-  tableDataCellElementOne.appendChild(settingsLink);
+  tableDataCellElementOne.appendChild(optionsLink);
   tableElement.appendChild(tableRowElementTwo);
   tableRowElementTwo.appendChild(tableDataCellElementTwo);
 
@@ -791,11 +791,11 @@ View._createEraseButton = function (eventHandlers) {
   return e;
 };
 
-View._createSettingsLink = function (eventHandlers) {
+View._createOptionsLink = function (eventHandlers) {
   var anchorElement = document.createElement('a');
   anchorElement.setAttribute('href', 'javascript:void(0);');
-  anchorElement.textContent = 'Settings';
-  anchorElement.addEventListener('click', eventHandlers.settingsLinkClicked, false);
+  anchorElement.textContent = 'Options';
+  anchorElement.addEventListener('click', eventHandlers.optionsLinkClicked, false);
   var fontElement = document.createElement('font');
   fontElement.setAttribute('size', '-2');
   fontElement.appendChild(anchorElement);
@@ -1710,7 +1710,7 @@ Search.Menu._createMenu = function (topClassLink, topAnchorLink) {
 
 /**
  * Placeholder values that can be entered into the class_menu or package_menu
- * settings and will, when the menu is opened, be replaced with data relevant
+ * options and will, when the menu is opened, be replaced with data relevant
  * to the current package or class.
  */
 Search.Menu._getMenuReplacement = function () {
@@ -2104,8 +2104,8 @@ EventHandlers.eraseButtonClick = function () {
   Search.perform();
 };
 
-EventHandlers.settingsLinkClicked = function (event) {
-  SettingsPage.open();
+EventHandlers.optionsLinkClicked = function (event) {
+  OptionsPage.open();
   event.preventDefault();
 };
 

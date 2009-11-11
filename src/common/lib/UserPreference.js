@@ -29,7 +29,7 @@
 
 /**
  * Create a new UserPreference.
- * @class Provides persistent configuration of the script settings.
+ * @class Provides persistent configuration of the script options.
  * @param key the key associated with this user preference
  * @param defaultValue the default value used when the value cannot be
  *                     retrieved or has not yet been configured
