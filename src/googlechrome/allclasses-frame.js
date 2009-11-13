@@ -34,7 +34,7 @@
  */
 
 
-#INCLUDE main.js
+#INCLUDE common.js
 
 
 /**

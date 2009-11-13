@@ -90,7 +90,7 @@
 #INCLUDE OptionsPage.js
 
 
-#INCLUDE main.js
+#INCLUDE common.js
 
 
 /**
