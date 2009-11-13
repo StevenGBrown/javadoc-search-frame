@@ -5,5 +5,7 @@
 // @homepage      http://code.google.com/p/javadoc-search-frame
 // @version       #INCLUDE buildDate#
 // @include       */allclasses-frame.html
+// @include       */allclasses-frame.html#JavadocSearchFrameOptions
 // @include       */package-frame.html
+// @include       */package-frame.html#JavadocSearchFrameOptions
 // ==/UserScript==

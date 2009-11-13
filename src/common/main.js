@@ -298,213 +298,6 @@ UnitTestExceptionThrownFailure.prototype.toString = function () {
 
 /*
  * ----------------------------------------------------------------------------
- * OPTIONS PAGE
- * ----------------------------------------------------------------------------
- */
-
-/**
- * @class The options page.
- */
-OptionsPage = {
-  privateFunctions : {
-    createTable : function (pageDocument, title, subTitle, contents) {
-      var tableElement = pageDocument.createElement('table');
-      tableElement.style.borderStyle = 'groove';
-      tableElement.style.borderColor = 'blue';
-      tableElement.style.borderWidth = 'thick';
-
-      var headerTableRow = pageDocument.createElement('tr');
-      headerTableRow.style.backgroundColor = '#AFEEEE';
-      tableElement.appendChild(headerTableRow);
-
-      var headerTableDataElement = pageDocument.createElement('td');
-      var headerInnerHTML = '<b>' + title + '</b>';
-      if (subTitle) {
-        headerInnerHTML += '<br/>' + subTitle;
-      }
-      headerTableDataElement.innerHTML = headerInnerHTML;
-      headerTableRow.appendChild(headerTableDataElement);
-
-      var contentsTableRow = pageDocument.createElement('tr');
-      contentsTableRow.style.backgroundColor = '#F0FFF0';
-      tableElement.appendChild(contentsTableRow);
-
-      var contentsTableDataElement = pageDocument.createElement('td');
-      contentsTableRow.appendChild(contentsTableDataElement);
-
-      var contentsParagraphElement = pageDocument.createElement('p');
-      contentsParagraphElement.innerHTML = contents;
-      contentsTableDataElement.appendChild(contentsParagraphElement);
-
-      return tableElement;
-    },
-
-    radioButton : function (args) {
-      var radioButtonHTML = '<label>' +
-          '<input id="' + args.id + '" type=radio name="' + args.name + '" value="true"';
-      if (args.isChecked) {
-        radioButtonHTML += ' checked="true"';
-      }
-      if (args.isDisabled) {
-        radioButtonHTML += ' disabled="true"';
-      }
-      radioButtonHTML += '/>' + args.text;
-      if (args.isDefault) {
-        radioButtonHTML += ' (Default)';
-      }
-      radioButtonHTML += '</label>';
-      return radioButtonHTML;
-    },
-
-    booleanOption : function (pageDocument, preference, title, trueText, falseText) {
-      var key = preference.getKey();
-      var trueChecked = preference.getValue();
-      var trueDefault = preference.getDefaultValue();
-
-      var trueRadioButtonHTML = this.radioButton({
-          name : key, id : key + '_true', text : trueText,
-          isChecked : trueChecked, isDisabled : !UserPreference.canGetAndSet(), isDefault : trueDefault});
-      var falseRadioButtonHTML = this.radioButton({
-          name : key, id : key + '_false', text : falseText,
-          isChecked : !trueChecked, isDisabled : !UserPreference.canGetAndSet(), isDefault : !trueDefault});
-
-      return this.createTable(pageDocument, title, '',
-          trueRadioButtonHTML + '<br/>' +
-          falseRadioButtonHTML);
-    },
-
-    menuOption : function (pageDocument, preference, title, subTitle) {
-      var key = preference.getKey();
-      var textAreaId = key + '_text_area';
-      var restoreDefaultButtonId = key + '_restore_default_button';
-
-      var textAreaHTML = '<textarea id="' + textAreaId + '" rows="5" cols="150" wrap="off"';
-      if (!UserPreference.canGetAndSet()) {
-        textAreaHTML += ' disabled="true"';
-      }
-      textAreaHTML += '>' + preference.getValue() + '</textarea>';
-
-      var restoreDefaultButtonHTML = '<input id="' + restoreDefaultButtonId + '"';
-      if (!UserPreference.canGetAndSet()) {
-        restoreDefaultButtonHTML += ' disabled="true"';
-      }
-      restoreDefaultButtonHTML += ' type=button value="Restore Default"/>';
-
-      return this.createTable(pageDocument, title, subTitle,
-          textAreaHTML + '<br/>' +
-          restoreDefaultButtonHTML);
-    },
-
-    getBackAnchor : function (pageDocument) {
-      var backAnchorElement = pageDocument.createElement('a');
-      backAnchorElement.setAttribute('href', location.href);
-      backAnchorElement.textContent = '<< Back';
-      return backAnchorElement;
-    },
-
-    getHeader : function (pageDocument) {
-      var headerElement = pageDocument.createElement('h2');
-      headerElement.textContent = 'Options';
-      return headerElement;
-    },
-
-    getErrorMessageIfOptionsNotAvailable : function (pageDocument) {
-      var errorMessageElement = pageDocument.createElement('p');
-      if (!UserPreference.canGetAndSet()) {
-        errorMessageElement.innerHTML = 'Options cannot be configured.';
-        errorMessageElement.style.color = 'red';
-      }
-      return errorMessageElement;
-    },
-
-    registerBooleanOptionEventListeners : function (pageDocument, preference) {
-      var key = preference.getKey();
-      var trueRadioButton = pageDocument.getElementById(key + '_true');
-      var falseRadioButton = pageDocument.getElementById(key + '_false');
-
-      var clickEventListener = function () {
-        preference.setValue(trueRadioButton.checked);
-      };
-
-      trueRadioButton.addEventListener('click', clickEventListener, false);
-      falseRadioButton.addEventListener('click', clickEventListener, false);
-    },
-
-    registerMenuOptionEventListeners : function (pageDocument, preference) {
-      var key = preference.getKey();
-
-      var textAreaId = key + '_text_area';
-      var textAreaElement = pageDocument.getElementById(textAreaId);
-      textAreaElement.addEventListener('keyup', function () {
-        preference.setValue(textAreaElement.value);
-      }, false);
-
-      var restoreDefaultButtonId = key + '_restore_default_button';
-      var restoreDefaultButton = pageDocument.getElementById(restoreDefaultButtonId);
-      restoreDefaultButton.addEventListener('click', function () {
-        textAreaElement.value = preference.getDefaultValue();preference.setValue(preference.getDefaultValue());
-      }, false);
-    }
-  },
-
-  getContents : function (pageDocument) {
-    var backAnchorElement = this.privateFunctions.getBackAnchor(pageDocument);
-    var headerElement = this.privateFunctions.getHeader(pageDocument);
-    var errorMessageElement = this.privateFunctions.getErrorMessageIfOptionsNotAvailable(pageDocument);
-    var autoOpenElement = this.privateFunctions.booleanOption(
-        pageDocument, UserPreference.AUTO_OPEN, 'Automatic Opening of Links',
-        'On. Automatically open the first package, class or method in the list after each search.',
-        'Off. Wait for the <tt>Enter</tt> key to be pressed.');
-    var hidePackageFrameElement = this.privateFunctions.booleanOption(
-        pageDocument, UserPreference.HIDE_PACKAGE_FRAME, 'Merge the Package and Class Frames',
-        'Yes. All packages and classes can be searched using a single combined frame.',
-        'No. The package frame will not be hidden. Only one package can be searched at a time.');
-    var classMenuElement = this.privateFunctions.menuOption(
-        pageDocument, UserPreference.CLASS_MENU, 'Class/Method Menu',
-        'Menu displayed when pressing the <tt>@</tt> key if a class or method is ' +
-        'currently displayed at the top of the search list.');
-    var packageMenuElement = this.privateFunctions.menuOption(
-        pageDocument, UserPreference.PACKAGE_MENU, 'Package Menu',
-        'Menu displayed when pressing the <tt>@</tt> key if a package is currently displayed ' +
-        'at the top of the search list.');
-
-    return [
-      backAnchorElement,       pageDocument.createElement('p'),
-      headerElement,           pageDocument.createElement('p'),
-      errorMessageElement,     pageDocument.createElement('p'),
-      autoOpenElement,         pageDocument.createElement('p'),
-      hidePackageFrameElement, pageDocument.createElement('p'),
-      classMenuElement,        pageDocument.createElement('p'),
-      packageMenuElement
-    ];
-  },
-
-  registerEventListeners : function (pageDocument) {
-    this.privateFunctions.registerBooleanOptionEventListeners(pageDocument, UserPreference.AUTO_OPEN);
-    this.privateFunctions.registerBooleanOptionEventListeners(pageDocument, UserPreference.HIDE_PACKAGE_FRAME);
-    this.privateFunctions.registerMenuOptionEventListeners(pageDocument, UserPreference.CLASS_MENU);
-    this.privateFunctions.registerMenuOptionEventListeners(pageDocument, UserPreference.PACKAGE_MENU);
-  },
-};
-
-/**
- * Open the options page.
- */
-OptionsPage.open = function () {
-  while (document.body.firstChild) {
-    document.body.removeChild(document.body.firstChild);
-  }
-
-  this.getContents(document).forEach(function (pageElement) {
-    document.body.appendChild(pageElement);
-  });
-
-  this.registerEventListeners(document);
-};
-
-
-/*
- * ----------------------------------------------------------------------------
  * LINKTYPE
  * ----------------------------------------------------------------------------
  */
@@ -1372,21 +1165,29 @@ Search.perform = function (parameters) {
       this.previousEntireSearchString === null ||
       entireSearchString !== this.previousEntireSearchString) {
 
-    var searchContext = {};
-    this.PackagesAndClasses.perform(searchContext, Query.getClassSearchString());
-    this.Anchors.perform(searchContext, Query.getAnchorSearchString());
-    this.Menu.perform(searchContext, Query.getMenuSearchString());
+    var search = this;
+    UserPreference.CLASS_MENU.getValue(function (classMenu) {
+      UserPreference.PACKAGE_MENU.getValue(function (packageMenu) {
+        var searchContext = {};
+	searchContext.classMenu = classMenu;
+	searchContext.packageMenu = packageMenu;
 
-    if (searchContext.getContentNodeHTML) {
-      View.setContentNodeHTML(searchContext.getContentNodeHTML());
-    }
-    this.topLink = searchContext.topAnchorLink || searchContext.topClassLink;
+        search.PackagesAndClasses.perform(searchContext, Query.getClassSearchString());
+        search.Anchors.perform(searchContext, Query.getAnchorSearchString());
+        search.Menu.perform(searchContext, Query.getMenuSearchString());
 
-    if (!suppressLogMessage) {
-      Log.message('\'' + entireSearchString + '\' in ' + stopWatch.timeElapsed() + '\n');
-    }
+        if (searchContext.getContentNodeHTML) {
+          View.setContentNodeHTML(searchContext.getContentNodeHTML());
+        }
+        search.topLink = searchContext.topAnchorLink || searchContext.topClassLink;
 
-    this._autoOpen();
+        if (!suppressLogMessage) {
+          Log.message('\'' + entireSearchString + '\' in ' + stopWatch.timeElapsed() + '\n');
+        }
+
+        search._autoOpen();
+      });
+    });
   }
 
   this.previousEntireSearchString = entireSearchString;
@@ -1401,8 +1202,12 @@ Search.getTopLinkURL = function () {
 
 Search._autoOpen = function () {
   var url = this.getTopLinkURL();
-  if (url && UserPreference.AUTO_OPEN.getValue()) {
-    Frames.openLinkInSummaryFrame(url);
+  if (url) {
+    UserPreference.AUTO_OPEN.getValue(function (autoOpen) {
+      if (autoOpen) {
+        Frames.openLinkInSummaryFrame(url);
+      }
+    });
   }
 };
 
@@ -1653,7 +1458,7 @@ Search.Menu.perform = function (searchContext, searchString) {
     return;
   }
 
-  var menu = this._createMenu(topClassLink, topAnchorLink);
+  var menu = this._createMenu(searchContext, topClassLink, topAnchorLink);
   searchContext.getContentNodeHTML = function () {
     var html = topClassLink.getHTML();
     if (topAnchorLink) {
@@ -1686,12 +1491,12 @@ Search.Menu.perform = function (searchContext, searchString) {
   document.body.removeChild(node);
 };
 
-Search.Menu._createMenu = function (topClassLink, topAnchorLink) {
+Search.Menu._createMenu = function (searchContext, topClassLink, topAnchorLink) {
   var menu;
   if (topClassLink && topClassLink.getType() === LinkType.PACKAGE) {
-    menu = UserPreference.PACKAGE_MENU.getValue();
+    menu = searchContext.packageMenu;
   } else {
-    menu = UserPreference.CLASS_MENU.getValue();
+    menu = searchContext.classMenu;
   }
   var menuReplacement = this._getMenuReplacement();
   var rx = /##(\w+)##/;
@@ -1747,53 +1552,56 @@ Search.Menu._getMenuReplacement = function () {
  */
 function init(startupLogMessage) {
 
-  // Retrieve the innerHTML of the class frame.
-  var classesInnerHTML = getClassesInnerHtml();
+  UserPreference.HIDE_PACKAGE_FRAME.getValue(function (hidePackageFrame) {
 
-  // Initialise stored package and class links.
-  var classLinks = getClassLinks(classesInnerHTML);
-  if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
-    var packageLinks = getPackageLinks(classLinks);
-    ALL_PACKAGE_AND_CLASS_LINKS = packageLinks.concat(classLinks);
-  } else {
-    ALL_PACKAGE_AND_CLASS_LINKS = classLinks;
-  }
-  if (ALL_PACKAGE_AND_CLASS_LINKS.length === 0) {
-    return false;
-  }
+    // Retrieve the innerHTML of the class frame.
+    var classesInnerHTML = getClassesInnerHtml();
 
-  // Initialise class frame.
-  View.initialise(EventHandlers);
+    // Initialise stored package and class links.
+    var classLinks = getClassLinks(classesInnerHTML);
+    if (hidePackageFrame) {
+      var packageLinks = getPackageLinks(classLinks);
+      ALL_PACKAGE_AND_CLASS_LINKS = packageLinks.concat(classLinks);
+    } else {
+      ALL_PACKAGE_AND_CLASS_LINKS = classLinks;
+    }
+    if (ALL_PACKAGE_AND_CLASS_LINKS.length === 0) {
+      return false;
+    }
 
-  // Perform an initial search. This will populate the class frame with the
-  // entire list of packages and classes.
-  Search.perform({suppressLogMessage : true});
+    // Initialise class frame.
+    View.initialise(EventHandlers);
 
-  // Run the unit test.
-  var unitTestResults = UnitTestSuite.run();
+    // Perform an initial search. This will populate the class frame with the
+    // entire list of packages and classes.
+    Search.perform({suppressLogMessage : true});
 
-  // Hide the package list frame.
-  if (UserPreference.HIDE_PACKAGE_FRAME.getValue()) {
-    Frames.hideAllPackagesFrame();
-  }
+    // Run the unit test.
+    var unitTestResults = UnitTestSuite.run();
 
-  // Give focus to the search field.
-  View.focusOnSearchField();
+    // Hide the package list frame.
+    if (hidePackageFrame) {
+      Frames.hideAllPackagesFrame();
+    }
 
-  // Log the startup message.
-  if (unitTestResults.failed()) {
-    startupLogMessage += 'Unit test FAILED: ';
-  }
-  startupLogMessage +=
-      unitTestResults.getNumberOfPassedAssertions() +
-      ' of ' +
-      unitTestResults.getNumberOfAssertions() +
-      ' unit test assertions passed.\n';
-  Log.startupMessage(startupLogMessage);
+    // Give focus to the search field.
+    View.focusOnSearchField();
 
-  // Log all unit test failures.
-  unitTestResults.getFailures().forEach(function (unitTestFailure) {
-    Log.message(unitTestFailure + '\n');
+    // Log the startup message.
+    if (unitTestResults.failed()) {
+      startupLogMessage += 'Unit test FAILED: ';
+    }
+    startupLogMessage +=
+        unitTestResults.getNumberOfPassedAssertions() +
+        ' of ' +
+        unitTestResults.getNumberOfAssertions() +
+        ' unit test assertions passed.\n';
+    Log.startupMessage(startupLogMessage);
+
+    // Log all unit test failures.
+    unitTestResults.getFailures().forEach(function (unitTestFailure) {
+      Log.message(unitTestFailure + '\n');
+    });
   });
 }
 

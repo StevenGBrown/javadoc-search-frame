@@ -56,26 +56,29 @@ UserPreference.prototype.getKey = function () {
 
 /**
  * Retrieve the current value of this user preference.
- * @returns the value of this user preference. If the preference cannot be
- *          retrieved or has not yet been configured, the default value is
- *          returned
+ * @param callback callback function that is provided with the value of this
+ *                 user preference. If the preference cannot be retrieved or
+ *                 has not yet been configured, the default value is returned
  * @see UserPreference.canGetAndSet
  */
-UserPreference.prototype.getValue = function () {
-  var value;
+UserPreference.prototype.getValue = function (callback) {
+  var defaultValue = this.defaultValue;
   if (Storage.canGet()) {
-    value = Storage.get(this.key);
-    if (value === 'true') {
-      return true;
-    }
-    if (value === 'false') {
-      return false;
-    }
-    if (value !== undefined && value !== null) {
-      return value;
-    }
+    Storage.get(this.key, function (value) {
+      if (value === 'true') {
+        value = true;
+      }
+      if (value === 'false') {
+        value = false;
+      }
+      if (value !== undefined && value !== null) {
+        callback(value);
+      } else {
+        callback(defaultValue);
+      }
+    });
   }
-  return this.defaultValue;
+  return defaultValue;
 };
 
 /**

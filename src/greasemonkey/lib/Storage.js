@@ -46,11 +46,11 @@ Storage.canGet = function () {
 
 /**
  * Retrieve a value based on a key.
- * @param the key
- * @returns the value
+ * @param key the key
+ * @param callback callback function that is provided with the retrieved value
  */
-Storage.get = function (key) {
-  return GM_getValue(key);
+Storage.get = function (key, callback) {
+  callback(GM_getValue(key));
 };
 
 /**
