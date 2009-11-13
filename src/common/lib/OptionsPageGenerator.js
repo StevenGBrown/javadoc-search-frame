@@ -227,6 +227,8 @@ OptionsPageGenerator = {
  * Generate the options page by replacing the current document.
  */
 OptionsPageGenerator.generate = function () {
+  document.title = 'Options: Javadoc Search Frame';
+
   while (document.body.firstChild) {
     document.body.removeChild(document.body.firstChild);
   }
