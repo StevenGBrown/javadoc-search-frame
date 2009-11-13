@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import datetime, json, io, shutil, sys
+import datetime, distutils.dir_util, json, io, shutil, sys
 from buildlib import build_date, includes, inline_includes
 
 
@@ -55,6 +55,11 @@ def buildGoogleChromeExtension():
     file.write(allclassesFrameContentScript)
 
   shutil.copy(sys.path[0] + '/../src/googlechrome/manifest.json', '.')
+  distutils.dir_util.copy_tree(
+      sys.path[0] + '/../src/googlechrome/icons', 'icons')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon32.png', 'icons')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon48.png', 'icons')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon128.png', 'icons')
   shutil.copy(sys.path[0] + '/../src/googlechrome/options.html', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/background.html', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/top.js', '.')
