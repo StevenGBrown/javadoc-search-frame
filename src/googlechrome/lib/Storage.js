@@ -45,7 +45,7 @@ Storage.canGet = function () {
  * @param callback callback function that is provided with the retrieved value
  */
 Storage.get = function (key, callback) {
-  chrome.extension.sendRequest(['get', key], callback);
+  chrome.extension.sendRequest({operation:'get', key:key}, callback);
 };
 
 /**
@@ -61,7 +61,7 @@ Storage.canSet = function () {
  * @param value the value
  */
 Storage.set = function (key, value) {
-  chrome.extension.sendRequest(['set', key, value]);
+  chrome.extension.sendRequest({operation:'set', key:key, value:value});
 };
 
 /**

@@ -2,21 +2,18 @@
 <head>
 <script>
 
-  chrome.extension.onRequest.addListener(function (request, sender, sendResponse) {
-    var operation = request[0];
-    var key = request[1];
-    if (operation == 'get') {
-      sendResponse(localStorage.getItem(key));
-      return;
-    }
-    if (operation === 'set') {
-      var value = request[2];
-      localStorage.setItem(key, value);
+  chrome.extension.onRequest.addListener(
+    function (request, sender, sendResponse) {
+      if (request.operation === 'get') {
+        sendResponse(localStorage.getItem(request.key));
+        return;
+      }
+      if (request.operation === 'set') {
+        localStorage.setItem(request.key, request.value);
+      }
       sendResponse(undefined);
-      return;
     }
-    throw 'unrecognised operation, expected "get" or "set"';
-  });
+  );
 
 </script>
 </head>
