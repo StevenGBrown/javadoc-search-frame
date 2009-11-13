@@ -1596,12 +1596,11 @@ function init(startupLogMessage) {
         ' of ' +
         unitTestResults.getNumberOfAssertions() +
         ' unit test assertions passed.\n';
+    unitTestResults.getFailures().forEach(function (unitTestFailure) {
+      startupLogMessage += '\n' + unitTestFailure + '\n';
+    });
     Log.startupMessage(startupLogMessage);
 
-    // Log all unit test failures.
-    unitTestResults.getFailures().forEach(function (unitTestFailure) {
-      Log.message(unitTestFailure + '\n');
-    });
   });
 }
 
