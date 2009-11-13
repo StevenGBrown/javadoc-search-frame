@@ -23,13 +23,13 @@
     },
     {
       "matches": [
-          "http://*/*/index.html",
-          "file://*/*/index.html"
+          "http://*/*",
+          "file://*/*"
       ],
       "js": [
           "Storage.js",
           "UserPreference.js",
-          "index.js"
+          "top.js"
       ]
     }
   ],

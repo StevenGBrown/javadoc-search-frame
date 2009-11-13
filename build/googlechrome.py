@@ -57,7 +57,7 @@ def buildGoogleChromeExtension():
   shutil.copy(sys.path[0] + '/../src/googlechrome/manifest.json', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/options.html', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/background.html', '.')
-  shutil.copy(sys.path[0] + '/../src/googlechrome/index.js', '.')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/top.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Frames.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Log.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Storage.js', '.')
