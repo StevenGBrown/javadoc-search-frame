@@ -2,6 +2,8 @@
   "name": "Javadoc Search Frame",
   "version": "1.0",
   "description": "Incremental search frame for Javadoc packages and classes.",
+  "background_page": "background.html",
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": [
@@ -15,6 +17,7 @@
           "Log.js",
           "Storage.js",
           "UserPreference.js",
+          "OptionsPage.js",
           "allclasses-frame.js"
       ]
     },

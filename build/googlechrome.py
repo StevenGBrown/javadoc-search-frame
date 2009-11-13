@@ -55,11 +55,15 @@ def buildGoogleChromeExtension():
     file.write(allclassesFrameContentScript)
 
   shutil.copy(sys.path[0] + '/../src/googlechrome/manifest.json', '.')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/options.html', '.')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/background.html', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/index.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Frames.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Log.js', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Storage.js', '.')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/OptionsPage.js', '.')
   shutil.copy(sys.path[0] + '/../src/common/lib/UserPreference.js', '.')
+  shutil.copy(sys.path[0] + '/../src/common/lib/OptionsPageGenerator.js', '.')
 
 
 if __name__ == "__main__":

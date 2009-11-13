@@ -72,6 +72,24 @@
 #INCLUDE UserPreference.js
 
 
+/*
+ * ----------------------------------------------------------------------------
+ * OPTIONS PAGE GENERATOR
+ * ----------------------------------------------------------------------------
+ */
+
+#INCLUDE OptionsPageGenerator.js
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * OPTIONS PAGE
+ * ----------------------------------------------------------------------------
+*/
+
+#INCLUDE OptionsPage.js
+
+
 #INCLUDE main.js
 
 
@@ -79,6 +97,11 @@
  * Entry point of this script; called when the script has loaded.
  */
 function main() {
+
+  if (document.location.hash === '#JavadocSearchFrameOptions') {
+    OptionsPageGenerator.generate();
+    return;
+  }
 
   var isGoogleChromeVersionOne = navigator.userAgent.toLowerCase().indexOf('chrome/1') !== -1;
   if (isGoogleChromeVersionOne) {
