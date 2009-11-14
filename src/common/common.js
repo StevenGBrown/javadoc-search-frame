@@ -829,7 +829,8 @@ AnchorsLoader = {
   request : null,
   classLink : null,
   anchorLinks : null,
-  bytesDownloaded : 0
+  bytesDownloaded : 0,
+  errorMessage : null
 };
 
 AnchorsLoader.onprogress = null;
@@ -843,19 +844,23 @@ AnchorsLoader.load = function (classLink) {
   this.classLink = classLink;
   this.anchorLinks = null;
   var anchorsLoader = this;
-  var request = new XMLHttpRequest();
-  request.onprogress = function (e) {
-    anchorsLoader._onprogress(e);
-  };
-  request.open('GET', classLink.getUrl());
-  request.onload = function (e) {
-    anchorsLoader._onload(e);
-  };
-  request.onerror = function (e) {
-    anchorsLoader._onerror(e);
-  };
-  request.overrideMimeType('text/plain; charset=x-user-defined');
-  request.send(null);
+  try {
+    var request = new XMLHttpRequest();
+    request.onprogress = function (e) {
+      anchorsLoader._onprogress(e);
+    };
+    request.open('GET', classLink.getUrl());
+    request.onload = function (e) {
+      anchorsLoader._onload(e);
+    };
+    request.onerror = function (e) {
+      anchorsLoader._onerror(e);
+    };
+    request.overrideMimeType('text/plain; charset=x-user-defined');
+    request.send(null);
+  } catch (ex) {
+    anchorsLoader._onexception(ex);
+  }
   this.request = request;
 };
 
@@ -865,7 +870,7 @@ AnchorsLoader.isComplete = function () {
 
 AnchorsLoader.getStatus = function () {
   if (this.bytesDownloaded === -1) {
-    return 'ERROR';
+    return this.errorMessage;
   }
   if (this.bytesDownloaded > 1048576) {
     return 'loading... (' + Math.floor(this.bytesDownloaded / 1048576) + ' MB)';
@@ -891,10 +896,12 @@ AnchorsLoader.cancel = function () {
   this.classLink = null;
   this.anchorLinks = null;
   this.bytesDownloaded = 0;
+  this.errorMessage = null;
 };
 
 AnchorsLoader._onprogress = function (e) {
   this.bytesDownloaded = e.position;
+  this.errorMessage = null;
   this.onprogress();
 };
 
@@ -906,6 +913,13 @@ AnchorsLoader._onload = function (e) {
 
 AnchorsLoader._onerror = function (e) {
   this.bytesDownloaded = -1;
+  this.errorMessage = 'ERROR';
+  this.onprogress();
+};
+
+AnchorsLoader._onexception = function (ex) {
+  this.bytesDownloaded = -1;
+  this.errorMessage = ex;
   this.onprogress();
 };
 
