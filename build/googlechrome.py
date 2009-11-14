@@ -47,28 +47,34 @@ def buildGoogleChromeExtension():
   with io.open(sys.path[0] + '/../src/googlechrome/allclasses-frame.js') as file:
     allclassesFrameContentScript = file.read()
 
-  allclassesFrameContentScript = includes.insertExternalFiles(allclassesFrameContentScript, [sys.path[0] + '/../src/common'])
-  allclassesFrameContentScript = inline_includes.insertValue(allclassesFrameContentScript, 'version', '\'' + version + '\'')
-  allclassesFrameContentScript = inline_includes.insertValue(allclassesFrameContentScript, 'buildDate', '\'' + formattedBuildDate + '\'');
+  allclassesFrameContentScript = includes.insertExternalFiles(
+      allclassesFrameContentScript, [sys.path[0] + '/../src/common'])
+  allclassesFrameContentScript = inline_includes.insertValue(
+      allclassesFrameContentScript, 'version', '\'' + version + '\'')
+  allclassesFrameContentScript = inline_includes.insertValue(
+      allclassesFrameContentScript, 'buildDate', '\'' + formattedBuildDate + '\'');
 
   with io.open('allclasses-frame.js', 'w', newline='\n') as file:
     file.write(allclassesFrameContentScript)
 
   shutil.copy(sys.path[0] + '/../src/googlechrome/manifest.json', '.')
-  distutils.dir_util.copy_tree(
-      sys.path[0] + '/../src/googlechrome/icons', 'icons')
-  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon32.png', 'icons')
-  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon48.png', 'icons')
-  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon128.png', 'icons')
   shutil.copy(sys.path[0] + '/../src/googlechrome/options.html', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/background.html', '.')
   shutil.copy(sys.path[0] + '/../src/googlechrome/top.js', '.')
-  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Frames.js', '.')
-  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Log.js', '.')
-  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Storage.js', '.')
-  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/OptionsPage.js', '.')
-  shutil.copy(sys.path[0] + '/../src/common/lib/UserPreference.js', '.')
-  shutil.copy(sys.path[0] + '/../src/common/lib/OptionsPageGenerator.js', '.')
+
+  distutils.dir_util.mkpath('icons')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon16.png', 'icons')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon32.png', 'icons')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon48.png', 'icons')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/icons/icon128.png', 'icons')
+
+  distutils.dir_util.mkpath('lib')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Frames.js', 'lib')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Log.js', 'lib')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/Storage.js', 'lib')
+  shutil.copy(sys.path[0] + '/../src/googlechrome/lib/OptionsPage.js', 'lib')
+  shutil.copy(sys.path[0] + '/../src/common/lib/UserPreference.js', 'lib')
+  shutil.copy(sys.path[0] + '/../src/common/lib/OptionsPageGenerator.js', 'lib')
 
 
 if __name__ == "__main__":

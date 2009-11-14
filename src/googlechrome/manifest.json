@@ -19,11 +19,11 @@
           "file://*/*/package-frame.html"
       ],
       "js": [
-          "Frames.js",
-          "Log.js",
-          "Storage.js",
-          "UserPreference.js",
-          "OptionsPage.js",
+          "lib/Frames.js",
+          "lib/Log.js",
+          "lib/Storage.js",
+          "lib/UserPreference.js",
+          "lib/OptionsPage.js",
           "allclasses-frame.js"
       ]
     },
@@ -33,8 +33,8 @@
           "file://*/*"
       ],
       "js": [
-          "Storage.js",
-          "UserPreference.js",
+          "lib/Storage.js",
+          "lib/UserPreference.js",
           "top.js"
       ]
     }
