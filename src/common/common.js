@@ -231,31 +231,22 @@ UnitTestResult = function (numberOfAssertions, failures) {
 };
 
 /**
- * @returns true if at least one unit test failed, false otherwise
+ * @returns a description of this unit test result
  */
-UnitTestResult.prototype.failed = function () {
-  return this.failures.length >= 1;
-};
-
-/**
- * @returns the total number of assertions made by the unit test
- */
-UnitTestResult.prototype.getNumberOfAssertions = function () {
-  return this.numberOfAssertions;
-};
-
-/**
- * @returns the number of passed assertions made by the unit test
- */
-UnitTestResult.prototype.getNumberOfPassedAssertions = function () {
-  return this.numberOfAssertions - this.failures.length;
-};
-
-/**
- * @returns {Array} the details of the unit test failures
- */
-UnitTestResult.prototype.getFailures = function () {
-  return this.failures;
+UnitTestResult.prototype.toString = function () {
+  var result = '';
+  if (this.failures.length >= 1) {
+    result += 'Unit test FAILED: ';
+  }
+  result +=
+      this.numberOfAssertions - this.failures.length +
+      ' of ' +
+      this.numberOfAssertions +
+      ' unit test assertions passed.\n';
+  this.failures.forEach(function (unitTestFailure) {
+    result += '\n' + unitTestFailure + '\n';
+  });
+  return result;
 };
 
 
@@ -268,7 +259,7 @@ UnitTestAssertionFailure = function (functionUnderTestName, description, actual,
   this.description = description;
   this.actual = actual;
   this.expected = expected;
-}
+};
 
 /**
  * @returns a description of this unit test failure
@@ -276,7 +267,7 @@ UnitTestAssertionFailure = function (functionUnderTestName, description, actual,
 UnitTestAssertionFailure.prototype.toString = function () {
   return this.functionUnderTestName + '\n' + this.description + '\n'
       + 'Expected "' + this.expected + '" but was "' + this.actual + '"';
-}
+};
 
 
 /**
@@ -286,14 +277,14 @@ UnitTestAssertionFailure.prototype.toString = function () {
 UnitTestExceptionThrownFailure = function (functionUnderTestName, exception) {
   this.functionUnderTestName = functionUnderTestName;
   this.exception = exception;
-}
+};
 
 /**
  * @returns a description of this unit test failure
  */
 UnitTestExceptionThrownFailure.prototype.toString = function () {
   return this.functionUnderTestName + '\n' + 'Exception thrown: ' + this.exception;
-}
+};
 
 
 /*
@@ -1602,18 +1593,7 @@ function init(startupLogMessage) {
     View.focusOnSearchField();
 
     // Log the startup message.
-    if (unitTestResults.failed()) {
-      startupLogMessage += 'Unit test FAILED: ';
-    }
-    startupLogMessage +=
-        unitTestResults.getNumberOfPassedAssertions() +
-        ' of ' +
-        unitTestResults.getNumberOfAssertions() +
-        ' unit test assertions passed.\n';
-    unitTestResults.getFailures().forEach(function (unitTestFailure) {
-      startupLogMessage += '\n' + unitTestFailure + '\n';
-    });
-    Log.startupMessage(startupLogMessage);
+    Log.startupMessage(startupLogMessage + unitTestResults);
 
   });
 }
