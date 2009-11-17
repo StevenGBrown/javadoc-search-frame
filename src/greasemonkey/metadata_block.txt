@@ -3,7 +3,7 @@
 // @namespace     http://userscripts.org/users/46156
 // @description   Incremental search frame for Javadoc packages and classes.
 // @homepage      http://code.google.com/p/javadoc-search-frame
-// @version       #INCLUDE buildDate#
+// @version       #INCLUDE unquotedBuildDate#
 // @include       */allclasses-frame.html
 // @include       */allclasses-frame.html#JavadocSearchFrameOptions
 // @include       */package-frame.html

@@ -28,8 +28,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import datetime, distutils.dir_util, json, io, shutil, sys
-from buildlib import build_date, includes, inline_includes
+import io, json, sys
+from buildlib.build_date import *
+from buildlib.file_copy import *
+from buildlib.transformations import *
 
 
 def buildGoogleChromeExtension():
@@ -38,37 +40,40 @@ def buildGoogleChromeExtension():
   This extension will be created in the current working directory.
   """
 
-  buildDate = datetime.date.today()
-  formattedBuildDate = build_date.format(buildDate)
+  copyFile(name='allclasses-frame.js', fromDir='googlechrome', toDir='.',
+    transformations=(
+      insertExternalFiles(['common']),
+      insertValue('version', '\'' + readVersionFromManifest() + '\''),
+      insertValue('buildDate', '\'' + formattedBuildDate() + '\'')
+    )
+  )
 
-  with io.open(sys.path[0] + '/../src/googlechrome/manifest.json') as file:
-    version = json.loads(file.read())['version']
+  copyFiles(
+    names=('manifest.json', 'options.html', 'background.html', 'top.js'),
+    fromDir='googlechrome', toDir='.')
 
-  with io.open(sys.path[0] + '/../src/googlechrome/allclasses-frame.js') as file:
-    allclassesFrameContentScript = file.read()
+  copyFiles(
+    names=('icon16.png', 'icon32.png', 'icon48.png', 'icon128.png'),
+    fromDir='googlechrome/icons', toDir='icons')
 
-  allclassesFrameContentScript = includes.insertExternalFiles(
-      allclassesFrameContentScript, [sys.path[0] + '/../src/common'])
-  allclassesFrameContentScript = inline_includes.insertValue(
-      allclassesFrameContentScript, 'version', '\'' + version + '\'')
-  allclassesFrameContentScript = inline_includes.insertValue(
-      allclassesFrameContentScript, 'buildDate', '\'' + formattedBuildDate + '\'');
+  copyFiles(
+    names=('Frames.js', 'Log.js', 'Storage.js', 'OptionsPage.js'),
+    fromDir='googlechrome/lib', toDir='lib')
 
-  with io.open('allclasses-frame.js', 'w', newline='\n') as file:
-    file.write(allclassesFrameContentScript)
+  copyFiles(
+    names=('UserPreference.js', 'OptionsPageGenerator.js'),
+    fromDir='common/lib', toDir='lib')
 
-  for file in 'manifest.json', 'options.html', 'background.html', 'top.js':
-    shutil.copy(sys.path[0] + '/../src/googlechrome/' + file, '.')
 
-  distutils.dir_util.mkpath('icons')
-  for file in 'icon16.png', 'icon32.png', 'icon48.png', 'icon128.png':
-    shutil.copy(sys.path[0] + '/../src/googlechrome/icons/' + file, 'icons')
+def readVersionFromManifest():
+  """
+  Read and return the script version from the extension manifest.
+  """
 
-  distutils.dir_util.mkpath('lib')
-  for file in 'Frames.js', 'Log.js', 'Storage.js', 'OptionsPage.js':
-    shutil.copy(sys.path[0] + '/../src/googlechrome/lib/' + file, 'lib')
-  for file in 'UserPreference.js', 'OptionsPageGenerator.js':
-    shutil.copy(sys.path[0] + '/../src/common/lib/' + file, 'lib')
+  manifestPath = os.path.join(
+      sys.path[0], '..', 'src', 'googlechrome', 'manifest.json')
+  with io.open(manifestPath) as manifestFile:
+    return json.loads(manifestFile.read())['version']
 
 
 if __name__ == "__main__":
