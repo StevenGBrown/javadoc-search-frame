@@ -31,17 +31,26 @@ OTHER DEALINGS IN THE SOFTWARE.
 import datetime
 
 
-def format(buildDate):
-  """Return the given date, in the build date format."""
+scriptBuildDate = datetime.date.today()
 
-  formattedBuildDate = buildDate.strftime(
-      '%d' + getOrdinalIndicator(buildDate.day) + ' %B %Y')
+
+def buildDate():
+  """Return the build date."""
+
+  return scriptBuildDate
+
+
+def formattedBuildDate():
+  """Return the build date in a human-readable format."""
+
+  formattedBuildDate = buildDate().strftime(
+      '%d' + _getOrdinalIndicator(buildDate().day) + ' %B %Y')
   if formattedBuildDate[0] == '0':
     formattedBuildDate = formattedBuildDate[1:]
   return formattedBuildDate
 
 
-def getOrdinalIndicator(number):
+def _getOrdinalIndicator(number):
   """Return the ordinal indicator for the given number."""
 
   if (number < 10 or number > 20):
