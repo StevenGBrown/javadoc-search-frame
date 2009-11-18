@@ -398,23 +398,24 @@ ClassLink = function (type, packageName, className, html) {
   this.html = html || '<br/>';
   this.url = null;
   this.canonicalName = packageName + '.' + className;
-  this.isInnerClass = className.indexOf('.') !== -1;
-  if (this.isInnerClass) {
-    this.classNameWithoutInnerClassSeparators = className.replace(/\./g, '');
-    this.canonicalNameWithoutInnerClassSeparators =
-        packageName + '.' + this.classNameWithoutInnerClassSeparators;
+
+  this.innerClassNames = [];
+  var name = className;
+  while (true) {
+    var index = name.indexOf('.');
+    if (index === -1) {
+      break;
+    }
+    name = name.substring(index + 1, name.length);
+    this.innerClassNames.push(name);
   }
 };
 
 ClassLink.prototype.matches = function (regex) {
-  // The class and canonical names without the inner class separators allow a
-  // Camel Case search to match an inner class.
-
   return regex.test(this.className) || regex.test(this.canonicalName) ||
-      this.isInnerClass && (
-        regex.test(this.classNameWithoutInnerClassSeparators) ||
-        regex.test(this.canonicalNameWithoutInnerClassSeparators)
-      );
+      this.innerClassNames.some(function (innerClassName) {
+        return regex.test(innerClassName);
+      });
 };
 
 ClassLink.prototype.getHTML = function () {
@@ -981,11 +982,13 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
   var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
   var hudsonPackage = new PackageLink('hudson');
   var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS, 'hudson.model', 'Hudson');
+  var testOuterAppleBananaClass = new ClassLink(LinkType.CLASS, 'test', 'Outer.Apple.Banana');
 
   var allLinks = [ javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass,
     javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
     javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass,
-    orgOmgCorbaObjectClass, hudsonPackage, hudsonModelHudsonClass ];
+    orgOmgCorbaObjectClass, hudsonPackage, hudsonModelHudsonClass,
+    testOuterAppleBananaClass ];
 
   var assertThatSearchResultFor = function (searchString, searchResult) {
     assertThat('Search for: ' + searchString,
@@ -995,6 +998,10 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
 
   assertThatSearchResultFor('java.io',
       is([javaIoPackage, javaIoCloseableClass]));
+  assertThatSearchResultFor('JI',
+      is([javaIoPackage, javaIoCloseableClass]));
+  assertThatSearchResultFor('JW',
+      is([]));
   assertThatSearchResultFor('j',
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass, javaIoPackage,
         javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
@@ -1006,8 +1013,10 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
   assertThatSearchResultFor('Object',
       is([javaLangObjectClass, orgOmgCorbaObjectClass]));
   assertThatSearchResultFor('O',
-      is([javaLangObjectClass, orgOmgCorbaObjectClass]));
+      is([javaLangObjectClass, orgOmgCorbaObjectClass, testOuterAppleBananaClass]));
   assertThatSearchResultFor('java.lang.Object',
+      is([javaLangObjectClass]));
+  assertThatSearchResultFor('JLO',
       is([javaLangObjectClass]));
   assertThatSearchResultFor('JAVA.LANG.OBJECT',
       is([javaLangObjectClass]));
@@ -1031,15 +1040,41 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
   assertThatSearchResultFor('java.awt.geom.PoiDD',
       is([javaAwtGeomPoint2DDoubleClass]));
+  assertThatSearchResultFor('PD',
+      is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
   assertThatSearchResultFor('P2D',
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
   assertThatSearchResultFor('P2DD',
       is([javaAwtGeomPoint2DDoubleClass]));
+  assertThatSearchResultFor('java.awt.geom.PD',
+      is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
+  assertThatSearchResultFor('JAGPD',
+      is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
   assertThatSearchResultFor('java.awt.geom.P2D',
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
   assertThatSearchResultFor('java.awt.geom.P2DD',
       is([javaAwtGeomPoint2DDoubleClass]));
   assertThatSearchResultFor('hudson.Hudson',
+      is([]));
+  assertThatSearchResultFor('Double',
+      is([javaAwtGeomPoint2DDoubleClass]));
+  assertThatSearchResultFor('java.awt.geom.Double',
+      is([]));
+  assertThatSearchResultFor('Apple',
+      is([testOuterAppleBananaClass]));
+  assertThatSearchResultFor('test.Apple',
+      is([]));
+  assertThatSearchResultFor('Apple.Banana',
+      is([testOuterAppleBananaClass]));
+  assertThatSearchResultFor('test.Apple.Banana',
+      is([]));
+  assertThatSearchResultFor('AB',
+      is([javaxSwingBorderAbstractBorderClass, testOuterAppleBananaClass]));
+  assertThatSearchResultFor('test.AB',
+      is([]));
+  assertThatSearchResultFor('Banana',
+      is([testOuterAppleBananaClass]));
+  assertThatSearchResultFor('test.Banana',
       is([]));
 });
 
@@ -1066,47 +1101,69 @@ RegexLibrary._createExactMatchCondition = function (searchString, caseSensitive)
 };
 
 RegexLibrary._getRegex = function (searchString) {
-  searchString = searchString.replace(/\*{2,}/g, '*');
-
   var pattern = '^';
 
-  for (i = 0; i < searchString.length; i++) {
-    var character = searchString.charAt(i);
-    if (/[A-Z]/.test(character) && i > 0) {
-      // An uppercase character which is not at the beginning of the
-      // search input string. Perform a case-insensitive match of this
-      // character. If the matched character is uppercase, allow any
-      // number of lowercase characters or digits to be matched before
-      // it. This allows for Camel Case searching.
+  var remainingSearchString = searchString.replace(/\*{2,}/g, '*');
+  var token;
+  while (remainingSearchString.length > 0) {
+    var camelCaseTokenMatch = /^[A-Z][a-z\\d]*/.exec(remainingSearchString);
+    if (camelCaseTokenMatch) {
+      // A Camel Case expression, consisting of an uppercase character followed
+      // by any number of lowercase characters or digit characters.
 
-      pattern += '(([a-z\\d]*' + character + ')|' + character.toLowerCase() + ')';
-    } else if (/\d/.test(character) && i > 0) {
-      // A digit character which is not at the beginning of the search
-      // input string. Allow any number of lowercase characters or digits
-      // to be matched before this digit. This allows for Camel Case
-      // searching.
-
-      pattern += '[a-z\\d]*' + character;
-    } else if (/[a-zA-Z]/.test(character)) {
-      // A lowercase character, or an uppercase character at the
-      // beginning of the search input string. Perform a case-insensitive
-      // match of this character.
-
-      pattern += '(' + character.toUpperCase() + '|' + character.toLowerCase() + ')';
-    } else if (character === '*') {
-      // Replace '*' with '.*' to allow the asterisk to be used as a wildcard.
-
-      pattern += '.*';
-    } else if (RegexLibrary._isSpecialRegularExpressionCharacter(character)) {
-       // A special regular expression character, but not an asterisk.
-       // Escape this character.
-
-       pattern += '\\' + character;
+      token = camelCaseTokenMatch[0];
+      if (remainingSearchString === searchString) {
+        // The Camel Case expression is at the start of the search string.
+        // Perform a case-insensitive match of the first character, followed by
+        // any number of lowercase characters or digit characters.
+        pattern += '(' + token + '|' + token.toLowerCase() + ')[a-z\\d]*';
+      } else {
+        // The Camel Case expression is NOT at the start of the search string.
+        pattern += '(' +
+            // Match the Camel Case expression followed by any number of
+            // lowercase characters or digit characters and optionally
+            // preceeded by a period character. The optional period character
+            // allows inner classes to be matched.
+            '(\\.?' + token + '[a-z\\d]*)' +
+            // OR
+	    '|' +
+            // Match the Camel Case expression in lowercase followed by any
+            // number of lowercase characters or digit characters and preceeded
+            // by a mandatory period character. This clause allows package
+            // names to be matched.
+            '(\\.' + token.toLowerCase() + '[a-z\\d]*)' +
+            // OR
+            '|' +
+            // Match the Camel Case expression in lowercase. This clause
+            // performs a direct case-insensitive match of the characters.
+            token.toLowerCase() +
+            ')';
+      }
     } else {
-      // Otherwise, just add the character to the regular expression.
+      token = remainingSearchString.charAt(0);
 
-      pattern += character;
+      if (/[a-z]/.test(token)) {
+        // A lowercase character that is not part of a Camel Case expression.
+        // Perform a case-insensitive match of this character.
+
+        pattern += '(' + token.toUpperCase() + '|' + token + ')';
+      } else if (token === '*') {
+        // Replace '*' with '.*' to allow the asterisk to be used as a wildcard.
+
+        pattern += '.*';
+      } else if (RegexLibrary._isSpecialRegularExpressionCharacter(token)) {
+         // A special regular expression character, but not an asterisk.
+         // Escape this character.
+
+         pattern += '\\' + token;
+      } else {
+        // Otherwise, add the character directly to the regular expression.
+
+        pattern += token;
+      }
     }
+    remainingSearchString = remainingSearchString.substring(
+        token.length, remainingSearchString.length);
   }
 
   if (!endsWith(pattern, '.*')) {
