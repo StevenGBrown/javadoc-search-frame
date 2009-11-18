@@ -283,7 +283,7 @@ UnitTestExceptionThrownFailure = function (functionUnderTestName, exception) {
  * @returns a description of this unit test failure
  */
 UnitTestExceptionThrownFailure.prototype.toString = function () {
-  return this.functionUnderTestName + '\n' + 'Exception thrown: ' + this.exception;
+  return this.functionUnderTestName + '\n' + this.exception;
 };
 
 
