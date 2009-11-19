@@ -1126,7 +1126,7 @@ RegexLibrary._getRegex = function (searchString) {
             // allows inner classes to be matched.
             '(\\.?' + token + '[a-z\\d]*)' +
             // OR
-	    '|' +
+            '|' +
             // Match the Camel Case expression in lowercase followed by any
             // number of lowercase characters or digit characters and preceeded
             // by a mandatory period character. This clause allows package
@@ -1231,8 +1231,8 @@ Search.perform = function (parameters) {
     UserPreference.CLASS_MENU.getValue(function (classMenu) {
       UserPreference.PACKAGE_MENU.getValue(function (packageMenu) {
         var searchContext = {};
-	searchContext.classMenu = classMenu;
-	searchContext.packageMenu = packageMenu;
+        searchContext.classMenu = classMenu;
+        searchContext.packageMenu = packageMenu;
 
         search.PackagesAndClasses.perform(searchContext, Query.getClassSearchString());
         search.Anchors.perform(searchContext, Query.getAnchorSearchString());
