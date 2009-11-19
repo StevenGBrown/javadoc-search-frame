@@ -29,6 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 # Developed with Python v3.0.1
 
 import distutils.dir_util, io, os, shutil, sys
+from . import static_analysis
 
 
 def copyFile(name, fromDir, toDir, transformations=()):
@@ -83,3 +84,4 @@ def copyAndRenameFile(fromPath, toPath, transformations=()):
       fileContents = transformation(fileContents)
     with io.open(absToPath, 'w', newline='\n') as toFile:
       toFile.write(fileContents)
+  static_analysis.analyse(absToPath)

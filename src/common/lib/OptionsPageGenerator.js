@@ -141,7 +141,7 @@ OptionsPageGenerator = {
 
       preference.getValue(function (value) {
         var radioButtonToCheck = value ? trueRadioButton : falseRadioButton;
-	radioButtonToCheck.setAttribute("checked", "true");
+        radioButtonToCheck.setAttribute("checked", "true");
 
         var clickEventListener = function () {
           preference.setValue(trueRadioButton.checked);
