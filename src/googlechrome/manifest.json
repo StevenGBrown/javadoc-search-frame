@@ -1,7 +1,7 @@
 {
-  "name": "Javadoc Search Frame",
+  "name": "Javadoc Search Frame Extension",
   "version": "1.0",
-  "description": "Incremental search frame for Javadoc packages and classes.",
+  "description": "Javadoc incremental search for packages and classes.",
   "background_page": "background.html",
   "options_page": "options.html",
   "icons": {
