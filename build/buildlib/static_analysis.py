@@ -74,7 +74,6 @@ def checkForTabCharacters(fileContents, log):
   """
 
   lines = fileContents.splitlines()
-  for lineNumber in range(len(lines)):
-    line = lines[lineNumber]
+  for lineNumber, line in zip(range(1, len(lines) + 1), lines):
     if line.find('\t') != -1:
       log(lineNumber, 'tab character found')
