@@ -145,21 +145,6 @@ UnitTestSuite.assertThat = function (description, actual, expected) {
 };
 
 /**
- * Assert that eval() of the actual value equals the expected value.
- * The advantage of using this function over {@link UnitTestSuite.assertThat} is
- * the description does not need to be supplied, since the actualToEval
- * parameter is used as a description.
- * 
- * @param {String} actualToEval evaluated (with the eval() method) to determine the actual value
- * @param expected the expected value
- */
-UnitTestSuite.assertThatEval = function (actualToEval, expected) {
-  var description = actualToEval;
-  var actual = eval(actualToEval);
-  UnitTestSuite.assertThat(description, actual, expected);
-};
-
-/**
  * Has no effect; intended to make calls to the {@link UnitTestSuite.assertThat}
  * and {@link UnitTestSuite.assertThatEval} functions more readable.
  * @returns the value paramter (unchanged)
@@ -167,6 +152,17 @@ UnitTestSuite.assertThatEval = function (actualToEval, expected) {
  */
 UnitTestSuite.is = function (value) {
   return value;
+};
+
+/**
+ * Quotes the given string value in the same way as the Console or Error Log.
+ * @returns the quoted string
+ */
+UnitTestSuite.quote = function (stringValue) {
+  if (stringValue || stringValue === '') {
+    return '\'' + stringValue + '\'';
+  }
+  return stringValue;
 };
 
 /**
@@ -991,7 +987,7 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
     testOuterAppleBananaClass ];
 
   var assertThatSearchResultFor = function (searchString, searchResult) {
-    assertThat('Search for: ' + searchString,
+    assertThat(UnitTestSuite.quote(searchString),
            allLinks.filter(RegexLibrary.createCondition(searchString)),
            is(searchResult));
   };
@@ -1186,7 +1182,7 @@ RegexLibrary._getRegex = function (searchString) {
 };
 
 UnitTestSuite.testFunctionFor('RegexLibrary._getRegex()', function () {
-  assertThat('excess asterisk characters are removed',
+  assertThat('removal of excess asterisk characters',
          RegexLibrary._getRegex('java.**.***o**e*').pattern, is(RegexLibrary._getRegex('java.*.*o*e').pattern));
 });
 
@@ -1406,7 +1402,7 @@ UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(searchStr
     javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
 
   var assertThatBestMatchFor = function (searchString, searchResult) {
-    assertThat('Best match for: ' + searchString,
+    assertThat(UnitTestSuite.quote(searchString),
            Search.PackagesAndClasses._getBestMatch(searchString, allLinks),
            is(searchResult));
   };
@@ -1923,12 +1919,19 @@ function endsWith(stringOne, stringTwo) {
 
 UnitTestSuite.testFunctionFor('endsWith(stringOne, stringTwo)', function () {
 
-  assertThatEval("endsWith(undefined, '')", is(false));
-  assertThatEval("endsWith(null, '')", is(false));
-  assertThatEval("endsWith('one', 'onetwo')", is(false));
-  assertThatEval("endsWith('one', 'one')", is(true));
-  assertThatEval("endsWith('one', 'e')", is(true));
-  assertThatEval("endsWith('', 'two')", is(false));
+  var assertThatEndsWith = function (stringOne, stringTwo, expectedResult) {
+    assertThat(
+        UnitTestSuite.quote(stringOne) + ' ends with ' + UnitTestSuite.quote(stringTwo)+ ':',
+        endsWith(stringOne, stringTwo),
+        expectedResult);
+  };
+
+  assertThatEndsWith(undefined, '', is(false));
+  assertThatEndsWith(null, '', is(false));
+  assertThatEndsWith('one', 'onetwo', is(false));
+  assertThatEndsWith('one', 'one', is(true));
+  assertThatEndsWith('one', 'e', is(true));
+  assertThatEndsWith('', 'two', is(false));
 });
 
 function rightTrim(stringToTrim) {
@@ -1937,10 +1940,14 @@ function rightTrim(stringToTrim) {
 
 UnitTestSuite.testFunctionFor('rightTrim(stringToTrim)', function () {
 
-  assertThatEval("rightTrim('string')", is('string'));
-  assertThatEval("rightTrim('string   ')", is('string'));
-  assertThatEval("rightTrim('   string')", is('   string'));
-  assertThatEval("rightTrim('   string   ')", is('   string'));
+  var assertThatRightTrim = function (stringToTrim, expectedResult) {
+    assertThat(UnitTestSuite.quote(stringToTrim), rightTrim(stringToTrim), expectedResult);
+  };
+
+  assertThatRightTrim('string', is('string'));
+  assertThatRightTrim('string   ', is('string'));
+  assertThatRightTrim('   string', is('   string'));
+  assertThatRightTrim('   string   ', is('   string'));
 });
 
 
