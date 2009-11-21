@@ -406,7 +406,7 @@ ClassLink = function (type, packageName, className, html) {
     if (index === -1) {
       break;
     }
-    name = name.substring(index + 1, name.length);
+    name = name.substring(index + 1);
     this.innerClassNames.push(name);
   }
 };
@@ -1076,6 +1076,8 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
       is([testOuterAppleBananaClass]));
   assertThatSearchResultFor('test.Banana',
       is([]));
+  assertThatSearchResultFor('Ja.Aw.',
+      is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
 });
 
 RegexLibrary.createCaseInsensitiveExactMatchCondition = function (searchString) {
@@ -1105,38 +1107,49 @@ RegexLibrary._getRegex = function (searchString) {
 
   var remainingSearchString = searchString.replace(/\*{2,}/g, '*');
   var token;
+  var previousToken;
   while (remainingSearchString.length > 0) {
+    var previousToken = token;
+
     var camelCaseTokenMatch = /^[A-Z][a-z\\d]*/.exec(remainingSearchString);
     if (camelCaseTokenMatch) {
-      // A Camel Case expression, consisting of an uppercase character followed
-      // by any number of lowercase characters or digit characters.
-
       token = camelCaseTokenMatch[0];
+
+      // A Camel Case expression, consisting of a leading character (uppercase)
+      // and one or more trailing characters (consisting of lowercase
+      // characters and digit characters).
+
+      var leadingCharacter = token.charAt(0);
+      var trailingCharacters = token.substring(1);
+      var trailingCharactersPattern = '[a-z\\d]*' + trailingCharacters + '[a-z\\d]*';
+
       if (remainingSearchString === searchString) {
         // The Camel Case expression is at the start of the search string.
-        // Perform a case-insensitive match of the first character, followed by
-        // any number of lowercase characters or digit characters.
-        pattern += '(' + token + '|' + token.toLowerCase() + ')[a-z\\d]*';
+        // Perform a case-insensitive match of the leading character, then
+        // match the trailing characters along with other lowercase characters
+        // or digit characters.
+        pattern += '(' + leadingCharacter + '|' + leadingCharacter.toLowerCase() + ')' + trailingCharactersPattern;
       } else {
         // The Camel Case expression is NOT at the start of the search string.
         pattern += '(' +
-            // Match the Camel Case expression followed by any number of
-            // lowercase characters or digit characters and optionally
-            // preceeded by a period character. The optional period character
-            // allows inner classes to be matched.
-            '(\\.?' + token + '[a-z\\d]*)' +
+            // Optionally match a period character, then match the leading
+            // character, then match the trailing characters along with other
+            // lowercase characters or digit characters. The optional period
+            // character allows inner classes to be matched by this Camel Case
+            // expression.
+            '(\\.?' + leadingCharacter + trailingCharactersPattern + ')' +
             // OR
             '|' +
-            // Match the Camel Case expression in lowercase followed by any
-            // number of lowercase characters or digit characters and preceeded
-            // by a mandatory period character. This clause allows package
-            // names to be matched.
-            '(\\.' + token.toLowerCase() + '[a-z\\d]*)' +
+            // Match a period character, then match the leading character in
+            // lowercase, then match the trailing characters along with other
+            // lowercase characters or digit characters. This clause allows
+            // package names to be matched by this Camel Case expression.
+            '(' + (endsWith(previousToken, '.') ? '' : '\\.') + leadingCharacter.toLowerCase() + trailingCharactersPattern + ')' +
             // OR
             '|' +
             // Match the Camel Case expression in lowercase. This clause
-            // performs a direct case-insensitive match of the characters.
-            token.toLowerCase() +
+            // performs a direct case-sensitive match of the characters.
+            leadingCharacter.toLowerCase() + trailingCharacters +
             ')';
       }
     } else {
@@ -1162,8 +1175,7 @@ RegexLibrary._getRegex = function (searchString) {
         pattern += token;
       }
     }
-    remainingSearchString = remainingSearchString.substring(
-        token.length, remainingSearchString.length);
+    remainingSearchString = remainingSearchString.substring(token.length);
   }
 
   if (!endsWith(pattern, '.*')) {
@@ -1902,12 +1914,17 @@ UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHTML)', function () {
 });
 
 function endsWith(stringOne, stringTwo) {
+  if (!stringOne) {
+    return false;
+  }
   var strIndex = stringOne.length - stringTwo.length;
   return strIndex >= 0 && stringOne.substring(strIndex) === stringTwo;
 }
 
 UnitTestSuite.testFunctionFor('endsWith(stringOne, stringTwo)', function () {
 
+  assertThatEval("endsWith(undefined, '')", is(false));
+  assertThatEval("endsWith(null, '')", is(false));
   assertThatEval("endsWith('one', 'onetwo')", is(false));
   assertThatEval("endsWith('one', 'one')", is(true));
   assertThatEval("endsWith('one', 'e')", is(true));
