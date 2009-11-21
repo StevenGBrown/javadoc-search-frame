@@ -32,7 +32,6 @@
  */
 OptionsPageGenerator = {};
 
-
 /**
  * Generate the options page by replacing the current document.
  */
@@ -50,7 +49,6 @@ OptionsPageGenerator.generate = function () {
 
   this._initialise(document);
 };
-
 
 OptionsPageGenerator._createContents = function (pageDocument) {
   var contents = [];
@@ -82,13 +80,11 @@ OptionsPageGenerator._createContents = function (pageDocument) {
   return contents;
 };
 
-
 OptionsPageGenerator._createHeader = function (pageDocument) {
   var headerElement = pageDocument.createElement('h2');
   headerElement.textContent = 'Javadoc Search Frame Options';
   return headerElement;
 };
-
 
 OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function (pageDocument) {
   var errorMessageElement = pageDocument.createElement('p');
@@ -96,7 +92,6 @@ OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function (pa
   errorMessageElement.style.color = 'red';
   return errorMessageElement;
 };
-
 
 OptionsPageGenerator._booleanOption = function (pageDocument, preference, title, trueText, falseText) {
   var key = preference.getKey();
@@ -114,7 +109,6 @@ OptionsPageGenerator._booleanOption = function (pageDocument, preference, title,
       falseRadioButtonHTML);
 };
 
-
 OptionsPageGenerator._radioButton = function (args) {
   var radioButtonHTML = '<label>' +
       '<input id="' + args.id + '" type=radio name="' + args.name + '" value="true"';
@@ -131,7 +125,6 @@ OptionsPageGenerator._radioButton = function (args) {
   radioButtonHTML += '</label>';
   return radioButtonHTML;
 };
-
 
 OptionsPageGenerator._menuOption = function (pageDocument, preference, title, subTitle) {
   var key = preference.getKey();
@@ -154,7 +147,6 @@ OptionsPageGenerator._menuOption = function (pageDocument, preference, title, su
       textAreaHTML + '<br/>' +
       restoreDefaultButtonHTML);
 };
-
 
 OptionsPageGenerator._createTable = function (pageDocument, title, subTitle, contents) {
   var tableElement = pageDocument.createElement('table');
@@ -188,7 +180,6 @@ OptionsPageGenerator._createTable = function (pageDocument, title, subTitle, con
   return tableElement;
 };
 
-
 OptionsPageGenerator._initialise = function (pageDocument) {
   var optionsGenerator = this;
   optionsGenerator._initialiseBooleanOption(pageDocument, UserPreference.AUTO_OPEN, function () {
@@ -199,7 +190,6 @@ OptionsPageGenerator._initialise = function (pageDocument) {
     });
   });
 };
-
 
 OptionsPageGenerator._initialiseBooleanOption = function (pageDocument, preference, completionCallback) {
   var key = preference.getKey();
@@ -222,7 +212,6 @@ OptionsPageGenerator._initialiseBooleanOption = function (pageDocument, preferen
     }
   });
 };
-
 
 OptionsPageGenerator._initialiseMenuOption = function (pageDocument, preference, completionCallback) {
   var key = preference.getKey();
