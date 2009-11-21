@@ -29,7 +29,6 @@
     },
     {
       "matches": [
-          "http://*/*",
           "file://*/*"
       ],
       "js": [
@@ -40,6 +39,7 @@
     }
   ],
   "permissions": [
-    "tabs"
+    "tabs",
+    "http://*/*"
   ]
 }

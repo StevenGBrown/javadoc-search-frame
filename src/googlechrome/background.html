@@ -2,16 +2,36 @@
 <head>
 <script>
 
+  var hidePackageFrameCode =
+      "var framesets = document.getElementsByTagName('frameset');" +
+      "if (framesets) {" +
+      "  for (var i = 0; i < framesets.length; i++) {" +
+      "    var frameset = framesets[i];" +
+      "    var framesetChildren = frameset.children;" +
+      "    if (framesetChildren &&" +
+      "        framesetChildren.length === 2 &&" +
+      "        framesetChildren[0].name === 'packageListFrame' &&" +
+      "        framesetChildren[1].name === 'packageFrame') {" +
+      "      frameset.setAttribute('rows', '0,*');" +
+      "      frameset.setAttribute('border', 0);" +
+      "      frameset.setAttribute('frameborder', 0);" +
+      "      frameset.setAttribute('framespacing', 0);" +
+      "    }" +
+      "  }" +
+      "}";
+
   chrome.extension.onRequest.addListener(
     function (request, sender, sendResponse) {
+      var response = {};
       if (request.operation === 'get') {
-        sendResponse(localStorage.getItem(request.key));
-        return;
-      }
-      if (request.operation === 'set') {
+        response = localStorage.getItem(request.key);
+      } else if (request.operation === 'set') {
         localStorage.setItem(request.key, request.value);
+      } else if (request.operation === 'hidePackageFrame') {
+        var scriptDef = {code: hidePackageFrameCode};
+        chrome.tabs.executeScript(sender.tab.id, scriptDef);
       }
-      sendResponse(undefined);
+      sendResponse(response);
     }
   );
 

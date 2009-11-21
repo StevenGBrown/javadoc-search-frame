@@ -37,7 +37,20 @@ Frames = {};
  * function will have no effect.
  */
 Frames.hideAllPackagesFrame = function () {
-  // Nothing to do. The packages frame is hidden by 'index.js'.
+  // If running on a remote site, send a request to the background page to hide
+  // the packages frame. If running on local site, do not send a request, since
+  // the packages frame is hidden by 'top.js'.
+
+  // Since the approach used for local sites loads 'top.js' and other
+  // scripts that are used by 'top.js' into every frame, I would prefer to use
+  // the remote site approach for all sites. This is not possible since the
+  // background page does not have permission to access the local sites and the
+  // permissions field in the manifest file does not accept "file://*/*" as a
+  // valid entry.
+
+  if (location.protocol !== 'file:') {
+    chrome.extension.sendRequest({operation: 'hidePackageFrame'});
+  }
 };
 
 /**
