@@ -73,6 +73,7 @@ Frames.openLinkInSummaryFrame = function (url) {
  * current frame.
  * @param name
  * @returns the frame, or null if it could not be found
+ * @private
  */
 Frames._getFrame = function (name) {
   if (this.siblingFramesByName[name]) {

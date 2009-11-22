@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import io, os
+import io, os, re
 
 
 def analyse(filePath):
@@ -41,7 +41,8 @@ def analyse(filePath):
       fileContents = file.read()
     log = createLogger(filePath)
     checkForTabCharacters(fileContents, log)
-    checkForInvalidJsdocTags(fileContents, log)
+    checkForReturnJsdocTag(fileContents, log)
+    checkForMissingPrivateJsdocTag(fileContents, log)
 
 
 def isText(filePath):
@@ -68,6 +69,14 @@ def createLogger(filePath):
   return log
 
 
+def getLineNumber(inputString, position):
+  """
+  Return the line number of the given character position.
+  """
+
+  return inputString.count('\n', 0, position) + 1;
+
+
 def checkForTabCharacters(fileContents, log):
   """
   Log a warning message if any tab characters are found in the given file
@@ -80,13 +89,29 @@ def checkForTabCharacters(fileContents, log):
       log(lineNumber, 'tab character found')
 
 
-def checkForInvalidJsdocTags(fileContents, log):
+def checkForReturnJsdocTag(fileContents, log):
   """
-  Log a warning message if any invalid Jsdoc tags are found in the given file
-  contents.
+  Log a warning message if the '@return' tag is found in the given file
+  contents. This is not a valid Jsdoc tag: it should be '@returns'.
   """
 
   lines = fileContents.splitlines();
   for lineNumber, line in zip(range(1, len(lines) + 1), lines):
     if line.find('@return ') != -1:
       log(lineNumber, 'found @return tag, should be @returns')
+
+
+def checkForMissingPrivateJsdocTag(fileContents, log):
+  """
+  Log a warning message if a '@private' tag is missing from the given file
+  contents. The convention in use is to start the name of a private function
+  with an underscore.
+  """
+
+  matches = re.finditer(r'/\*(.*?)\*/([^= ]*)', fileContents, re.DOTALL)
+  for match in matches:
+    functionDoc = match.group(1)
+    functionName = match.group(2).strip()
+    if functionDoc.find('@private') == -1 and functionName.find('._') != -1:
+      lineNumber = getLineNumber(fileContents, match.end())
+      log(lineNumber, 'missing @private tag for ' + functionName)
