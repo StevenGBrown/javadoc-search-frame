@@ -1353,6 +1353,7 @@ UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getTopLink(classLinks,
 
 /**
  * Get the best match (if any) from the given array of links.
+ * @private
  */
 Search.PackagesAndClasses._getBestMatch = function (searchString, links) {
   var caseInsensitiveExactMatchCondition = RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString);
@@ -1591,6 +1592,7 @@ Search.Menu._createMenu = function (searchContext, topClassLink, topAnchorLink) 
  * Placeholder values that can be entered into the class_menu or package_menu
  * options and will, when the menu is opened, be replaced with data relevant
  * to the current package or class.
+ * @private
  */
 Search.Menu._getMenuReplacement = function () {
   if (!this.menuReplacement) {

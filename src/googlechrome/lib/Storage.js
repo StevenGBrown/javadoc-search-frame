@@ -66,6 +66,7 @@ Storage.set = function (key, value) {
 
 /**
  * @returns true if the localStorage object is defined, false otherwise
+ * @private
  */
 Storage._localStorageDefined = function () {
   try {
