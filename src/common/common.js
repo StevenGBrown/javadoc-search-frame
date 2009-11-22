@@ -1721,7 +1721,7 @@ UnitTestSuite.testFunctionFor('getPackageLinks(classLinks)', function () {
 });
 
 /**
- * @return the inner HTML of the body element of the classes list frame, or undefined if the element does not exist
+ * @returns the inner HTML of the body element of the classes list frame, or undefined if the element does not exist
  */
 function getClassesInnerHtml() {
   var classesInnerHTML;
