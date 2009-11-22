@@ -317,6 +317,10 @@ LinkType.EXCEPTION = new LinkType('exception', 'Exceptions');
 LinkType.ERROR = new LinkType('error', 'Errors');
 LinkType.ANNOTATION = new LinkType('annotation', 'Annotation Types');
 
+LinkType.getByName = function (name) {
+  return LinkType[name.toUpperCase()];
+};
+
 LinkType.values = function () {
   return [ LinkType.PACKAGE, LinkType.INTERFACE, LinkType.CLASS,
       LinkType.ENUM, LinkType.EXCEPTION, LinkType.ERROR, LinkType.ANNOTATION ];
@@ -759,7 +763,7 @@ AnchorLink.prototype.getNameWithoutParameter = function () {
   }
 };
 
-AnchorLink.keywords = {
+AnchorLink._keywords = {
   'navbar_top':1,
   'navbar_top_firstrow':1,
   'skip-navbar_top':1,
@@ -775,19 +779,19 @@ AnchorLink.keywords = {
   'skip-navbar_bottom':1
 };
 
-AnchorLink.keywordPrefixes = [
+AnchorLink._keywordPrefixes = [
   'methods_inherited_from_',
   'fields_inherited_from_',
   'nested_classes_inherited_from_'
 ];
 
 AnchorLink.prototype._getKeywordOrNot = function (name) {
-  if (AnchorLink.keywords[name] === 1) {
+  if (AnchorLink._keywords[name] === 1) {
     return true;
   }
   var i;
-  for (i = 0; i < AnchorLink.keywordPrefixes.length; i++) {
-    if (name.indexOf(AnchorLink.keywordPrefixes[i]) === 0) {
+  for (i = 0; i < AnchorLink._keywordPrefixes.length; i++) {
+    if (name.indexOf(AnchorLink._keywordPrefixes[i]) === 0) {
       return true;
     }
   }
@@ -1779,7 +1783,7 @@ function getClassLinks(classesInnerHTML) {
     var typeInTitle = matches[1];
     var packageName = matches[2];
     var className = rightTrim(matches[3]);
-    var type = LinkType[typeInTitle.toUpperCase()];
+    var type = LinkType.getByName(typeInTitle);
     type = checkForExceptionOrErrorType(type, className);
 
     cl = new ClassLink(
