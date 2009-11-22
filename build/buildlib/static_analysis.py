@@ -41,6 +41,7 @@ def analyse(filePath):
       fileContents = file.read()
     log = createLogger(filePath)
     checkForTabCharacters(fileContents, log)
+    checkForInvalidJsdocTags(fileContents, log)
 
 
 def isText(filePath):
@@ -77,3 +78,15 @@ def checkForTabCharacters(fileContents, log):
   for lineNumber, line in zip(range(1, len(lines) + 1), lines):
     if line.find('\t') != -1:
       log(lineNumber, 'tab character found')
+
+
+def checkForInvalidJsdocTags(fileContents, log):
+  """
+  Log a warning message if any invalid Jsdoc tags are found in the given file
+  contents.
+  """
+
+  lines = fileContents.splitlines();
+  for lineNumber, line in zip(range(1, len(lines) + 1), lines):
+    if line.find('@return ') != -1:
+      log(lineNumber, 'found @return tag, should be @returns')

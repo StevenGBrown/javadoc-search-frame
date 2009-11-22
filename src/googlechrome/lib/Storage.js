@@ -65,7 +65,7 @@ Storage.set = function (key, value) {
 };
 
 /**
- * @return true if the localStorage object is defined, false otherwise
+ * @returns true if the localStorage object is defined, false otherwise
  */
 Storage._localStorageDefined = function () {
   try {
