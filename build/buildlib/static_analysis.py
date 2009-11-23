@@ -43,6 +43,7 @@ def analyse(filePath):
     checkForTabCharacters(fileContents, log)
     checkForReturnJsdocTag(fileContents, log)
     checkForMissingPrivateJsdocTag(fileContents, log)
+    checkForMissingFunctionDocumentation(fileContents, log)
 
 
 def isText(filePath):
@@ -115,3 +116,21 @@ def checkForMissingPrivateJsdocTag(fileContents, log):
     if functionDoc.find('@private') == -1 and functionName.find('._') != -1:
       lineNumber = getLineNumber(fileContents, match.end())
       log(lineNumber, 'missing @private tag for ' + functionName)
+
+
+def checkForMissingFunctionDocumentation(fileContents, log):
+  """
+  Log a warning message if an undocumented public function is found in the
+  given file contents. A function is considered to be public if the name does
+  not start with an underscore.
+  """
+
+  lines = fileContents.splitlines();
+  for lineNumber, line in zip(range(1, len(lines) + 1), lines):
+    isFunctionDeclaration = line.startswith('function') or re.match(r'[^ ].*=.*function.*', line)
+    isPublicFunctionDeclaration = isFunctionDeclaration and line.find('._') == -1
+    hasPreceedingDocumentation = lineNumber > 1 and previousLine.find('*/') != -1
+    if isPublicFunctionDeclaration and not hasPreceedingDocumentation:
+      functionName = re.sub(r'\(.*\)', '', line.replace('function', '')).strip(' ={')
+      log(lineNumber, 'missing documentation for ' + functionName)
+    previousLine = line
