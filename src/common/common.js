@@ -333,7 +333,12 @@ LinkType.values = function () {
  * ----------------------------------------------------------------------------
  */
 
-function parseURL(anchorElementHTML) {
+/**
+ * Extract a URL from the given anchor element HTML.
+ * @param anchorElementHTML
+ * @returns the URL
+ */
+function extractURL(anchorElementHTML) {
   var rx = /href\s*=\s*(?:"|')([^"']+)(?:"|')/i;
   var matches;
   if ((matches = rx.exec(anchorElementHTML)) !== null) {
@@ -373,7 +378,7 @@ PackageLink.prototype.getPackageName = function () {
 
 PackageLink.prototype.getUrl = function () {
   if (!this.url) {
-    this.url = parseURL(this.html);
+    this.url = extractURL(this.html);
   }
   return this.url;
 };
@@ -440,7 +445,7 @@ ClassLink.prototype.getCanonicalName = function () {
 
 ClassLink.prototype.getUrl = function () {
   if (!this.url) {
-    this.url = parseURL(this.html);
+    this.url = extractURL(this.html);
   }
   return this.url;
 };
@@ -1784,7 +1789,7 @@ function getClassLinks(classesInnerHTML) {
         classesInnerHTML.lastIndexOf('<a', classesRegexWithTitle.lastIndex), classesRegexWithTitle.lastIndex);
     var typeInTitle = matches[1];
     var packageName = matches[2];
-    var className = rightTrim(matches[3]);
+    var className = trimFromEnd(matches[3]);
     var type = LinkType.getByName(typeInTitle);
     type = checkForExceptionOrErrorType(type, className);
 
@@ -1801,7 +1806,7 @@ function getClassLinks(classesInnerHTML) {
       var entireMatch = matches[0];
       var packageNameInHref = matches[1];
       var openingItalicTag = matches[2];
-      var className = rightTrim(matches[3]);
+      var className = trimFromEnd(matches[3]);
       var type = openingItalicTag ? LinkType.INTERFACE : LinkType.CLASS;
       type = checkForExceptionOrErrorType(type, className);
 
@@ -1915,6 +1920,12 @@ UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHTML)', function () {
       package:'javax.xml.ws', class:'Action', italic:false} );
 });
 
+/**
+ * Determine whether stringOne ends with stringTwo.
+ * @param stringOne
+ * @param stringTwo
+ * @returns true if stringOne ends with stringTwo, false otherwise
+ */
 function endsWith(stringOne, stringTwo) {
   if (!stringOne) {
     return false;
@@ -1940,20 +1951,25 @@ UnitTestSuite.testFunctionFor('endsWith(stringOne, stringTwo)', function () {
   assertThatEndsWith('', 'two', is(false));
 });
 
-function rightTrim(stringToTrim) {
+/**
+ * Trim whitespace from the end of the given string.
+ * @param stringToTrim the string to trim
+ * @returns the trimmed string
+ */
+function trimFromEnd(stringToTrim) {
   return stringToTrim.replace(/\s+$/, '');
 }
 
-UnitTestSuite.testFunctionFor('rightTrim(stringToTrim)', function () {
+UnitTestSuite.testFunctionFor('trimFromEnd(stringToTrim)', function () {
 
-  var assertThatRightTrim = function (stringToTrim, expectedResult) {
-    assertThat(UnitTestSuite.quote(stringToTrim), rightTrim(stringToTrim), expectedResult);
+  var assertThatTrimFromEnd = function (stringToTrim, expectedResult) {
+    assertThat(UnitTestSuite.quote(stringToTrim), trimFromEnd(stringToTrim), expectedResult);
   };
 
-  assertThatRightTrim('string', is('string'));
-  assertThatRightTrim('string   ', is('string'));
-  assertThatRightTrim('   string', is('   string'));
-  assertThatRightTrim('   string   ', is('   string'));
+  assertThatTrimFromEnd('string', is('string'));
+  assertThatTrimFromEnd('string   ', is('string'));
+  assertThatTrimFromEnd('   string', is('   string'));
+  assertThatTrimFromEnd('   string   ', is('   string'));
 });
 
 
@@ -1964,47 +1980,72 @@ UnitTestSuite.testFunctionFor('rightTrim(stringToTrim)', function () {
  */
 
 /**
- * @class EventHandlers (undocumented).
+ * @class EventHandlers Called by the view to handle UI events.
  */
 EventHandlers = {};
 
-EventHandlers.searchFieldKeyup = function (e) {
-  var code = e.keyCode;
+/**
+ * Called when a key has been pressed while the search field has focus.
+ * @param evt
+ */
+EventHandlers.searchFieldKeyup = function (evt) {
+  var code = evt.keyCode;
   if (code === 13) {
-    EventHandlers._returnKeyPressed(e.ctrlKey);
+    EventHandlers._returnKeyPressed(evt.ctrlKey);
   } else if (code === 27) {
     EventHandlers._escapeKeyPressed();
   }
 };
 
-EventHandlers.searchFieldChanged = function (input) {
-  Query.input(input);
+/**
+ * Called when the contents of the search field has changed.
+ * @param searchFieldContents
+ */
+EventHandlers.searchFieldChanged = function (searchFieldContents) {
+  Query.input(searchFieldContents);
   Search.perform();
 };
 
-EventHandlers.searchFieldFocus = function (e) {
+/**
+ * Called when the search field has gained focus.
+ */
+EventHandlers.searchFieldFocus = function () {
   document.body.scrollLeft = 0;
 };
 
+/**
+ * Caled when the erase button has been clicked.
+ */
 EventHandlers.eraseButtonClick = function () {
   Query.erase();
   View.focusOnSearchField();
   Search.perform();
 };
 
-EventHandlers.optionsLinkClicked = function (event) {
+/**
+ * Called when the Options link has been clicked.
+ * @param evt
+ */
+EventHandlers.optionsLinkClicked = function (evt) {
   OptionsPage.open();
-  event.preventDefault();
+  evt.preventDefault();
 };
 
-EventHandlers._returnKeyPressed = function (controlModifier) {
+/**
+ * Called when the return key has been pressed while the search field has
+ * focus.
+ * @param ctrlModifier true if the CTRL key was held down when the return key
+ *                     was pressed, false otherwise
+ * @private
+ */
+EventHandlers._returnKeyPressed = function (ctrlModifier) {
   var searchFieldValue = View.getSearchFieldValue();
   Query.input(searchFieldValue);
   Search.perform();
 
   var url = Search.getTopLinkURL();
   if (url) {
-    if (controlModifier) {
+    if (ctrlModifier) {
       window.open(url);
     } else {
       Frames.openLinkInSummaryFrame(url);
@@ -2012,6 +2053,11 @@ EventHandlers._returnKeyPressed = function (controlModifier) {
   }
 };
 
+/**
+ * Called when the escape key has been pressed while the search field has
+ * focus.
+ * @private
+ */
 EventHandlers._escapeKeyPressed = function () {
   var searchFieldValue = View.getSearchFieldValue();
   if (searchFieldValue) {
