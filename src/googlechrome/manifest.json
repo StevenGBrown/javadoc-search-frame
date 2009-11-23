@@ -20,7 +20,6 @@
       ],
       "js": [
           "lib/Frames.js",
-          "lib/Log.js",
           "lib/Storage.js",
           "lib/UserPreference.js",
           "lib/OptionsPage.js",

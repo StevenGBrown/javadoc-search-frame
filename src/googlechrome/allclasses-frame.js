@@ -54,7 +54,9 @@ function main() {
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
-  init(startupLogMessage);
+  init(function (unitTestResults) {
+    console.log(startupLogMessage + unitTestResults);
+  });
 }
 
 

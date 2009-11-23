@@ -38,15 +38,6 @@
 
 /*
  * ----------------------------------------------------------------------------
- * LOGGING
- * ----------------------------------------------------------------------------
- */
-
-#INCLUDE Log.js
-
-
-/*
- * ----------------------------------------------------------------------------
  * STORAGE
  * ----------------------------------------------------------------------------
  */
@@ -122,7 +113,14 @@ function main() {
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
-  init(startupLogMessage);
+  init(function (unitTestResults) {
+    var logMessage = '\n' + startupLogMessage + unitTestResults;
+    try {
+      GM_log(logMessage);
+    } catch (ex) {
+      console.log(logMessage);
+    }
+  });
 }
 
 

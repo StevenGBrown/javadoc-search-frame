@@ -48,46 +48,6 @@ var ALL_PACKAGE_AND_CLASS_LINKS = [];
 
 /*
  * ----------------------------------------------------------------------------
- * STOPWATCH
- * ----------------------------------------------------------------------------
- */
-
-/**
- * Create a new StopWatch.
- * @class Used to measure elapsed time.
- */
-StopWatch = function () {
-  this.startTimeInMillisecondsSinceEpoch = new Date().getTime();
-  this.isStopped = false;
-};
-
-/**
- * Stop this stopwatch.
- */
-StopWatch.prototype.stop = function () {
-  this.stopTimeElapsedInMilliseconds = new Date().getTime() - this.startTimeInMillisecondsSinceEpoch;
-  this.isStopped = true;
-};
-
-/**
- * Get the time period that has elapsed since this stopwatch object was
- * created.
- * If the stop method has been called, this function returns the time period
- * that has elapsed between creation of the object and calling the stop method.
- */
-StopWatch.prototype.timeElapsed = function () {
-  var timeElapsedInMilliseconds;
-  if (this.isStopped) {
-    timeElapsedInMilliseconds = this.stopTimeElapsedInMilliseconds;
-  } else {
-    timeElapsedInMilliseconds = new Date().getTime() - this.startTimeInMillisecondsSinceEpoch;
-  }
-  return timeElapsedInMilliseconds + 'ms';
-};
-
-
-/*
- * ----------------------------------------------------------------------------
  * UNIT TEST SUITE
  * ----------------------------------------------------------------------------
  */
@@ -1225,58 +1185,65 @@ RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
  */
 
 /**
- * @class Search (undocumented).
+ * @class Search The searching functionality.
  */
 Search = {
   previousEntireSearchString : null,
   topLink : null
 };
 
-Search.perform = function (parameters) {
-  var stopWatch = new StopWatch();
-  if (parameters) {
-    var forceUpdate = parameters.forceUpdate;
-    var suppressLogMessage = parameters.suppressLogMessage;
-  }
-
+/**
+ * Perform a search.
+ */
+Search.perform = function () {
   var entireSearchString = Query.getEntireSearchString();
-  if (forceUpdate ||
-      this.previousEntireSearchString === null ||
-      entireSearchString !== this.previousEntireSearchString) {
-
-    var search = this;
-    UserPreference.CLASS_MENU.getValue(function (classMenu) {
-      UserPreference.PACKAGE_MENU.getValue(function (packageMenu) {
-        var searchContext = {};
-        searchContext.classMenu = classMenu;
-        searchContext.packageMenu = packageMenu;
-
-        search.PackagesAndClasses.perform(searchContext, Query.getClassSearchString());
-        search.Anchors.perform(searchContext, Query.getAnchorSearchString());
-        search.Menu.perform(searchContext, Query.getMenuSearchString());
-
-        if (searchContext.getContentNodeHTML) {
-          View.setContentNodeHTML(searchContext.getContentNodeHTML());
-        }
-        search.topLink = searchContext.topAnchorLink || searchContext.topClassLink;
-
-        if (!suppressLogMessage) {
-          Log.message('\'' + entireSearchString + '\' in ' + stopWatch.timeElapsed() + '\n');
-        }
-
-        search._autoOpen();
-      });
-    });
-  }
-
+  this._performSearch(entireSearchString);
   this.previousEntireSearchString = entireSearchString;
 };
 
+/**
+ * Perform a search only if the search string has changed.
+ */
+Search.performIfSearchStringHasChanged = function () {
+  var entireSearchString = Query.getEntireSearchString();
+  if (this.previousEntireSearchString === null ||
+      entireSearchString !== this.previousEntireSearchString) {
+    this._performSearch(entireSearchString);
+  }
+  this.previousEntireSearchString = entireSearchString;
+};
+
+/**
+ * @returns the URL of the link currently displayed at the top of the list, or
+ *          null if no links are currently displayed
+ */
 Search.getTopLinkURL = function () {
   if (this.topLink) {
     return this.topLink.getUrl();
   }
   return null;
+};
+
+Search._performSearch = function (entireSearchString) {
+  var search = this;
+  UserPreference.CLASS_MENU.getValue(function (classMenu) {
+    UserPreference.PACKAGE_MENU.getValue(function (packageMenu) {
+      var searchContext = {};
+      searchContext.classMenu = classMenu;
+      searchContext.packageMenu = packageMenu;
+
+      search._PackagesAndClasses._perform(searchContext, Query.getClassSearchString());
+      search._Anchors._perform(searchContext, Query.getAnchorSearchString());
+      search._Menu._perform(searchContext, Query.getMenuSearchString());
+
+      if (searchContext.getContentNodeHTML) {
+        View.setContentNodeHTML(searchContext.getContentNodeHTML());
+      }
+      search.topLink = searchContext.topAnchorLink || searchContext.topClassLink;
+
+      search._autoOpen();
+    });
+  });
 };
 
 Search._autoOpen = function () {
@@ -1293,20 +1260,22 @@ Search._autoOpen = function () {
 
 /*
  * ----------------------------------------------------------------------------
- * SEARCH.PACKAGESANDCLASSES
+ * SEARCH._PACKAGESANDCLASSES
  * ----------------------------------------------------------------------------
  */
 
 /**
- * @class Search.PackagesAndClasses (undocumented).
+ * @class Search._PackagesAndClasses Component of the search functionality that
+ *                                   deals with package and class links.
+ * @private
  */
-Search.PackagesAndClasses = {
+Search._PackagesAndClasses = {
   previousQuery : null,
   currentLinks : null,
   topLink : null
 };
 
-Search.PackagesAndClasses.perform = function (searchContext, searchString) {
+Search._PackagesAndClasses._perform = function (searchContext, searchString) {
   if (this.previousQuery === null || this.previousQuery !== searchString) {
 
     if (this.previousQuery !== null && searchString.indexOf(this.previousQuery) === 0) {
@@ -1334,7 +1303,7 @@ Search.PackagesAndClasses.perform = function (searchContext, searchString) {
   searchContext.topClassLink = this.topLink;
 };
 
-Search.PackagesAndClasses._getTopLink = function (links, bestMatch) {
+Search._PackagesAndClasses._getTopLink = function (links, bestMatch) {
   if (bestMatch) {
     return bestMatch;
   }
@@ -1344,10 +1313,10 @@ Search.PackagesAndClasses._getTopLink = function (links, bestMatch) {
   return null;
 };
 
-UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getTopLink(classLinks, bestMatch)', function () {
+UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink(classLinks, bestMatch)', function () {
   var classLinkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component', 'java/awt/Component');
   var classLinkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object', 'java/lang/Object');
-  var getTopLink = Search.PackagesAndClasses._getTopLink;
+  var getTopLink = Search._PackagesAndClasses._getTopLink;
 
   assertThat('no links, best match undefined', getTopLink([]), is(null));
   assertThat('one link, best match undefined', getTopLink([classLinkOne]), is(classLinkOne));
@@ -1360,7 +1329,7 @@ UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getTopLink(classLinks,
  * Get the best match (if any) from the given array of links.
  * @private
  */
-Search.PackagesAndClasses._getBestMatch = function (searchString, links) {
+Search._PackagesAndClasses._getBestMatch = function (searchString, links) {
   var caseInsensitiveExactMatchCondition = RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString);
   var exactMatchLinks = links.filter(caseInsensitiveExactMatchCondition);
   // If all of the links displayed in the search list are exact matches, do
@@ -1393,7 +1362,7 @@ Search.PackagesAndClasses._getBestMatch = function (searchString, links) {
   return bestMatchLinks.length > 0 ? bestMatchLinks[0] : null;
 };
 
-UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(searchString, links)', function () {
+UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch(searchString, links)', function () {
   var hudsonPackage = new PackageLink('hudson');
   var javaIoPackage = new PackageLink('java.io');
   var javaLangPackage = new PackageLink('java.lang');
@@ -1413,7 +1382,7 @@ UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(searchStr
 
   var assertThatBestMatchFor = function (searchString, searchResult) {
     assertThat(UnitTestSuite.quote(searchString),
-           Search.PackagesAndClasses._getBestMatch(searchString, allLinks),
+           Search._PackagesAndClasses._getBestMatch(searchString, allLinks),
            is(searchResult));
   };
 
@@ -1435,7 +1404,7 @@ UnitTestSuite.testFunctionFor('Search.PackagesAndClasses._getBestMatch(searchStr
   assertThatBestMatchFor('list', is(javaUtilListClass));
 });
 
-Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
+Search._PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
   if (classLinks.length === 0) {
     return 'No search results.';
   }
@@ -1464,16 +1433,18 @@ Search.PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
 
 /*
  * ----------------------------------------------------------------------------
- * SEARCH.ANCHORS
+ * SEARCH._ANCHORS
  * ----------------------------------------------------------------------------
  */
 
 /**
- * @class Search.Anchors (undocumented).
+ * @class Search._Anchors Component of the search functionality that deals with
+ *                        method anchors.
+ * @private
  */
-Search.Anchors = {};
+Search._Anchors = {};
 
-Search.Anchors.perform = function (searchContext, searchString) {
+Search._Anchors._perform = function (searchContext, searchString) {
   var topClassLink = searchContext.topClassLink;
   if (searchString === null || !topClassLink) {
     AnchorsLoader.cancel();
@@ -1481,7 +1452,7 @@ Search.Anchors.perform = function (searchContext, searchString) {
   }
 
   AnchorsLoader.onprogress = function () {
-    Search.perform({forceUpdate : true, suppressLogMessage : true});
+    Search.perform();
   };
 
   AnchorsLoader.load(topClassLink);
@@ -1497,7 +1468,7 @@ Search.Anchors.perform = function (searchContext, searchString) {
   }
 };
 
-Search.Anchors._append = function (searchContext, topClassLink, anchorLinks, condition) {
+Search._Anchors._append = function (searchContext, topClassLink, anchorLinks, condition) {
   var matchingAnchorLinks = anchorLinks.filter(condition);
   searchContext.topAnchorLink = matchingAnchorLinks.length > 0 ? matchingAnchorLinks[0] : null;
 
@@ -1517,18 +1488,20 @@ Search.Anchors._append = function (searchContext, topClassLink, anchorLinks, con
 
 /*
  * ----------------------------------------------------------------------------
- * SEARCH.MENU
+ * SEARCH._MENU
  * ----------------------------------------------------------------------------
  */
 
 /**
- * @class Search.Menu (undocumented).
+ * @class Search._Menu Component of the search functionality that deals with
+ *                     the package menu and class menu.
+ * @private
  */
-Search.Menu = {
+Search._Menu = {
   menuReplacement : null
 };
 
-Search.Menu.perform = function (searchContext, searchString) {
+Search._Menu._perform = function (searchContext, searchString) {
   var topClassLink = searchContext.topClassLink;
   var topAnchorLink = searchContext.topAnchorLink;
 
@@ -1571,7 +1544,7 @@ Search.Menu.perform = function (searchContext, searchString) {
   document.body.removeChild(node);
 };
 
-Search.Menu._createMenu = function (searchContext, topClassLink, topAnchorLink) {
+Search._Menu._createMenu = function (searchContext, topClassLink, topAnchorLink) {
   var menu;
   if (topClassLink && topClassLink.getType() === LinkType.PACKAGE) {
     menu = searchContext.packageMenu;
@@ -1599,7 +1572,7 @@ Search.Menu._createMenu = function (searchContext, topClassLink, topAnchorLink) 
  * to the current package or class.
  * @private
  */
-Search.Menu._getMenuReplacement = function () {
+Search._Menu._getMenuReplacement = function () {
   if (!this.menuReplacement) {
     this.menuReplacement = {
       CLASS_NAME: function (classLink) { 
@@ -1628,10 +1601,10 @@ Search.Menu._getMenuReplacement = function () {
 
 /**
  * Initialise this script.
- * @param startupLogMessage message that will be written to the log once the
- *                          script has been initialised
+ * @param unitTestResultsCallback function that is called with the unit test
+ *                                results once the script has been initialised
  */
-function init(startupLogMessage) {
+function init(unitTestResultsCallback) {
 
   UserPreference.HIDE_PACKAGE_FRAME.getValue(function (hidePackageFrame) {
 
@@ -1655,7 +1628,7 @@ function init(startupLogMessage) {
 
     // Perform an initial search. This will populate the class frame with the
     // entire list of packages and classes.
-    Search.perform({suppressLogMessage : true});
+    Search.perform();
 
     // Run the unit test.
     var unitTestResults = UnitTestSuite.run();
@@ -1668,8 +1641,8 @@ function init(startupLogMessage) {
     // Give focus to the search field.
     View.focusOnSearchField();
 
-    // Log the startup message.
-    Log.startupMessage(startupLogMessage + unitTestResults);
+    // Provide the unit test results to the callback function.
+    unitTestResultsCallback(unitTestResults);
 
   });
 }
@@ -2003,7 +1976,7 @@ EventHandlers.searchFieldKeyup = function (evt) {
  */
 EventHandlers.searchFieldChanged = function (searchFieldContents) {
   Query.input(searchFieldContents);
-  Search.perform();
+  Search.performIfSearchStringHasChanged();
 };
 
 /**
@@ -2019,7 +1992,7 @@ EventHandlers.searchFieldFocus = function () {
 EventHandlers.eraseButtonClick = function () {
   Query.erase();
   View.focusOnSearchField();
-  Search.perform();
+  Search.performIfSearchStringHasChanged();
 };
 
 /**
@@ -2041,7 +2014,7 @@ EventHandlers.optionsLinkClicked = function (evt) {
 EventHandlers._returnKeyPressed = function (ctrlModifier) {
   var searchFieldValue = View.getSearchFieldValue();
   Query.input(searchFieldValue);
-  Search.perform();
+  Search.performIfSearchStringHasChanged();
 
   var url = Search.getTopLinkURL();
   if (url) {
@@ -2062,6 +2035,6 @@ EventHandlers._escapeKeyPressed = function () {
   var searchFieldValue = View.getSearchFieldValue();
   if (searchFieldValue) {
     Query.erase();
-    Search.perform();
+    Search.performIfSearchStringHasChanged();
   }
 };
