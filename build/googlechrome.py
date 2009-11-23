@@ -57,7 +57,7 @@ def buildGoogleChromeExtension():
     fromDir='googlechrome/icons', toDir='icons')
 
   copyFiles(
-    names=('Frames.js', 'Log.js', 'Storage.js', 'OptionsPage.js'),
+    names=('Frames.js', 'Storage.js', 'OptionsPage.js'),
     fromDir='googlechrome/lib', toDir='lib')
 
   copyFiles(
