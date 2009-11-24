@@ -36,7 +36,7 @@
 
 /*
  * ----------------------------------------------------------------------------
- * GLOBAL VARIABLES
+ * Global variables
  * ----------------------------------------------------------------------------
  */
 
@@ -48,7 +48,7 @@ var ALL_PACKAGE_AND_CLASS_LINKS = [];
 
 /*
  * ----------------------------------------------------------------------------
- * UNIT TEST SUITE
+ * UnitTestSuite
  * ----------------------------------------------------------------------------
  */
 
@@ -177,6 +177,12 @@ var is = UnitTestSuite.is;
  */
 
 
+/*
+ * ----------------------------------------------------------------------------
+ * UnitTestResult
+ * ----------------------------------------------------------------------------
+ */
+
 /**
  * Create a new UnitTestResult.
  * @class Unit test result; returned by {@link UnitTestSuite#run}.
@@ -206,6 +212,12 @@ UnitTestResult.prototype.toString = function () {
 };
 
 
+/*
+ * ----------------------------------------------------------------------------
+ * UnitTestAssertionFailure
+ * ----------------------------------------------------------------------------
+ */
+
 /**
  * Create a new UnitTestAssertionFailure.
  * @class A unit test failure due to a failed assertion.
@@ -226,6 +238,12 @@ UnitTestAssertionFailure.prototype.toString = function () {
 };
 
 
+/*
+ * ----------------------------------------------------------------------------
+ * UnitTestExceptionThrownFailure
+ * ----------------------------------------------------------------------------
+ */
+
 /**
  * Create a new UnitTestExceptionThrownFailure.
  * @class A unit test failure due to a thrown exception.
@@ -245,7 +263,7 @@ UnitTestExceptionThrownFailure.prototype.toString = function () {
 
 /*
  * ----------------------------------------------------------------------------
- * LINKTYPE
+ * LinkType
  * ----------------------------------------------------------------------------
  */
 
@@ -337,7 +355,7 @@ LinkType.forEach = function (forEachFunction) {
 
 /*
  * ----------------------------------------------------------------------------
- * PACKAGELINK AND CLASSLINK
+ * PackageLink, ClassLink and AnchorLink
  * ----------------------------------------------------------------------------
  */
 
@@ -470,9 +488,93 @@ ClassLink.prototype.toString = function () {
 };
 
 
+/**
+ * @class AnchorLink (undocumented).
+ */
+AnchorLink = function (baseurl, name) {
+  this.name = name;
+  this.lowerName = name.toLowerCase();
+  this.url = baseurl + '#' + name;
+  this.keywordOrNot = this._getKeywordOrNot(name);
+  this.html = this._getHtml(name, this.url, this.keywordOrNot);
+};
+
+AnchorLink.prototype.matches = function (regex) {
+  return regex.test(this.name);
+};
+
+AnchorLink.prototype.getHtml = function () {
+  return this.html;
+};
+
+AnchorLink.prototype.getLowerName = function () {
+  return this.lowerName;
+};
+
+AnchorLink.prototype.getUrl = function () {
+  return this.url;
+};
+
+AnchorLink.prototype.isKeyword = function () {
+  return this.keywordOrNot;
+};
+
+AnchorLink.prototype.getNameWithoutParameter = function () {
+  if (this.name.indexOf('(') !== -1) {
+    return this.name.substring(0, this.name.indexOf('('));
+  } else {
+    return this.name;
+  }
+};
+
+AnchorLink._keywords = {
+  'navbar_top':1,
+  'navbar_top_firstrow':1,
+  'skip-navbar_top':1,
+  'field_summary':1,
+  'nested_class_summary':1,
+  'constructor_summary':1,
+  'constructor_detail':1,
+  'method_summary':1,
+  'method_detail':1,
+  'field_detail':1,
+  'navbar_bottom':1,
+  'navbar_bottom_firstrow':1,
+  'skip-navbar_bottom':1
+};
+
+AnchorLink._keywordPrefixes = [
+  'methods_inherited_from_',
+  'fields_inherited_from_',
+  'nested_classes_inherited_from_'
+];
+
+AnchorLink.prototype._getKeywordOrNot = function (name) {
+  if (AnchorLink._keywords[name] === 1) {
+    return true;
+  }
+  var i;
+  for (i = 0; i < AnchorLink._keywordPrefixes.length; i++) {
+    if (name.indexOf(AnchorLink._keywordPrefixes[i]) === 0) {
+      return true;
+    }
+  }
+  return false;
+};
+
+AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
+  var html = '<a href="' + url + '" target="classFrame" class="anchorLink"';
+  if (keywordOrNot) {
+    html += ' style="color:#666"';
+  }
+  html += '>' + name.replace(/ /g, '&nbsp;') + '</a><br/>';
+  return html;
+};
+
+
 /*
  * ----------------------------------------------------------------------------
- * VIEW
+ * View
  * ----------------------------------------------------------------------------
  */
 
@@ -635,7 +737,7 @@ View._watch = function (element, callback, msec) {
 
 /*
  * ----------------------------------------------------------------------------
- * QUERY
+ * Query
  * ----------------------------------------------------------------------------
  */
 
@@ -755,97 +857,7 @@ Query._updateView = function () {
 
 /*
  * ----------------------------------------------------------------------------
- * ANCHORLINK
- * ----------------------------------------------------------------------------
- */
-
-/**
- * @class AnchorLink (undocumented).
- */
-AnchorLink = function (baseurl, name) {
-  this.name = name;
-  this.lowerName = name.toLowerCase();
-  this.url = baseurl + '#' + name;
-  this.keywordOrNot = this._getKeywordOrNot(name);
-  this.html = this._getHtml(name, this.url, this.keywordOrNot);
-};
-
-AnchorLink.prototype.matches = function (regex) {
-  return regex.test(this.name);
-};
-
-AnchorLink.prototype.getHtml = function () {
-  return this.html;
-};
-
-AnchorLink.prototype.getLowerName = function () {
-  return this.lowerName;
-};
-
-AnchorLink.prototype.getUrl = function () {
-  return this.url;
-};
-
-AnchorLink.prototype.isKeyword = function () {
-  return this.keywordOrNot;
-};
-
-AnchorLink.prototype.getNameWithoutParameter = function () {
-  if (this.name.indexOf('(') !== -1) {
-    return this.name.substring(0, this.name.indexOf('('));
-  } else {
-    return this.name;
-  }
-};
-
-AnchorLink._keywords = {
-  'navbar_top':1,
-  'navbar_top_firstrow':1,
-  'skip-navbar_top':1,
-  'field_summary':1,
-  'nested_class_summary':1,
-  'constructor_summary':1,
-  'constructor_detail':1,
-  'method_summary':1,
-  'method_detail':1,
-  'field_detail':1,
-  'navbar_bottom':1,
-  'navbar_bottom_firstrow':1,
-  'skip-navbar_bottom':1
-};
-
-AnchorLink._keywordPrefixes = [
-  'methods_inherited_from_',
-  'fields_inherited_from_',
-  'nested_classes_inherited_from_'
-];
-
-AnchorLink.prototype._getKeywordOrNot = function (name) {
-  if (AnchorLink._keywords[name] === 1) {
-    return true;
-  }
-  var i;
-  for (i = 0; i < AnchorLink._keywordPrefixes.length; i++) {
-    if (name.indexOf(AnchorLink._keywordPrefixes[i]) === 0) {
-      return true;
-    }
-  }
-  return false;
-};
-
-AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
-  var html = '<a href="' + url + '" target="classFrame" class="anchorLink"';
-  if (keywordOrNot) {
-    html += ' style="color:#666"';
-  }
-  html += '>' + name.replace(/ /g, '&nbsp;') + '</a><br/>';
-  return html;
-};
-
-
-/*
- * ----------------------------------------------------------------------------
- * ANCHORS LOADER
+ * AnchorsLoader
  * ----------------------------------------------------------------------------
  */
 
@@ -1004,7 +1016,7 @@ AnchorsLoader._getAnchorNames = function (doc) {
 
 /*
  * ----------------------------------------------------------------------------
- * REGEX LIBRARY
+ * RegexLibrary
  * ----------------------------------------------------------------------------
  */
 
@@ -1298,7 +1310,7 @@ RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
 
 /*
  * ----------------------------------------------------------------------------
- * SEARCH
+ * Search
  * ----------------------------------------------------------------------------
  */
 
@@ -1378,7 +1390,7 @@ Search._autoOpen = function () {
 
 /*
  * ----------------------------------------------------------------------------
- * SEARCH._PACKAGESANDCLASSES
+ * Search._PackagesAndClasses
  * ----------------------------------------------------------------------------
  */
 
@@ -1551,7 +1563,7 @@ Search._PackagesAndClasses._constructHtml = function (classLinks, bestMatch) {
 
 /*
  * ----------------------------------------------------------------------------
- * SEARCH._ANCHORS
+ * Search._Anchors
  * ----------------------------------------------------------------------------
  */
 
@@ -1606,7 +1618,7 @@ Search._Anchors._append = function (searchContext, topClassLink, anchorLinks, co
 
 /*
  * ----------------------------------------------------------------------------
- * SEARCH._MENU
+ * Search._Menu
  * ----------------------------------------------------------------------------
  */
 
@@ -1713,7 +1725,7 @@ Search._Menu._getMenuReplacement = function () {
 
 /*
  * ----------------------------------------------------------------------------
- * MAIN SCRIPT
+ * Main script
  * ----------------------------------------------------------------------------
  */
 
@@ -2065,7 +2077,7 @@ UnitTestSuite.testFunctionFor('trimFromEnd(stringToTrim)', function () {
 
 /*
  * ----------------------------------------------------------------------------
- * EVENT HANDLERS
+ * EventHandlers
  * ----------------------------------------------------------------------------
  */
 
