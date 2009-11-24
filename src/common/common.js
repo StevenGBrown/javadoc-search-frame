@@ -295,17 +295,17 @@ LinkType.values = function () {
 
 /**
  * Extract a URL from the given anchor element HTML.
- * @param anchorElementHTML
+ * @param anchorElementHtml
  * @returns the URL
  */
-function extractURL(anchorElementHTML) {
+function extractUrl(anchorElementHtml) {
   var rx = /href\s*=\s*(?:"|')([^"']+)(?:"|')/i;
   var matches;
-  if ((matches = rx.exec(anchorElementHTML)) !== null) {
-    var relativeURL = matches[1];
-    var windowURL = location.href;
-    var absoluteURL = windowURL.substring(0, windowURL.lastIndexOf('/') + 1) + relativeURL;
-    return absoluteURL;
+  if ((matches = rx.exec(anchorElementHtml)) !== null) {
+    var relativeUrl = matches[1];
+    var windowUrl = location.href;
+    var absoluteUrl = windowUrl.substring(0, windowUrl.lastIndexOf('/') + 1) + relativeUrl;
+    return absoluteUrl;
   }
   return null;
 }
@@ -324,7 +324,7 @@ PackageLink.prototype.matches = function (regex) {
   return regex.test(this.packageName);
 };
 
-PackageLink.prototype.getHTML = function () {
+PackageLink.prototype.getHtml = function () {
   return this.html;
 };
 
@@ -338,7 +338,7 @@ PackageLink.prototype.getPackageName = function () {
 
 PackageLink.prototype.getUrl = function () {
   if (!this.url) {
-    this.url = extractURL(this.html);
+    this.url = extractUrl(this.html);
   }
   return this.url;
 };
@@ -383,7 +383,7 @@ ClassLink.prototype.matches = function (regex) {
       });
 };
 
-ClassLink.prototype.getHTML = function () {
+ClassLink.prototype.getHtml = function () {
   return this.html;
 };
 
@@ -405,7 +405,7 @@ ClassLink.prototype.getCanonicalName = function () {
 
 ClassLink.prototype.getUrl = function () {
   if (!this.url) {
-    this.url = extractURL(this.html);
+    this.url = extractUrl(this.html);
   }
   return this.url;
 };
@@ -429,7 +429,8 @@ ClassLink.prototype.toString = function () {
  */
 
 /**
- * @class View (undocumented).
+ * @class View Provides access to the UI elements of the frame containing the
+ *             search field.
  */
 View = {
   searchField : null,
@@ -439,41 +440,57 @@ View = {
 
 /**
  * Access key that will focus on the search field when activated ('s').
- * To activate in Mozilla Firefox 2.0 or later press Alt+Shift+S.
+ * This access key can be activated by pressing either Alt+s or Alt+Shift+s,
+ * depending on the internet browser.
  */
 View.searchAccessKey = 's';
 
 /**
  * Access key that will clear the search field when activated ('a').
- * To activate in Mozilla Firefox 2.0 or later press Alt+Shift+A.
+ * This access key can be activated by pressing either Alt+a or Alt+Shift+a,
+ * depending on the internet browser.
  */
 View.eraseAccessKey = 'a';
 
+/**
+ * Initialise the search field frame.
+ * @param eventHandlers
+ */
 View.initialise = function (eventHandlers) {
   this._create(eventHandlers);
 };
 
-View.setContentNodeHTML = function (contents) {
+/**
+ * Set the HTML contents of the area below the search field.
+ * @param contents
+ */
+View.setContentsHtml = function (contents) {
   var newNode = this.contentNode.cloneNode(false);
   newNode.innerHTML = contents;
   this.contentNodeParent.replaceChild(newNode, this.contentNode);
   this.contentNode = newNode;
 };
 
-View.getContentNode = function () {
-  return this.contentNode;
-};
-
-View.setSearchFieldValue = function (v) {
-  if (this.searchField.value !== v) {
-    this.searchField.value = v;
+/**
+ * Set the value displayed in the search field.
+ * @param value
+ */
+View.setSearchFieldValue = function (value) {
+  if (this.searchField.value !== value) {
+    this.searchField.value = value;
   }
 };
 
+/**
+ * @returns the current value displayed in the search field.
+ */
 View.getSearchFieldValue = function () {
   return this.searchField.value;
 };
 
+/**
+ * Give focus to the search field.
+ */
 View.focusOnSearchField = function () {
   if (this.searchField) {
     this.searchField.focus();
@@ -709,7 +726,7 @@ AnchorLink.prototype.matches = function (regex) {
   return regex.test(this.name);
 };
 
-AnchorLink.prototype.getHTML = function () {
+AnchorLink.prototype.getHtml = function () {
   return this.html;
 };
 
@@ -1222,7 +1239,7 @@ Search.performIfSearchStringHasChanged = function () {
  * @returns the URL of the link currently displayed at the top of the list, or
  *          null if no links are currently displayed
  */
-Search.getTopLinkURL = function () {
+Search.getTopLinkUrl = function () {
   if (this.topLink) {
     return this.topLink.getUrl();
   }
@@ -1241,8 +1258,8 @@ Search._performSearch = function (entireSearchString) {
       search._Anchors._perform(searchContext, Query.getAnchorSearchString());
       search._Menu._perform(searchContext, Query.getMenuSearchString());
 
-      if (searchContext.getContentNodeHTML) {
-        View.setContentNodeHTML(searchContext.getContentNodeHTML());
+      if (searchContext.getContentNodeHtml) {
+        View.setContentsHtml(searchContext.getContentNodeHtml());
       }
       search.topLink = searchContext.topAnchorLink || searchContext.topClassLink;
 
@@ -1252,7 +1269,7 @@ Search._performSearch = function (entireSearchString) {
 };
 
 Search._autoOpen = function () {
-  var url = this.getTopLinkURL();
+  var url = this.getTopLinkUrl();
   if (url) {
     UserPreference.AUTO_OPEN.getValue(function (autoOpen) {
       if (autoOpen) {
@@ -1299,10 +1316,10 @@ Search._PackagesAndClasses._perform = function (searchContext, searchString) {
 
   this.previousQuery = searchString;
 
-  var constructHTML = this._constructHTML;
+  var constructHtml = this._constructHtml;
   var currentLinks = this.currentLinks;
-  searchContext.getContentNodeHTML = function () {
-    return constructHTML(currentLinks, bestMatch);
+  searchContext.getContentNodeHtml = function () {
+    return constructHtml(currentLinks, bestMatch);
   };
 
   searchContext.topClassLink = this.topLink;
@@ -1409,7 +1426,7 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch(searchSt
   assertThatBestMatchFor('list', is(javaUtilListClass));
 });
 
-Search._PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
+Search._PackagesAndClasses._constructHtml = function (classLinks, bestMatch) {
   if (classLinks.length === 0) {
     return 'No search results.';
   }
@@ -1418,7 +1435,7 @@ Search._PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
     html += '<br/><b><i>Best Match</i></b><br/>';
     html += bestMatch.getType().getName();
     html += '<br/>';
-    html += bestMatch.getHTML();
+    html += bestMatch.getHtml();
     html += '<br/>';
   }
   var type;
@@ -1429,7 +1446,7 @@ Search._PackagesAndClasses._constructHTML = function (classLinks, bestMatch) {
       html += '<br/><b>' + newType.getHeader() + '</b><br/>';
       type = newType;
     }
-    html += link.getHTML();
+    html += link.getHtml();
     html += '<br/>';
   });
   return html;
@@ -1466,8 +1483,8 @@ Search._Anchors._perform = function (searchContext, searchString) {
     var condition = RegexLibrary.createCondition(searchString);
     this._append(searchContext, topClassLink, anchorLinks, condition);
   } else {
-    searchContext.getContentNodeHTML = function () {
-      return topClassLink.getHTML() + '<p>' + AnchorsLoader.getStatus() + '</p>';
+    searchContext.getContentNodeHtml = function () {
+      return topClassLink.getHtml() + '<p>' + AnchorsLoader.getStatus() + '</p>';
     };
     searchContext.anchorLinksLoading = true;
   }
@@ -1477,16 +1494,16 @@ Search._Anchors._append = function (searchContext, topClassLink, anchorLinks, co
   var matchingAnchorLinks = anchorLinks.filter(condition);
   searchContext.topAnchorLink = matchingAnchorLinks.length > 0 ? matchingAnchorLinks[0] : null;
 
-  searchContext.getContentNodeHTML = function () {
+  searchContext.getContentNodeHtml = function () {
     var html = '';
     if (matchingAnchorLinks.length === 0) {
       html += 'No search results.';
     } else {
        matchingAnchorLinks.forEach(function (anchorLink) {
-        html += anchorLink.getHTML();
+        html += anchorLink.getHtml();
       });
     }
-    return topClassLink.getHTML() + '<p>' + html + '</p>';
+    return topClassLink.getHtml() + '<p>' + html + '</p>';
   };
 };
 
@@ -1517,10 +1534,10 @@ Search._Menu._perform = function (searchContext, searchString) {
   }
 
   var menu = this._createMenu(searchContext, topClassLink, topAnchorLink);
-  searchContext.getContentNodeHTML = function () {
-    var html = topClassLink.getHTML();
+  searchContext.getContentNodeHtml = function () {
+    var html = topClassLink.getHtml();
     if (topAnchorLink) {
-      html += '<br/>' + topAnchorLink.getHTML();
+      html += '<br/>' + topAnchorLink.getHtml();
     }
     html += '<p>' + menu + '</p>';
     return html;
@@ -1613,11 +1630,11 @@ function init(unitTestResultsCallback) {
 
   UserPreference.HIDE_PACKAGE_FRAME.getValue(function (hidePackageFrame) {
 
-    // Retrieve the innerHTML of the class frame.
-    var classesInnerHTML = getClassesInnerHtml();
+    // Retrieve the inner HTML of the class frame.
+    var classesInnerHtml = getClassesInnerHtml();
 
     // Initialise stored package and class links.
-    var classLinks = getClassLinks(classesInnerHTML);
+    var classLinks = getClassLinks(classesInnerHtml);
     if (hidePackageFrame) {
       var packageLinks = getPackageLinks(classLinks);
       ALL_PACKAGE_AND_CLASS_LINKS = packageLinks.concat(classLinks);
@@ -1655,8 +1672,7 @@ function init(unitTestResultsCallback) {
 /**
  * Parse packages from the given array of {@ClassLink} objects.
  * 
- * @param packagesInnerHTML the inner HTML of the body element of the packages
- *                          list frame
+ * @param classLinks
  * @returns an array of {@PackageLink} objects
  */
 function getPackageLinks(classLinks) {
@@ -1713,11 +1729,11 @@ UnitTestSuite.testFunctionFor('getPackageLinks(classLinks)', function () {
  * @returns the inner HTML of the body element of the classes list frame, or undefined if the element does not exist
  */
 function getClassesInnerHtml() {
-  var classesInnerHTML;
+  var classesInnerHtml;
   if (document && document.body) {
-    classesInnerHTML = document.body.innerHTML;
+    classesInnerHtml = document.body.innerHTML;
   }
-  return classesInnerHTML;
+  return classesInnerHtml;
 }
 
 /**
@@ -1731,12 +1747,12 @@ function getClassesInnerHtml() {
  * - The italic element is the only element that can be a child of the
  *   anchor element.
  * 
- * @param classesInnerHTML the inner HTML of the body element of the classes
+ * @param classesInnerHtml the inner HTML of the body element of the classes
  *                         list frame
  * @returns an array of {@link ClassLink} objects
  */
-function getClassLinks(classesInnerHTML) {
-  if (!classesInnerHTML) {
+function getClassLinks(classesInnerHtml) {
+  if (!classesInnerHtml) {
     return [];
   }
 
@@ -1762,9 +1778,9 @@ function getClassLinks(classesInnerHTML) {
   var classesRegexWithTitle =
       /title\s*=\s*\"\s*([^\s]+)\s+in\s+([^\s\"]+)[^>]+>(?:\s*<i\s*>)?\s*([^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
   var anchorWithTitleFound = false;
-  while ((matches = classesRegexWithTitle.exec(classesInnerHTML)) !== null) {
-    var entireMatch = classesInnerHTML.substring(
-        classesInnerHTML.lastIndexOf('<a', classesRegexWithTitle.lastIndex), classesRegexWithTitle.lastIndex);
+  while ((matches = classesRegexWithTitle.exec(classesInnerHtml)) !== null) {
+    var entireMatch = classesInnerHtml.substring(
+        classesInnerHtml.lastIndexOf('<a', classesRegexWithTitle.lastIndex), classesRegexWithTitle.lastIndex);
     var typeInTitle = matches[1];
     var packageName = matches[2];
     var className = trimFromEnd(matches[3]);
@@ -1780,7 +1796,7 @@ function getClassLinks(classesInnerHTML) {
   if (!anchorWithTitleFound) {
     var classesWithoutTitleRegex =
         /<a\s+href\s*=\s*\"([^\"]+)(?:\/|\\)[^\"]+\"[^>]*>(\s*<i\s*>)?\s*([^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
-    while ((matches = classesWithoutTitleRegex.exec(classesInnerHTML)) !== null) {
+    while ((matches = classesWithoutTitleRegex.exec(classesInnerHtml)) !== null) {
       var entireMatch = matches[0];
       var packageNameInHref = matches[1];
       var openingItalicTag = matches[2];
@@ -1802,7 +1818,7 @@ function getClassLinks(classesInnerHTML) {
   return classLinks;
 }
 
-UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHTML)', function () {
+UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHtml)', function () {
 
   function assert(args, html, description) {
     var link = new ClassLink(
@@ -2021,7 +2037,7 @@ EventHandlers._returnKeyPressed = function (ctrlModifier) {
   Query.update(searchFieldValue);
   Search.performIfSearchStringHasChanged();
 
-  var url = Search.getTopLinkURL();
+  var url = Search.getTopLinkUrl();
   if (url) {
     if (ctrlModifier) {
       window.open(url);
