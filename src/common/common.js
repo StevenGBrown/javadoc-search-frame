@@ -939,10 +939,18 @@ AnchorsLoader._getAnchorNames = function (doc) {
  */
 
 /**
- * @class RegexLibrary (undocumented).
+ * @class RegexLibrary Library of regular expressions used by this script.
  */
 RegexLibrary = {};
 
+/**
+ * Create and return a function that will take a {@PackageLink}, {@ClassLink}
+ * or {@AnchorLink} as an argument and return true if that link matches the
+ * given search string and return false otherwise.
+ * 
+ * @param searchString
+ * @returns the created function
+ */
 RegexLibrary.createCondition = function (searchString) {
   if (searchString.length === 0 || searchString === '*') {
     return function (link) {
@@ -1067,10 +1075,28 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
 });
 
+/**
+ * Create and return a function that will take a {@PackageLink}, {@ClassLink}
+ * or {@AnchorLink} as an argument and return true if that link is a
+ * case-sensitive exact match for the given search string and return false
+ * otherwise.
+ * 
+ * @param searchString
+ * @returns the created function
+ */
 RegexLibrary.createCaseInsensitiveExactMatchCondition = function (searchString) {
   return this._createExactMatchCondition(searchString, false);
 };
 
+/**
+ * Create and return a function that will take a {@PackageLink}, {@ClassLink}
+ * or {@AnchorLink} as an argument and return true if that link is a
+ * case-sensitive exact match for the given search string and return false
+ * otherwise.
+ * 
+ * @param searchString
+ * @returns the created function
+ */
 RegexLibrary.createCaseSensitiveExactMatchCondition = function (searchString) {
   return this._createExactMatchCondition(searchString, true);
 };
