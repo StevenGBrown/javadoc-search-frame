@@ -575,7 +575,8 @@ View._watch = function (element, callback, msec) {
  */
 
 /**
- * @class Query (undocumented).
+ * @class Query Constructs the text entered into the search field into a search
+ *              query.
  */
 Query = {
   classSearchString : '',
@@ -583,18 +584,33 @@ Query = {
   menuSearchString : null
 };
 
+/**
+ * @returns the portion of the search query that relates to the packages and
+ *          classes search
+ */
 Query.getClassSearchString = function () {
   return this.classSearchString;
 };
 
+/**
+ * @returns the portion of the search query that relates to the method anchors
+ *          search
+ */
 Query.getAnchorSearchString = function () {
   return this.anchorSearchString;
 };
 
+/**
+ * @returns the portion of the search query that relates to the package menu or
+ *          class menu
+ */
 Query.getMenuSearchString = function () {
   return this.menuSearchString;
 };
 
+/**
+ * @returns the entire search query
+ */
 Query.getEntireSearchString = function () {
   var searchString = this.classSearchString;
   if (this.anchorSearchString !== null) {
@@ -608,30 +624,29 @@ Query.getEntireSearchString = function () {
   return searchString;
 };
 
-Query.input = function (input) {
-  this._processInput(input);
+/**
+ * Update this query based on the contents of the search field.
+ * @param searchFieldContents
+ */
+Query.update = function (searchFieldContents) {
+  this._processInput(searchFieldContents);
   this._updateView();
 };
 
-Query.erase = function () {
-  this._processErase();
-  this._updateView();
-};
-
-Query._processInput = function (input) {
+Query._processInput = function (searchFieldContents) {
   var searchString;
   if (this.menuSearchString !== null) {
     searchString = this.classSearchString;
     if (this.anchorSearchString !== null) {
       searchString += '#' + this.anchorSearchString;
     }
-    if (input.indexOf('@') !== -1) {
-      searchString += input;
+    if (searchFieldContents.indexOf('@') !== -1) {
+      searchString += searchFieldContents;
     }
   } else if (this.anchorSearchString !== null) {
-    searchString = this.classSearchString + input;
+    searchString = this.classSearchString + searchFieldContents;
   } else {
-    searchString = input;
+    searchString = searchFieldContents;
   }
 
   var tokens = [];
@@ -649,16 +664,6 @@ Query._processInput = function (input) {
   this.classSearchString = searchString;
   this.anchorSearchString = tokens[1];
   this.menuSearchString = tokens[0];
-};
-
-Query._processErase = function () {
-  if (this.menuSearchString !== null) {
-    this.menuSearchString = null;
-  } else if (this.anchorSearchString !== null) {
-    this.anchorSearchString = null;
-  } else {
-    this.classSearchString = '';
-  }
 };
 
 Query._updateView = function () {
@@ -1975,7 +1980,7 @@ EventHandlers.searchFieldKeyup = function (evt) {
  * @param searchFieldContents
  */
 EventHandlers.searchFieldChanged = function (searchFieldContents) {
-  Query.input(searchFieldContents);
+  Query.update(searchFieldContents);
   Search.performIfSearchStringHasChanged();
 };
 
@@ -1990,7 +1995,7 @@ EventHandlers.searchFieldFocus = function () {
  * Caled when the erase button has been clicked.
  */
 EventHandlers.eraseButtonClick = function () {
-  Query.erase();
+  Query.update('');
   View.focusOnSearchField();
   Search.performIfSearchStringHasChanged();
 };
@@ -2013,7 +2018,7 @@ EventHandlers.optionsLinkClicked = function (evt) {
  */
 EventHandlers._returnKeyPressed = function (ctrlModifier) {
   var searchFieldValue = View.getSearchFieldValue();
-  Query.input(searchFieldValue);
+  Query.update(searchFieldValue);
   Search.performIfSearchStringHasChanged();
 
   var url = Search.getTopLinkURL();
@@ -2034,7 +2039,7 @@ EventHandlers._returnKeyPressed = function (ctrlModifier) {
 EventHandlers._escapeKeyPressed = function () {
   var searchFieldValue = View.getSearchFieldValue();
   if (searchFieldValue) {
-    Query.erase();
+    Query.update('');
     Search.performIfSearchStringHasChanged();
   }
 };
