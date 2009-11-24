@@ -802,52 +802,67 @@ AnchorLink.prototype._getHtml = function (name, url, keywordOrNot) {
  */
 
 /**
- * @class AnchorsLoader (undocumented).
+ * @class AnchorsLoader Asynchronously loads anchors for a {@PackageLink} or
+ *                      {@ClassLink}.
  */
 AnchorsLoader = {
-  request : null,
-  classLink : null,
-  anchorLinks : null,
+  xmlHttpRequest : null,
+  classOrPackageLink : null,
+  loadedAnchorLinks : null,
   bytesDownloaded : 0,
-  errorMessage : null
+  errorMessage : null,
+  progressCallback : null
 };
 
-AnchorsLoader.onprogress = null;
-
-AnchorsLoader.load = function (classLink) {
-  if (this.classLink === classLink) {
-    // Already loading this class link.
+/**
+ * Load anchors for the given {@PackageLink} or {@ClassLink}. If anchors are
+ * already being loaded for the given link, calling this function will have no
+ * effect.
+ * 
+ * @param classOrPackageLink the link
+ * @param progressCallback function that is called when whenever some progress
+ *                         has been made towards loading the anchors
+ */
+AnchorsLoader.load = function (classOrPackageLink, progressCallback) {
+  if (this.classOrPackageLink === classOrPackageLink) {
+    // Already loading this link.
     return;
   }
-  this.cancel();
-  this.classLink = classLink;
-  this.anchorLinks = null;
+  this.abort();
+  this.classOrPackageLink = classOrPackageLink;
+  this.progressCallback = progressCallback;
   var anchorsLoader = this;
   try {
-    var request = new XMLHttpRequest();
-    request.onprogress = function (e) {
+    var xmlHttpRequest = new XMLHttpRequest();
+    xmlHttpRequest.onprogress = function (e) {
       anchorsLoader._onprogress(e);
     };
-    request.open('GET', classLink.getUrl());
-    request.onload = function (e) {
+    xmlHttpRequest.open('GET', classOrPackageLink.getUrl());
+    xmlHttpRequest.onload = function (e) {
       anchorsLoader._onload(e);
     };
-    request.onerror = function (e) {
+    xmlHttpRequest.onerror = function (e) {
       anchorsLoader._onerror(e);
     };
-    request.overrideMimeType('text/plain; charset=x-user-defined');
-    request.send(null);
+    xmlHttpRequest.overrideMimeType('text/plain; charset=x-user-defined');
+    xmlHttpRequest.send(null);
   } catch (ex) {
     anchorsLoader._onexception(ex);
   }
-  this.request = request;
+  this.xmlHttpRequest = xmlHttpRequest;
 };
 
+/**
+ * @retuns true if the loading is complete, false otherwise
+ */
 AnchorsLoader.isComplete = function () {
-  return this.anchorLinks !== null;
+  return this.loadedAnchorLinks !== null;
 };
 
-AnchorsLoader.getStatus = function () {
+/**
+ * @returns a status message on the progress made towards loading the anchors
+ */
+AnchorsLoader.getStatusMessage = function () {
   if (this.bytesDownloaded === -1) {
     return this.errorMessage;
   }
@@ -863,43 +878,50 @@ AnchorsLoader.getStatus = function () {
   return 'loading...';
 };
 
+/**
+ * @returns the loaded anchors, or null if the loading is not complete
+ */
 AnchorsLoader.getAnchorLinks = function () {
-  return this.anchorLinks;
+  return this.loadedAnchorLinks;
 };
 
-AnchorsLoader.cancel = function () {
-  if (this.request) {
-    this.request.abort();
+/**
+ * Abort the current anchor load operation.
+ */
+AnchorsLoader.abort = function () {
+  if (this.xmlHttpRequest) {
+    this.xmlHttpRequest.abort();
   }
-  this.request = null;
-  this.classLink = null;
-  this.anchorLinks = null;
+  this.xmlHttpRequest = null;
+  this.classOrPackageLink = null;
+  this.loadedAnchorLinks = null;
   this.bytesDownloaded = 0;
   this.errorMessage = null;
+  this.progressCallback = null;
 };
 
 AnchorsLoader._onprogress = function (e) {
   this.bytesDownloaded = e.position;
   this.errorMessage = null;
-  this.onprogress();
+  this.progressCallback();
 };
 
 AnchorsLoader._onload = function (e) {
-  var names = this._getAnchorNames(this.request.responseText);
-  this.anchorLinks = this._createAnchorLinkArray(this.classLink.getUrl(), names);
-  this.onprogress();
+  var names = this._getAnchorNames(this.xmlHttpRequest.responseText);
+  this.loadedAnchorLinks = this._createAnchorLinkArray(this.classOrPackageLink.getUrl(), names);
+  this.progressCallback();
 };
 
 AnchorsLoader._onerror = function (e) {
   this.bytesDownloaded = -1;
   this.errorMessage = 'ERROR';
-  this.onprogress();
+  this.progressCallback();
 };
 
 AnchorsLoader._onexception = function (ex) {
   this.bytesDownloaded = -1;
   this.errorMessage = ex;
-  this.onprogress();
+  this.progressCallback();
 };
 
 AnchorsLoader._createAnchorLinkArray = function (baseurl, names) {
@@ -1495,22 +1517,22 @@ Search._Anchors = {};
 Search._Anchors._perform = function (searchContext, searchString) {
   var topClassLink = searchContext.topClassLink;
   if (searchString === null || !topClassLink) {
-    AnchorsLoader.cancel();
+    AnchorsLoader.abort();
     return;
   }
 
-  AnchorsLoader.onprogress = function () {
+  var progressCallback = function () {
     Search.perform();
   };
 
-  AnchorsLoader.load(topClassLink);
+  AnchorsLoader.load(topClassLink, progressCallback);
   if (AnchorsLoader.isComplete()) {
     var anchorLinks = AnchorsLoader.getAnchorLinks();
     var condition = RegexLibrary.createCondition(searchString);
     this._append(searchContext, topClassLink, anchorLinks, condition);
   } else {
     searchContext.getContentNodeHtml = function () {
-      return topClassLink.getHtml() + '<p>' + AnchorsLoader.getStatus() + '</p>';
+      return topClassLink.getHtml() + '<p>' + AnchorsLoader.getStatusMessage() + '</p>';
     };
     searchContext.anchorLinksLoading = true;
   }
