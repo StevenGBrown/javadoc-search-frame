@@ -378,7 +378,8 @@ function extractUrl(anchorElementHtml) {
 
 
 /**
- * @class PackageLink (undocumented).
+ * @class PackageLink Link to a package. These links are of type
+ *                    {@LinkType.PACKAGE}.
  */
 PackageLink = function (packageName, html) {
   this.packageName = packageName;
@@ -386,22 +387,40 @@ PackageLink = function (packageName, html) {
   this.url = null;
 };
 
+/**
+ * Determine whether this link matches the given regular expression.
+ * 
+ * @param regex the regular expression
+ * @returns true if this link is a match, false otherwise
+ */
 PackageLink.prototype.matches = function (regex) {
   return regex.test(this.packageName);
 };
 
+/**
+ * @returns this link in HTML format
+ */
 PackageLink.prototype.getHtml = function () {
   return this.html;
 };
 
+/**
+ * @returns {@LinkType} the type of this link
+ */
 PackageLink.prototype.getType = function () {
   return LinkType.PACKAGE;
 };
 
+/**
+ * @returns the name of this package
+ */
 PackageLink.prototype.getPackageName = function () {
   return this.packageName;
 };
 
+/**
+ * @returns the URL of this link
+ */
 PackageLink.prototype.getUrl = function () {
   if (!this.url) {
     this.url = extractUrl(this.html);
@@ -409,19 +428,31 @@ PackageLink.prototype.getUrl = function () {
   return this.url;
 };
 
+/**
+ * Equals function.
+ * 
+ * @param obj
+ * @returns true if this link is equal to the given object, false otherwise
+ */
 PackageLink.prototype.equals = function (obj) {
   return obj instanceof PackageLink &&
        this.packageName === obj.packageName &&
        this.html === obj.html;
 };
 
+/**
+ * @returns a string representation of this link
+ */
 PackageLink.prototype.toString = function () {
   return this.html + ' (' + this.packageName + ')';
 };
 
 
 /**
- * @class ClassLink (undocumented).
+ * @class ClassLink Link to a class. These links are of type
+ *                  {@LinkType.INTERFACE}, {@LinkType.CLASS}, {@LinkType.ENUM},
+ *                  {@LinkType.EXCEPTION}, {@LinkType.ERROR} or
+ *                  {@LinkType.ANNOTATION}.
  */
 ClassLink = function (type, packageName, className, html) {
   this.type = type;
@@ -442,6 +473,12 @@ ClassLink = function (type, packageName, className, html) {
   }
 };
 
+/**
+ * Determine whether this link matches the given regular expression.
+ * 
+ * @param regex the regular expression
+ * @returns true if this link is a match, false otherwise
+ */
 ClassLink.prototype.matches = function (regex) {
   return regex.test(this.className) || regex.test(this.canonicalName) ||
       this.innerClassNames.some(function (innerClassName) {
@@ -449,26 +486,44 @@ ClassLink.prototype.matches = function (regex) {
       });
 };
 
+/**
+ * @returns this link in HTML format
+ */
 ClassLink.prototype.getHtml = function () {
   return this.html;
 };
 
+/**
+ * @returns {@LinkType} the type of this link
+ */
 ClassLink.prototype.getType = function () {
   return this.type;
 };
 
+/**
+ * @returns the simple name of this class
+ */
 ClassLink.prototype.getClassName = function () {
   return this.className;
 };
 
+/**
+ * @returns the name of the package that contains this class
+ */
 ClassLink.prototype.getPackageName = function () {
   return this.canonicalName.substring(0, this.canonicalName.length - this.className.length - 1);
 };
 
+/**
+ * @returns the canonical name of this class
+ */
 ClassLink.prototype.getCanonicalName = function () {
   return this.canonicalName;
 };
 
+/**
+ * @returns the URL of this link
+ */
 ClassLink.prototype.getUrl = function () {
   if (!this.url) {
     this.url = extractUrl(this.html);
@@ -476,6 +531,12 @@ ClassLink.prototype.getUrl = function () {
   return this.url;
 };
 
+/**
+ * Equals function.
+ * 
+ * @param obj
+ * @returns true if this link is equal to the given object, false otherwise
+ */
 ClassLink.prototype.equals = function (obj) {
   return obj instanceof ClassLink &&
        this.type === obj.type &&
@@ -483,13 +544,16 @@ ClassLink.prototype.equals = function (obj) {
        this.html === obj.html;
 };
 
+/**
+ * @returns a string representation of this link
+ */
 ClassLink.prototype.toString = function () {
   return this.html + ' (' + this.canonicalName + ')';
 };
 
 
 /**
- * @class AnchorLink (undocumented).
+ * @class AnchorLink Link to a method or other page anchor.
  */
 AnchorLink = function (baseurl, name) {
   this.name = name;
@@ -499,26 +563,47 @@ AnchorLink = function (baseurl, name) {
   this.html = this._getHtml(name, this.url, this.keywordOrNot);
 };
 
+/**
+ * Determine whether this link matches the given regular expression.
+ * 
+ * @param regex the regular expression
+ * @returns true if this link is a match, false otherwise
+ */
 AnchorLink.prototype.matches = function (regex) {
   return regex.test(this.name);
 };
 
+/**
+ * @returns this link in HTML format
+ */
 AnchorLink.prototype.getHtml = function () {
   return this.html;
 };
 
+/**
+ * @returns the name of this link in lowercase
+ */
 AnchorLink.prototype.getLowerName = function () {
   return this.lowerName;
 };
 
+/**
+ * @returns the URL of this link
+ */
 AnchorLink.prototype.getUrl = function () {
   return this.url;
 };
 
+/**
+ * @returns true if this is a keyword link, false if it is a method link
+ */
 AnchorLink.prototype.isKeyword = function () {
   return this.keywordOrNot;
 };
 
+/**
+ * @returns the name of this link without method parameters
+ */
 AnchorLink.prototype.getNameWithoutParameter = function () {
   if (this.name.indexOf('(') !== -1) {
     return this.name.substring(0, this.name.indexOf('('));
