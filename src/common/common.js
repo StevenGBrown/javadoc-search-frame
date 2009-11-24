@@ -250,40 +250,88 @@ UnitTestExceptionThrownFailure.prototype.toString = function () {
  */
 
 /**
- * @class LinkType (undocumented).
+ * @class LinkType Package and class link types.
  */
-LinkType = function(name, header) {
-  this.name = name;
-  this.header = header;
+LinkType = function(singularName, pluralName) {
+  this.singularName = singularName;
+  this.pluralName = pluralName;
 };
 
-LinkType.prototype.getName = function () {
-  return this.name;
+/**
+ * @returns the singular name of this type
+ */
+LinkType.prototype.getSingularName = function () {
+  return this.singularName;
 };
 
-LinkType.prototype.getHeader = function () {
-  return this.header;
+/**
+ * @returns the plural name of this type
+ */
+LinkType.prototype.getPluralName = function () {
+  return this.pluralName;
 };
 
+/**
+ * @returns a string representation of this type
+ */
 LinkType.prototype.toString = function () {
-  return this.name;
+  return this.singularName;
 };
 
-LinkType.PACKAGE = new LinkType('package', 'Packages');
-LinkType.INTERFACE = new LinkType('interface', 'Interfaces');
-LinkType.CLASS = new LinkType('class', 'Classes');
-LinkType.ENUM = new LinkType('enum', 'Enums');
-LinkType.EXCEPTION = new LinkType('exception', 'Exceptions');
-LinkType.ERROR = new LinkType('error', 'Errors');
-LinkType.ANNOTATION = new LinkType('annotation', 'Annotation Types');
+/**
+ * Package link type.
+ */
+LinkType.PACKAGE = new LinkType('Package', 'Packages');
 
-LinkType.getByName = function (name) {
-  return LinkType[name.toUpperCase()];
+/**
+ * Interface link type.
+ */
+LinkType.INTERFACE = new LinkType('Interface', 'Interfaces');
+
+/**
+ * Class link type.
+ */
+LinkType.CLASS = new LinkType('Class', 'Classes');
+
+/**
+ * Enum link type.
+ */
+LinkType.ENUM = new LinkType('Enum', 'Enums');
+
+/**
+ * Exception link type.
+ */
+LinkType.EXCEPTION = new LinkType('Exception', 'Exceptions');
+
+/**
+ * Error link type.
+ */
+LinkType.ERROR = new LinkType('Error', 'Errors');
+
+/**
+ * Annotation link type.
+ */
+LinkType.ANNOTATION = new LinkType('Annotation', 'Annotation Types');
+
+/**
+ * Get the link type with the given singular name.
+ * 
+ * @param singluarName
+ * @returns the link type
+ */
+LinkType.getByName = function (singularName) {
+  return LinkType[singularName.toUpperCase()];
 };
 
-LinkType.values = function () {
-  return [ LinkType.PACKAGE, LinkType.INTERFACE, LinkType.CLASS,
+/**
+ * Call the given function with each link type.
+ * 
+ * @param forEachFunction
+ */
+LinkType.forEach = function (forEachFunction) {
+  var all = [ LinkType.PACKAGE, LinkType.INTERFACE, LinkType.CLASS,
       LinkType.ENUM, LinkType.EXCEPTION, LinkType.ERROR, LinkType.ANNOTATION ];
+  all.forEach(forEachFunction);
 };
 
 
@@ -1481,7 +1529,7 @@ Search._PackagesAndClasses._constructHtml = function (classLinks, bestMatch) {
   var html = '';
   if (bestMatch && classLinks.length > 1) {
     html += '<br/><b><i>Best Match</i></b><br/>';
-    html += bestMatch.getType().getName();
+    html += bestMatch.getType().getSingularName().toLowerCase();
     html += '<br/>';
     html += bestMatch.getHtml();
     html += '<br/>';
@@ -1491,7 +1539,7 @@ Search._PackagesAndClasses._constructHtml = function (classLinks, bestMatch) {
   classLinks.forEach(function (link) {
     newType = link.getType();
     if (type !== newType) {
-      html += '<br/><b>' + newType.getHeader() + '</b><br/>';
+      html += '<br/><b>' + newType.getPluralName() + '</b><br/>';
       type = newType;
     }
     html += link.getHtml();
@@ -1808,7 +1856,7 @@ function getClassLinks(classesInnerHtml) {
   var matches;
 
   var classLinksMap = {};
-  LinkType.values().forEach(function (type) {
+  LinkType.forEach(function (type) {
     classLinksMap[type] = [];
   });
 
@@ -1860,7 +1908,7 @@ function getClassLinks(classesInnerHtml) {
   }
 
   var classLinks = [];
-  LinkType.values().forEach(function (type) {
+  LinkType.forEach(function (type) {
     classLinks = classLinks.concat(classLinksMap[type]);
   });
   return classLinks;
