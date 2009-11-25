@@ -48,13 +48,6 @@ UserPreference.canGetAndSet = function () {
 };
 
 /**
- * @returns the key associated with this user preference
- */
-UserPreference.prototype.getKey = function () {
-  return this.key;
-};
-
-/**
  * Retrieve the current value of this user preference.
  * @param callback callback function that is provided with the value of this
  *                 user preference. If the preference cannot be retrieved or
