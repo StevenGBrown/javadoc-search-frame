@@ -181,17 +181,13 @@ OptionsPageGenerator._createTable = function (pageDocument, title, subTitle, con
 };
 
 OptionsPageGenerator._initialise = function (pageDocument) {
-  var optionsGenerator = this;
-  optionsGenerator._initialiseBooleanOption(pageDocument, UserPreference.AUTO_OPEN, function () {
-    optionsGenerator._initialiseBooleanOption(pageDocument, UserPreference.HIDE_PACKAGE_FRAME, function () {
-      optionsGenerator._initialiseMenuOption(pageDocument, UserPreference.CLASS_MENU, function () {
-        optionsGenerator._initialiseMenuOption(pageDocument, UserPreference.PACKAGE_MENU);
-      });
-    });
-  });
+  this._initialiseBooleanOption(pageDocument, UserPreference.AUTO_OPEN);
+  this._initialiseBooleanOption(pageDocument, UserPreference.HIDE_PACKAGE_FRAME);
+  this._initialiseMenuOption(pageDocument, UserPreference.CLASS_MENU);
+  this._initialiseMenuOption(pageDocument, UserPreference.PACKAGE_MENU);
 };
 
-OptionsPageGenerator._initialiseBooleanOption = function (pageDocument, preference, completionCallback) {
+OptionsPageGenerator._initialiseBooleanOption = function (pageDocument, preference) {
   var key = preference.getKey();
   var trueRadioButton = pageDocument.getElementById(key + '_true');
   var falseRadioButton = pageDocument.getElementById(key + '_false');
@@ -206,14 +202,10 @@ OptionsPageGenerator._initialiseBooleanOption = function (pageDocument, preferen
 
     trueRadioButton.addEventListener('click', clickEventListener, false);
     falseRadioButton.addEventListener('click', clickEventListener, false);
-
-    if (completionCallback) {
-      completionCallback();
-    }
   });
 };
 
-OptionsPageGenerator._initialiseMenuOption = function (pageDocument, preference, completionCallback) {
+OptionsPageGenerator._initialiseMenuOption = function (pageDocument, preference) {
   var key = preference.getKey();
   var textAreaId = key + '_text_area';
   var textAreaElement = pageDocument.getElementById(textAreaId);
@@ -230,9 +222,5 @@ OptionsPageGenerator._initialiseMenuOption = function (pageDocument, preference,
     restoreDefaultButton.addEventListener('click', function () {
       textAreaElement.value = preference.getDefaultValue();preference.setValue(preference.getDefaultValue());
     }, false);
-
-    if (completionCallback) {
-      completionCallback();
-    }
   });
 };
