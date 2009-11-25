@@ -49,7 +49,7 @@ def buildGoogleChromeExtension():
   )
 
   copyFiles(
-    names=('manifest.json', 'options.html', 'background.html', 'top.js'),
+    names=('background.html', 'manifest.json', 'options.html', 'top.js'),
     fromDir='googlechrome', toDir='.')
 
   copyFiles(
@@ -57,11 +57,11 @@ def buildGoogleChromeExtension():
     fromDir='googlechrome/icons', toDir='icons')
 
   copyFiles(
-    names=('Frames.js', 'Storage.js', 'OptionsPage.js'),
+    names=('Frames.js', 'OptionsPage.js', 'Storage.js'),
     fromDir='googlechrome/lib', toDir='lib')
 
   copyFiles(
-    names=('UserPreference.js', 'OptionsPageGenerator.js'),
+    names=('Option.js', 'OptionsPageGenerator.js'),
     fromDir='common/lib', toDir='lib')
 
 
