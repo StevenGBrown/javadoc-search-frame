@@ -42,7 +42,7 @@ def buildGoogleChromeExtension():
 
   copyFile(name='allclasses-frame.js', fromDir='googlechrome', toDir='.',
     transformations=(
-      insertExternalFiles(['common']),
+      insertExternalFiles(['common', 'googlechrome/lib']),
       insertValue('version', '\'' + readVersionFromManifest() + '\''),
       insertValue('buildDate', '\'' + formattedBuildDate() + '\'')
     )
@@ -56,9 +56,7 @@ def buildGoogleChromeExtension():
     names=('icon16.png', 'icon32.png', 'icon48.png', 'icon128.png'),
     fromDir='googlechrome/icons', toDir='icons')
 
-  copyFiles(
-    names=('Frames.js', 'OptionsPage.js', 'Storage.js'),
-    fromDir='googlechrome/lib', toDir='lib')
+  copyFile(name='Storage.js', fromDir='googlechrome/lib', toDir='lib')
 
   copyFiles(
     names=('Option.js', 'OptionsPageGenerator.js'),
