@@ -46,8 +46,6 @@ OptionsPageGenerator.generate = function () {
   contents.forEach(function (pageElement) {
     document.body.appendChild(pageElement);
   });
-
-  this._initialise(document);
 };
 
 OptionsPageGenerator._createContents = function (pageDocument) {
@@ -94,61 +92,88 @@ OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function (pa
 };
 
 OptionsPageGenerator._booleanOption = function (pageDocument, preference, title, trueText, falseText) {
-  var key = preference.getKey();
-  var trueDefault = preference.getDefaultValue();
+  var trueRadioButtonElement = this._radioButton(pageDocument, preference, title, true);
+  var falseRadioButtonElement = this._radioButton(pageDocument, preference, title, false);
 
-  var trueRadioButtonHTML = this._radioButton({
-      name : key, id : key + '_true', text : trueText,
-      isChecked : false, isDisabled : !UserPreference.canGetAndSet(), isDefault : trueDefault});
-  var falseRadioButtonHTML = this._radioButton({
-      name : key, id : key + '_false', text : falseText,
-      isChecked : false, isDisabled : !UserPreference.canGetAndSet(), isDefault : !trueDefault});
+  preference.getValue(function (value) {
+    var radioButtonToCheck = value ? trueRadioButtonElement : falseRadioButtonElement;
+    radioButtonToCheck.setAttribute('checked', true);
 
-  return this._createTable(pageDocument, title, '',
-      trueRadioButtonHTML + '<br/>' +
-      falseRadioButtonHTML);
+    var clickEventListener = function () {
+      preference.setValue(trueRadioButtonElement.checked);
+    };
+
+    trueRadioButtonElement.addEventListener('click', clickEventListener, false);
+    falseRadioButtonElement.addEventListener('click', clickEventListener, false);
+  });
+
+  if (preference.getDefaultValue()) {
+    trueText += ' (Default)';
+  } else {
+    falseText += ' (Default)';
+  }
+
+  return this._createTable(pageDocument, title, '', [
+      this._tableContentElementForRadioButton(pageDocument, trueRadioButtonElement, trueText),
+      this._tableContentElementForRadioButton(pageDocument, falseRadioButtonElement, falseText)
+  ]);
 };
 
-OptionsPageGenerator._radioButton = function (args) {
-  var radioButtonHTML = '<label>' +
-      '<input id="' + args.id + '" type=radio name="' + args.name + '" value="true"';
-  if (args.isChecked) {
-    radioButtonHTML += ' checked="true"';
+OptionsPageGenerator._radioButton = function (pageDocument, preference, name, value) {
+  var radioButtonElement = pageDocument.createElement('input');
+  radioButtonElement.setAttribute('type', 'radio');
+  radioButtonElement.setAttribute('name', name);
+  radioButtonElement.setAttribute('value', value);
+  if (!UserPreference.canGetAndSet()) {
+    radioButtonElement.setAttribute('disabled', true);
   }
-  if (args.isDisabled) {
-    radioButtonHTML += ' disabled="true"';
-  }
-  radioButtonHTML += '/>' + args.text;
-  if (args.isDefault) {
-    radioButtonHTML += ' (Default)';
-  }
-  radioButtonHTML += '</label>';
-  return radioButtonHTML;
+  return radioButtonElement;
+};
+
+OptionsPageGenerator._tableContentElementForRadioButton = function (pageDocument, radioButtonElement, text) {
+  var spanElement = pageDocument.createElement('span');
+  spanElement.innerHTML = text;
+
+  var labelElement = pageDocument.createElement('label');
+  labelElement.appendChild(radioButtonElement);
+  labelElement.appendChild(spanElement);
+
+  return labelElement;
 };
 
 OptionsPageGenerator._menuOption = function (pageDocument, preference, title, subTitle) {
-  var key = preference.getKey();
-  var textAreaId = key + '_text_area';
-  var restoreDefaultButtonId = key + '_restore_default_button';
-
-  var textAreaHTML = '<textarea id="' + textAreaId + '" rows="5" cols="150" wrap="off"';
+  var textAreaElement = pageDocument.createElement('textarea');
+  textAreaElement.setAttribute('rows', 5);
+  textAreaElement.setAttribute('cols', 150);
+  textAreaElement.setAttribute('wrap', 'off');
   if (!UserPreference.canGetAndSet()) {
-    textAreaHTML += ' disabled="true"';
+    textAreaElement.setAttribute('disabled', true);
   }
-  textAreaHTML += '></textarea>';
 
-  var restoreDefaultButtonHTML = '<input id="' + restoreDefaultButtonId + '"';
+  var restoreDefaultButtonElement = pageDocument.createElement('input');
+  restoreDefaultButtonElement.setAttribute('type', 'button');
+  restoreDefaultButtonElement.setAttribute('value', 'Restore Default');
   if (!UserPreference.canGetAndSet()) {
-    restoreDefaultButtonHTML += ' disabled="true"';
+    restoreDefaultButtonElement.setAttribute('disabled', true);
   }
-  restoreDefaultButtonHTML += ' type=button value="Restore Default"/>';
 
-  return this._createTable(pageDocument, title, subTitle,
-      textAreaHTML + '<br/>' +
-      restoreDefaultButtonHTML);
+  preference.getValue(function (value) {
+    textAreaElement.textContent = value;
+
+    textAreaElement.addEventListener('keyup', function () {
+      preference.setValue(textAreaElement.value);
+    }, false);
+
+    restoreDefaultButtonElement.addEventListener('click', function () {
+      textAreaElement.value = preference.getDefaultValue();
+      preference.setValue(preference.getDefaultValue());
+    }, false);
+  });
+
+  return this._createTable(pageDocument, title, subTitle, [textAreaElement, restoreDefaultButtonElement]);
 };
 
-OptionsPageGenerator._createTable = function (pageDocument, title, subTitle, contents) {
+OptionsPageGenerator._createTable = function (pageDocument, title, subTitle, contentElements) {
   var tableElement = pageDocument.createElement('table');
   tableElement.style.borderStyle = 'groove';
   tableElement.style.borderColor = 'blue';
@@ -174,53 +199,11 @@ OptionsPageGenerator._createTable = function (pageDocument, title, subTitle, con
   contentsTableRow.appendChild(contentsTableDataElement);
 
   var contentsParagraphElement = pageDocument.createElement('p');
-  contentsParagraphElement.innerHTML = contents;
+  contentElements.forEach(function (tableContentElement) {
+    contentsParagraphElement.appendChild(tableContentElement);
+    contentsParagraphElement.appendChild(pageDocument.createElement('br'));
+  });
   contentsTableDataElement.appendChild(contentsParagraphElement);
 
   return tableElement;
-};
-
-OptionsPageGenerator._initialise = function (pageDocument) {
-  this._initialiseBooleanOption(pageDocument, UserPreference.AUTO_OPEN);
-  this._initialiseBooleanOption(pageDocument, UserPreference.HIDE_PACKAGE_FRAME);
-  this._initialiseMenuOption(pageDocument, UserPreference.CLASS_MENU);
-  this._initialiseMenuOption(pageDocument, UserPreference.PACKAGE_MENU);
-};
-
-OptionsPageGenerator._initialiseBooleanOption = function (pageDocument, preference) {
-  var key = preference.getKey();
-  var trueRadioButton = pageDocument.getElementById(key + '_true');
-  var falseRadioButton = pageDocument.getElementById(key + '_false');
-
-  preference.getValue(function (value) {
-    var radioButtonToCheck = value ? trueRadioButton : falseRadioButton;
-    radioButtonToCheck.setAttribute("checked", "true");
-
-    var clickEventListener = function () {
-      preference.setValue(trueRadioButton.checked);
-    };
-
-    trueRadioButton.addEventListener('click', clickEventListener, false);
-    falseRadioButton.addEventListener('click', clickEventListener, false);
-  });
-};
-
-OptionsPageGenerator._initialiseMenuOption = function (pageDocument, preference) {
-  var key = preference.getKey();
-  var textAreaId = key + '_text_area';
-  var textAreaElement = pageDocument.getElementById(textAreaId);
-
-  preference.getValue(function (value) {
-    textAreaElement.textContent = value;
-
-    textAreaElement.addEventListener('keyup', function () {
-      preference.setValue(textAreaElement.value);
-    }, false);
-
-    var restoreDefaultButtonId = key + '_restore_default_button';
-    var restoreDefaultButton = pageDocument.getElementById(restoreDefaultButtonId);
-    restoreDefaultButton.addEventListener('click', function () {
-      textAreaElement.value = preference.getDefaultValue();preference.setValue(preference.getDefaultValue());
-    }, false);
-  });
 };
