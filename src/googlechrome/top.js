@@ -28,7 +28,7 @@
 
 
 if (window === top) {
-  UserPreference.HIDE_PACKAGE_FRAME.getValue(function (hidePackageFrame) {
+  Option.HIDE_PACKAGE_FRAME.getValue(function (hidePackageFrame) {
     if (hidePackageFrame) {
       var framesets = document.getElementsByTagName('frameset');
       if (framesets) {

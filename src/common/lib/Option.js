@@ -28,33 +28,34 @@
 
 
 /**
- * Create a new UserPreference.
+ * Create a new Option.
  * @class Provides persistent configuration of the script options.
- * @param key the key associated with this user preference
+ * @param key the key associated with this option
  * @param defaultValue the default value used when the value cannot be
  *                     retrieved or has not yet been configured
+ * @private
  */
-UserPreference = function (key, defaultValue) {
+Option = function (key, defaultValue) {
   this.key = key;
   this.defaultValue = defaultValue;
 };
 
 /**
- * @returns {Boolean} true if user preferences can be both retrieved and set,
- *                    false otherwise
+ * @returns {Boolean} true if options can be both retrieved and set, false
+ *                    otherwise
  */
-UserPreference.canGetAndSet = function () {
+Option.canGetAndSet = function () {
   return Storage.canGet() && Storage.canSet();
 };
 
 /**
- * Retrieve the current value of this user preference.
+ * Retrieve the current value of this option.
  * @param callback callback function that is provided with the value of this
- *                 user preference. If the preference cannot be retrieved or
- *                 has not yet been configured, the default value is returned
- * @see UserPreference.canGetAndSet
+ *                 option. If the option cannot be retrieved or has not yet
+ *                 been configured, the default value is returned
+ * @see Option.canGetAndSet
  */
-UserPreference.prototype.getValue = function (callback) {
+Option.prototype.getValue = function (callback) {
   var defaultValue = this.defaultValue;
   if (Storage.canGet()) {
     Storage.get(this.key, function (value) {
@@ -75,47 +76,47 @@ UserPreference.prototype.getValue = function (callback) {
 };
 
 /**
- * @returns the default value of this user preference
+ * @returns the default value of this option
  */
-UserPreference.prototype.getDefaultValue = function () {
+Option.prototype.getDefaultValue = function () {
   return this.defaultValue;
 };
 
 /**
- * Set this user preference to a new value.
- * @throws an exception if this user preference cannot be set
- * @see UserPreference.canGetAndSet
+ * Set this option to a new value.
+ * @throws an exception if this option cannot be set
+ * @see Option.canGetAndSet
  */
-UserPreference.prototype.setValue = function (newValue) {
+Option.prototype.setValue = function (newValue) {
   Storage.set(this.key, newValue);
 };
 
 
 /**#@+
- * User preference recognised by this script.
+ * Option recognised by this script.
  */
 
 /**
  * @field
  */
-UserPreference.AUTO_OPEN = new UserPreference('auto_open', false);
+Option.AUTO_OPEN = new Option('auto_open', false);
 
 /**
  * @field
  */
-UserPreference.HIDE_PACKAGE_FRAME = new UserPreference('hide_package_frame', true);
+Option.HIDE_PACKAGE_FRAME = new Option('hide_package_frame', true);
 
 /**
  * @field
  */
-UserPreference.PACKAGE_MENU = new UserPreference('package_menu',
+Option.PACKAGE_MENU = new Option('package_menu',
     "<a href='http://www.koders.com/?s=##PACKAGE_NAME##' target='classFrame'>@1:search(koders)</a><br/>\n" +
     "<a href='http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##' target='classFrame'>@2:search(Docjar)</a><br/>\n");
 
 /**
  * @field
  */
-UserPreference.CLASS_MENU = new UserPreference('class_menu',
+Option.CLASS_MENU = new Option('class_menu',
     "<a href='http://www.koders.com/?s=##PACKAGE_NAME##+##CLASS_NAME##+##ANCHOR_NAME##' target='classFrame'>@1:search(koders)</a><br/>\n" +
     "<a href='http://www.docjar.com/s.jsp?q=##CLASS_NAME##' target='classFrame'>@2:search(Docjar)</a><br/>\n" +
     "<a href='http://www.docjar.com/html/api/##PACKAGE_PATH##/##CLASS_NAME##.java.html' target='classFrame'>@3:source(Docjar)</a><br/>\n");

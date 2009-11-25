@@ -1441,8 +1441,8 @@ Search.getTopLinkUrl = function () {
 
 Search._performSearch = function (entireSearchString) {
   var search = this;
-  UserPreference.CLASS_MENU.getValue(function (classMenu) {
-    UserPreference.PACKAGE_MENU.getValue(function (packageMenu) {
+  Option.CLASS_MENU.getValue(function (classMenu) {
+    Option.PACKAGE_MENU.getValue(function (packageMenu) {
       var searchContext = {};
       searchContext.classMenu = classMenu;
       searchContext.packageMenu = packageMenu;
@@ -1464,7 +1464,7 @@ Search._performSearch = function (entireSearchString) {
 Search._autoOpen = function () {
   var url = this.getTopLinkUrl();
   if (url) {
-    UserPreference.AUTO_OPEN.getValue(function (autoOpen) {
+    Option.AUTO_OPEN.getValue(function (autoOpen) {
       if (autoOpen) {
         Frames.openLinkInSummaryFrame(url);
       }
@@ -1821,7 +1821,7 @@ Search._Menu._getMenuReplacement = function () {
  */
 function init(unitTestResultsCallback) {
 
-  UserPreference.HIDE_PACKAGE_FRAME.getValue(function (hidePackageFrame) {
+  Option.HIDE_PACKAGE_FRAME.getValue(function (hidePackageFrame) {
 
     // Retrieve the inner HTML of the class frame.
     var classesInnerHtml = getClassesInnerHtml();

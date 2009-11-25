@@ -52,27 +52,27 @@ OptionsPageGenerator._createContents = function (pageDocument) {
   var contents = [];
   contents.push(this._createHeader(pageDocument));
   contents.push(pageDocument.createElement('p'));
-  if (!UserPreference.canGetAndSet()) {
+  if (!Option.canGetAndSet()) {
     contents.push(this._createOptionsCannotBeConfiguredErrorMessage(pageDocument));
     contents.push(pageDocument.createElement('p'));
   }
   contents.push(this._booleanOption(
-      pageDocument, UserPreference.AUTO_OPEN, 'Automatic Opening of Links',
+      pageDocument, Option.AUTO_OPEN, 'Automatic Opening of Links',
       'On. Automatically open the first package, class or method in the list after each search.',
       'Off. Wait for the <tt>Enter</tt> key to be pressed.'));
   contents.push(pageDocument.createElement('p'));
   contents.push(this._booleanOption(
-      pageDocument, UserPreference.HIDE_PACKAGE_FRAME, 'Merge the Package and Class Frames',
+      pageDocument, Option.HIDE_PACKAGE_FRAME, 'Merge the Package and Class Frames',
       'Yes. All packages and classes can be searched using a single combined frame.',
       'No. The package frame will not be hidden. Only one package can be searched at a time.'));
   contents.push(pageDocument.createElement('p'));
   contents.push(this._menuOption(
-      pageDocument, UserPreference.CLASS_MENU, 'Class/Method Menu',
+      pageDocument, Option.CLASS_MENU, 'Class/Method Menu',
       'Menu displayed when pressing the <tt>@</tt> key if a class or method is ' +
       'currently displayed at the top of the search list.'));
   contents.push(pageDocument.createElement('p'));
   contents.push(this._menuOption(
-      pageDocument, UserPreference.PACKAGE_MENU, 'Package Menu',
+      pageDocument, Option.PACKAGE_MENU, 'Package Menu',
       'Menu displayed when pressing the <tt>@</tt> key if a package is currently displayed ' +
       'at the top of the search list.'));
   return contents;
@@ -91,23 +91,23 @@ OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function (pa
   return errorMessageElement;
 };
 
-OptionsPageGenerator._booleanOption = function (pageDocument, preference, title, trueText, falseText) {
-  var trueRadioButtonElement = this._radioButton(pageDocument, preference, title, true);
-  var falseRadioButtonElement = this._radioButton(pageDocument, preference, title, false);
+OptionsPageGenerator._booleanOption = function (pageDocument, option, title, trueText, falseText) {
+  var trueRadioButtonElement = this._radioButton(pageDocument, option, title, true);
+  var falseRadioButtonElement = this._radioButton(pageDocument, option, title, false);
 
-  preference.getValue(function (value) {
+  option.getValue(function (value) {
     var radioButtonToCheck = value ? trueRadioButtonElement : falseRadioButtonElement;
     radioButtonToCheck.setAttribute('checked', true);
 
     var clickEventListener = function () {
-      preference.setValue(trueRadioButtonElement.checked);
+      option.setValue(trueRadioButtonElement.checked);
     };
 
     trueRadioButtonElement.addEventListener('click', clickEventListener, false);
     falseRadioButtonElement.addEventListener('click', clickEventListener, false);
   });
 
-  if (preference.getDefaultValue()) {
+  if (option.getDefaultValue()) {
     trueText += ' (Default)';
   } else {
     falseText += ' (Default)';
@@ -119,12 +119,12 @@ OptionsPageGenerator._booleanOption = function (pageDocument, preference, title,
   ]);
 };
 
-OptionsPageGenerator._radioButton = function (pageDocument, preference, name, value) {
+OptionsPageGenerator._radioButton = function (pageDocument, option, name, value) {
   var radioButtonElement = pageDocument.createElement('input');
   radioButtonElement.setAttribute('type', 'radio');
   radioButtonElement.setAttribute('name', name);
   radioButtonElement.setAttribute('value', value);
-  if (!UserPreference.canGetAndSet()) {
+  if (!Option.canGetAndSet()) {
     radioButtonElement.setAttribute('disabled', true);
   }
   return radioButtonElement;
@@ -141,32 +141,32 @@ OptionsPageGenerator._tableContentElementForRadioButton = function (pageDocument
   return labelElement;
 };
 
-OptionsPageGenerator._menuOption = function (pageDocument, preference, title, subTitle) {
+OptionsPageGenerator._menuOption = function (pageDocument, option, title, subTitle) {
   var textAreaElement = pageDocument.createElement('textarea');
   textAreaElement.setAttribute('rows', 5);
   textAreaElement.setAttribute('cols', 150);
   textAreaElement.setAttribute('wrap', 'off');
-  if (!UserPreference.canGetAndSet()) {
+  if (!Option.canGetAndSet()) {
     textAreaElement.setAttribute('disabled', true);
   }
 
   var restoreDefaultButtonElement = pageDocument.createElement('input');
   restoreDefaultButtonElement.setAttribute('type', 'button');
   restoreDefaultButtonElement.setAttribute('value', 'Restore Default');
-  if (!UserPreference.canGetAndSet()) {
+  if (!Option.canGetAndSet()) {
     restoreDefaultButtonElement.setAttribute('disabled', true);
   }
 
-  preference.getValue(function (value) {
+  option.getValue(function (value) {
     textAreaElement.textContent = value;
 
     textAreaElement.addEventListener('keyup', function () {
-      preference.setValue(textAreaElement.value);
+      option.setValue(textAreaElement.value);
     }, false);
 
     restoreDefaultButtonElement.addEventListener('click', function () {
-      textAreaElement.value = preference.getDefaultValue();
-      preference.setValue(preference.getDefaultValue());
+      textAreaElement.value = option.getDefaultValue();
+      option.setValue(option.getDefaultValue());
     }, false);
   });
 

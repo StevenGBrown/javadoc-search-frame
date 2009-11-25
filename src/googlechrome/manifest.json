@@ -21,7 +21,7 @@
       "js": [
           "lib/Frames.js",
           "lib/Storage.js",
-          "lib/UserPreference.js",
+          "lib/Option.js",
           "lib/OptionsPage.js",
           "allclasses-frame.js"
       ]
@@ -32,7 +32,7 @@
       ],
       "js": [
           "lib/Storage.js",
-          "lib/UserPreference.js",
+          "lib/Option.js",
           "top.js"
       ]
     }

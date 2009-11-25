@@ -28,7 +28,7 @@
 
 
 /**
- * @class Provides local storage functionality, which is used to implement {UserPreference}.
+ * @class Provides local storage functionality.
  */
 Storage = {};
 
