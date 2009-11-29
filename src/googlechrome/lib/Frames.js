@@ -61,3 +61,12 @@ Frames.hideAllPackagesFrame = function () {
 Frames.openLinkInSummaryFrame = function (url) {
   window.open(url, 'classFrame');
 };
+
+/**
+ * Open the given URL in a new tab.
+ * @param url
+ */
+Frames.openLinkInNewTab = function (url) {
+  chrome.extension.sendRequest(
+      {operation: 'openInNewTab', urlToOpen: url});
+};

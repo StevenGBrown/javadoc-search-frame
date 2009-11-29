@@ -69,6 +69,14 @@ Frames.openLinkInSummaryFrame = function (url) {
 };
 
 /**
+ * Open the given URL in a new tab.
+ * @param url
+ */
+Frames.openLinkInNewTab = function (url) {
+  window.open(url);
+};
+
+/**
  * Get the frame with the given name. This frame will share a parent with the
  * current frame.
  * @param name

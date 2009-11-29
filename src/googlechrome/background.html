@@ -27,6 +27,13 @@
         response = localStorage.getItem(request.key);
       } else if (request.operation === 'set') {
         localStorage.setItem(request.key, request.value);
+      } else if (request.operation === 'openInNewTab') {
+        var tabProperties = {
+            windowId: sender.tab.windowId,
+            index: sender.tab.index + 1,
+            url: request.urlToOpen
+        };
+        chrome.tabs.create(tabProperties);
       } else if (request.operation === 'hidePackageFrame') {
         var scriptDef = {code: hidePackageFrameCode};
         chrome.tabs.executeScript(sender.tab.id, scriptDef);
