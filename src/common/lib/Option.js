@@ -117,7 +117,7 @@ Option.PACKAGE_MENU = new Option('package_menu',
  * @field
  */
 Option.CLASS_MENU = new Option('class_menu',
-    "<a href='http://www.koders.com/?s=##PACKAGE_NAME##+##CLASS_NAME##+##ANCHOR_NAME##' target='classFrame'>@1:search(koders)</a><br/>\n" +
+    "<a href='http://www.koders.com/?s=##PACKAGE_NAME##+##CLASS_NAME##+##METHOD_NAME##' target='classFrame'>@1:search(koders)</a><br/>\n" +
     "<a href='http://www.docjar.com/s.jsp?q=##CLASS_NAME##' target='classFrame'>@2:search(Docjar)</a><br/>\n" +
     "<a href='http://www.docjar.com/html/api/##PACKAGE_PATH##/##CLASS_NAME##.java.html' target='classFrame'>@3:source(Docjar)</a><br/>\n");
 
