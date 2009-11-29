@@ -35,6 +35,39 @@
     }
   );
 
+  chrome.extension.onConnect.addListener(function(port) {
+    console.assert(port.name === 'httpRequest');
+    var xmlHttpRequest = new XMLHttpRequest();
+
+    port.onMessage.addListener(function (msg) {
+      xmlHttpRequest.onprogress = function (e) {
+        var bytesDownloaded = e.position;
+        if (bytesDownloaded > 1048576) {
+          var mbDownloaded = Math.floor(bytesDownloaded / 1048576);
+          port.postMessage({type:'status', status: 'loading... (' + mbDownloaded + ' MB)'});
+        } else if (bytesDownloaded > 1024) {
+          var kbDownloaded = Math.floor(bytesDownloaded / 1024);
+          port.postMessage({type:'status', status: 'loading... (' + kbDownloaded + ' kB)'});
+        } else {
+          port.postMessage({type:'status', status: 'loading... (' + bytesDownloaded + ' bytes)'});
+        }
+      };
+      xmlHttpRequest.open('GET', msg.httpRequestUrl);
+      xmlHttpRequest.onload = function (e) {
+        port.postMessage({type: 'resource', resource: xmlHttpRequest.responseText});
+      };
+      xmlHttpRequest.onerror = function (e) {
+        port.postMessage({type:'status', status: 'ERROR'});
+      };
+      xmlHttpRequest.overrideMimeType('text/plain; charset=x-user-defined');
+      xmlHttpRequest.send(null);
+    });
+
+    port.onDisconnect.addListener(function () {
+      xmlHttpRequest.abort();
+    });
+  });
+
 </script>
 </head>
 </html>
