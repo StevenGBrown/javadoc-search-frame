@@ -942,57 +942,55 @@ Query._updateView = function () {
 
 /*
  * ----------------------------------------------------------------------------
- * AnchorsLoader
+ * HttpRequest
  * ----------------------------------------------------------------------------
  */
 
 /**
- * @class AnchorsLoader Asynchronously loads anchors for a {@PackageLink} or
- *                      {@ClassLink}.
+ * @class HttpRequest Asynchronously loads resources from external URLs.
  */
-AnchorsLoader = {
-  xmlHttpRequest : null,
-  classOrPackageLink : null,
-  loadedAnchorLinks : null,
-  bytesDownloaded : 0,
-  errorMessage : null,
-  progressCallback : null
+HttpRequest = function () {
+  this.xmlHttpRequest = null;
+  this.url = null;
+  this.loadedResource = null;
+  this.bytesDownloaded = 0;
+  this.errorMessage = null;
+  this.progressCallback = null;
 };
 
 /**
- * Load anchors for the given {@PackageLink} or {@ClassLink}. If anchors are
- * already being loaded for the given link, calling this function will have no
- * effect.
+ * Loads the resource at the given URL. If the resource at the given URL is
+ * already being loaded, calling this function will have no effect.
  * 
- * @param classOrPackageLink the link
+ * @param url the URL
  * @param progressCallback function that is called when whenever some progress
- *                         has been made towards loading the anchors
+ *                         has been made towards loading the resource
  */
-AnchorsLoader.load = function (classOrPackageLink, progressCallback) {
-  if (this.classOrPackageLink === classOrPackageLink) {
-    // Already loading this link.
+HttpRequest.prototype.load = function (url, progressCallback) {
+  if (this.url === url) {
+    // Already loading the resource at this URL.
     return;
   }
   this.abort();
-  this.classOrPackageLink = classOrPackageLink;
+  this.url = url;
   this.progressCallback = progressCallback;
-  var anchorsLoader = this;
+  var thisObj = this;
   try {
     var xmlHttpRequest = new XMLHttpRequest();
     xmlHttpRequest.onprogress = function (e) {
-      anchorsLoader._onprogress(e);
+      thisObj._onprogress(e);
     };
-    xmlHttpRequest.open('GET', classOrPackageLink.getUrl());
+    xmlHttpRequest.open('GET', url);
     xmlHttpRequest.onload = function (e) {
-      anchorsLoader._onload(e);
+      thisObj._onload(e);
     };
     xmlHttpRequest.onerror = function (e) {
-      anchorsLoader._onerror(e);
+      thisObj._onerror(e);
     };
     xmlHttpRequest.overrideMimeType('text/plain; charset=x-user-defined');
     xmlHttpRequest.send(null);
   } catch (ex) {
-    anchorsLoader._onexception(ex);
+    thisObj._onexception(ex);
   }
   this.xmlHttpRequest = xmlHttpRequest;
 };
@@ -1000,14 +998,14 @@ AnchorsLoader.load = function (classOrPackageLink, progressCallback) {
 /**
  * @retuns true if the loading is complete, false otherwise
  */
-AnchorsLoader.isComplete = function () {
-  return this.loadedAnchorLinks !== null;
+HttpRequest.prototype.isComplete = function () {
+  return this.loadedResource !== null;
 };
 
 /**
- * @returns a status message on the progress made towards loading the anchors
+ * @returns a status message on the progress made towards loading the resource
  */
-AnchorsLoader.getStatusMessage = function () {
+HttpRequest.prototype.getStatusMessage = function () {
   if (this.bytesDownloaded === -1) {
     return this.errorMessage;
   }
@@ -1024,78 +1022,48 @@ AnchorsLoader.getStatusMessage = function () {
 };
 
 /**
- * @returns the loaded anchors, or null if the loading is not complete
+ * @returns the loaded resource, or null if the loading is not complete
  */
-AnchorsLoader.getAnchorLinks = function () {
-  return this.loadedAnchorLinks;
+HttpRequest.prototype.getResource = function () {
+  return this.loadedResource;
 };
 
 /**
  * Abort the current anchor load operation.
  */
-AnchorsLoader.abort = function () {
+HttpRequest.prototype.abort = function () {
   if (this.xmlHttpRequest) {
     this.xmlHttpRequest.abort();
   }
   this.xmlHttpRequest = null;
-  this.classOrPackageLink = null;
-  this.loadedAnchorLinks = null;
+  this.url = null;
+  this.loadedResource = null;
   this.bytesDownloaded = 0;
   this.errorMessage = null;
   this.progressCallback = null;
 };
 
-AnchorsLoader._onprogress = function (e) {
+HttpRequest.prototype._onprogress = function (e) {
   this.bytesDownloaded = e.position;
   this.errorMessage = null;
   this.progressCallback();
 };
 
-AnchorsLoader._onload = function (e) {
-  var names = this._getAnchorNames(this.xmlHttpRequest.responseText);
-  this.loadedAnchorLinks = this._createAnchorLinkArray(this.classOrPackageLink.getUrl(), names);
+HttpRequest.prototype._onload = function (e) {
+  this.loadedResource = this.xmlHttpRequest.responseText;
   this.progressCallback();
 };
 
-AnchorsLoader._onerror = function (e) {
+HttpRequest.prototype._onerror = function (e) {
   this.bytesDownloaded = -1;
   this.errorMessage = 'ERROR';
   this.progressCallback();
 };
 
-AnchorsLoader._onexception = function (ex) {
+HttpRequest.prototype._onexception = function (ex) {
   this.bytesDownloaded = -1;
   this.errorMessage = ex;
   this.progressCallback();
-};
-
-AnchorsLoader._createAnchorLinkArray = function (baseurl, names) {
-  var nodes = [];
-  var keywordNodes = [];
-  var i;
-  for (i = 0; i < names.length; i++) {
-    var node = new AnchorLink(baseurl, names[i]);
-    if (node.isKeyword()) {
-      keywordNodes.push(node);
-    } else {
-      nodes.push(node);
-    }
-  }
-  for (i = 0; i < keywordNodes.length; i++) {
-    nodes.push(keywordNodes[i]);
-  }
-  return nodes;
-};
-
-AnchorsLoader._getAnchorNames = function (doc) {
-  var pat = /<a name=\"([^\"]+)\"/gi;
-  var i = 0;
-  var matches;
-  var names = [];
-  while ((matches = pat.exec(doc)) !== null) {
-    names.push(matches[1]);
-  }
-  return names;
 };
 
 
@@ -1657,12 +1625,14 @@ Search._PackagesAndClasses._constructHtml = function (classLinks, bestMatch) {
  *                        method anchors.
  * @private
  */
-Search._Anchors = {};
+Search._Anchors = {
+  httpRequest : new HttpRequest()
+};
 
 Search._Anchors._perform = function (searchContext, searchString) {
   var topClassLink = searchContext.topClassLink;
   if (searchString === null || !topClassLink) {
-    AnchorsLoader.abort();
+    Search._Anchors.httpRequest.abort();
     return;
   }
 
@@ -1670,17 +1640,52 @@ Search._Anchors._perform = function (searchContext, searchString) {
     Search.perform();
   };
 
-  AnchorsLoader.load(topClassLink, progressCallback);
-  if (AnchorsLoader.isComplete()) {
-    var anchorLinks = AnchorsLoader.getAnchorLinks();
+  Search._Anchors.httpRequest.load(topClassLink.getUrl(), progressCallback);
+  if (Search._Anchors.httpRequest.isComplete()) {
+    var anchorLinksPageHtml = Search._Anchors.httpRequest.getResource();
+    var anchorLinks = this._getAnchorLinks(anchorLinksPageHtml);
     var condition = RegexLibrary.createCondition(searchString);
     this._append(searchContext, topClassLink, anchorLinks, condition);
   } else {
     searchContext.getContentNodeHtml = function () {
-      return topClassLink.getHtml() + '<p>' + AnchorsLoader.getStatusMessage() + '</p>';
+      return topClassLink.getHtml() + '<p>' + Search._Anchors.httpRequest.getStatusMessage() + '</p>';
     };
     searchContext.anchorLinksLoading = true;
   }
+};
+
+Search._Anchors._getAnchorLinks = function (anchorLinksPageHtml) {
+  var names = this._getAnchorNames(anchorLinksPageHtml);
+  return this._createAnchorLinkArray(this.url, names);
+};
+
+Search._Anchors._getAnchorNames = function (doc) {
+  var pat = /<a name=\"([^\"]+)\"/gi;
+  var i = 0;
+  var matches;
+  var names = [];
+  while ((matches = pat.exec(doc)) !== null) {
+    names.push(matches[1]);
+  }
+  return names;
+};
+
+Search._Anchors._createAnchorLinkArray = function (baseurl, names) {
+  var nodes = [];
+  var keywordNodes = [];
+  var i;
+  for (i = 0; i < names.length; i++) {
+    var node = new AnchorLink(baseurl, names[i]);
+    if (node.isKeyword()) {
+      keywordNodes.push(node);
+    } else {
+      nodes.push(node);
+    }
+  }
+  for (i = 0; i < keywordNodes.length; i++) {
+    nodes.push(keywordNodes[i]);
+  }
+  return nodes;
 };
 
 Search._Anchors._append = function (searchContext, topClassLink, anchorLinks, condition) {
