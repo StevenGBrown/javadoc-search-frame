@@ -1671,7 +1671,7 @@ Search._Menu._perform = function (searchContext, searchString) {
     if (textNode
         && textNode.nodeType === 3 /* Node.TEXT_NODE */
         && textNode.nodeValue.indexOf('@' + searchString) === 0) {
-      Frames.openLinkInSummaryFrame(anchorNode.getAttribute('href'));
+      Frames.openLinkInNewTab(anchorNode.getAttribute('href'));
       break;
     }
   }
