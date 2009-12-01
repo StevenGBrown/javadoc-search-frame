@@ -52,7 +52,7 @@ Option.canGetAndSet = function () {
  * Retrieve the current value of this option.
  * @param callback callback function that is provided with the value of this
  *                 option. If the option cannot be retrieved or has not yet
- *                 been configured, the default value is returned
+ *                 been configured, the default value will be provided
  * @see Option.canGetAndSet
  */
 Option.prototype.getValue = function (callback) {
@@ -71,8 +71,9 @@ Option.prototype.getValue = function (callback) {
         callback(defaultValue);
       }
     });
+  } else {
+    callback(defaultValue);
   }
-  return defaultValue;
 };
 
 /**
