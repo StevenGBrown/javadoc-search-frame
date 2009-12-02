@@ -22,7 +22,8 @@
           "lib/Storage.js",
           "lib/Option.js",
           "allclasses-frame.js"
-      ]
+      ],
+      "all_frames": true
     },
     {
       "matches": [
@@ -31,8 +32,9 @@
       "js": [
           "lib/Storage.js",
           "lib/Option.js",
-          "top.js"
-      ]
+          "parent-frame.js"
+      ],
+      "all_frames": true
     }
   ],
   "permissions": [
