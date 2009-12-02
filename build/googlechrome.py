@@ -49,7 +49,7 @@ def buildGoogleChromeExtension():
   )
 
   copyFiles(
-    names=('background.html', 'manifest.json', 'options.html', 'top.js'),
+    names=('background.html', 'manifest.json', 'parent-frame.js', 'options.html'),
     fromDir='googlechrome', toDir='.')
 
   copyFiles(
