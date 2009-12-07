@@ -1645,13 +1645,13 @@ Search._Menu._perform = function (searchContext, searchString) {
     return;
   }
 
-  var menu = this._createMenu(searchContext, topPackageOrClassLink, topMethodOrKeywordLink);
+  var menuHtml = this._constructMenuHtml(searchContext, topPackageOrClassLink, topMethodOrKeywordLink);
   searchContext.getContentNodeHtml = function () {
     var html = topPackageOrClassLink.getHtml();
     if (topMethodOrKeywordLink) {
       html += '<br/>' + topMethodOrKeywordLink.getHtml();
     }
-    html += '<p>' + menu + '</p>';
+    html += '<p>' + menuHtml + '</p>';
     return html;
   };
 
@@ -1660,7 +1660,7 @@ Search._Menu._perform = function (searchContext, searchString) {
   }
 
   var node = document.createElement('p');
-  node.innerHTML = menu;
+  node.innerHTML = menuHtml;
   // It is necessary to add the context node to the document for the
   // document.evaluate function to return any results in Firefox 1.5.
   document.body.appendChild(node);
@@ -1678,31 +1678,42 @@ Search._Menu._perform = function (searchContext, searchString) {
   document.body.removeChild(node);
 };
 
-Search._Menu._createMenu = function (searchContext, classOrPackageLink, methodOrKeywordLink) {
+Search._Menu._constructMenuHtml = function (searchContext, classOrPackageLink, methodOrKeywordLink) {
+  var methodLink;
+  if (methodOrKeywordLink &&
+      methodOrKeywordLink.getType() === LinkType.METHOD) {
+    methodLink = methodOrKeywordLink;
+  };
+
   var menu;
   if (classOrPackageLink && classOrPackageLink.getType() === LinkType.PACKAGE) {
     menu = searchContext.packageMenu;
   } else {
     menu = searchContext.classMenu;
   }
-  var methodLink;
-  if (methodOrKeywordLink &&
-      methodOrKeywordLink.getType() === LinkType.METHOD) {
-    methodLink = methodOrKeywordLink;
-  };
+
+  var menuHtml = '';
   var menuReplacement = this._getMenuReplacement();
-  var rx = /##(\w+)##/;
-  var matches;
-  while ((matches = rx.exec(menu)) !== null) {
-    var f = menuReplacement[matches[1]];
-    var rx2 = new RegExp(matches[0], 'g');
-    if (f) {
-      menu = menu.replace(rx2, f(classOrPackageLink, methodLink));
-    } else {
-      menu = menu.replace(rx2, '');
+  menu.split('\n').forEach(function (menuAnchorDefinition) {
+    var labelAndHtml = menuAnchorDefinition.split('->');
+    var menuAnchorLabel = labelAndHtml[0];
+    var menuAnchorHref = labelAndHtml[1];
+    if (labelAndHtml.length === 2) {
+      var matches;
+      while ((matches = /##(\w+)##/.exec(menuAnchorHref)) !== null) {
+        var f = menuReplacement[matches[1]];
+        var rx2 = new RegExp(matches[0], 'g');
+        if (f) {
+          menuAnchorHref = menuAnchorHref.replace(rx2, f(classOrPackageLink, methodLink));
+        } else {
+          menuAnchorHref = menuAnchorHref.replace(rx2, '');
+        }
+      }
+      menuHtml +='<a href="' + menuAnchorHref + '">' + menuAnchorLabel + '</a><br/>';
     }
-  }
-  return menu;
+  });
+
+  return menuHtml;
 };
 
 /**
