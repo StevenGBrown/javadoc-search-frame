@@ -69,18 +69,18 @@ OptionsPageGenerator._createContents = function (pageDocument) {
   contents.push(this._menuOption(
       pageDocument, Option.CLASS_MENU, 'Class/Method Menu',
       'Menu displayed when pressing the <tt>@</tt> key if a class or method is ' +
-      'currently displayed at the top of the search list.'));
+      'currently at the top of the search list.'));
   contents.push(pageDocument.createElement('p'));
   contents.push(this._menuOption(
       pageDocument, Option.PACKAGE_MENU, 'Package Menu',
-      'Menu displayed when pressing the <tt>@</tt> key if a package is currently displayed ' +
+      'Menu displayed when pressing the <tt>@</tt> key if a package is currently ' +
       'at the top of the search list.'));
   return contents;
 };
 
 OptionsPageGenerator._createHeader = function (pageDocument) {
   var headerElement = pageDocument.createElement('h2');
-  headerElement.textContent = 'Javadoc Search Frame Options';
+  headerElement.textContent = 'Options: Javadoc Search Frame';
   return headerElement;
 };
 
@@ -144,7 +144,7 @@ OptionsPageGenerator._tableContentElementForRadioButton = function (pageDocument
 OptionsPageGenerator._menuOption = function (pageDocument, option, title, subTitle) {
   var textAreaElement = pageDocument.createElement('textarea');
   textAreaElement.setAttribute('rows', 5);
-  textAreaElement.setAttribute('cols', 150);
+  textAreaElement.setAttribute('cols', 100);
   textAreaElement.setAttribute('wrap', 'off');
   if (!Option.canGetAndSet()) {
     textAreaElement.setAttribute('disabled', true);

@@ -30,14 +30,27 @@
 /**
  * Create a new Option.
  * @class Provides persistent configuration of the script options.
- * @param key the key associated with this option
- * @param defaultValue the default value used when the value cannot be
- *                     retrieved or has not yet been configured
+ * @param properties the properties for this option:
+ *          key:          the key associated with this option
+ *          defaultValue: the default used when the value cannot be retrieved
+ *                        or has not yet been configured
+ *          isValidValue (optional):
+ *                        a function that returns true if a given value is
+ *                        valid and false otherwise. Invalid values will be
+ *                        replaced with the default. If this function is not
+ *                        provided then all values are considered valid
  * @private
  */
-Option = function (key, defaultValue) {
-  this.key = key;
-  this.defaultValue = defaultValue;
+Option = function (properties) {
+  this.key = properties.key;
+  this.defaultValue = properties.defaultValue;
+  this.isValidValue = properties.isValidValue;
+
+  if (!this.isValidValue) {
+    this.isValidValue = function (value) {
+      return true;
+    };
+  }
 };
 
 /**
@@ -51,12 +64,14 @@ Option.canGetAndSet = function () {
 /**
  * Retrieve the current value of this option.
  * @param callback callback function that is provided with the value of this
- *                 option. If the option cannot be retrieved or has not yet
- *                 been configured, the default value will be provided
+ *                 option. If the option cannot be retrieved, has not yet been
+ *                 configured, or is invalid, the default value will be
+ *                 returned
  * @see Option.canGetAndSet
  */
 Option.prototype.getValue = function (callback) {
   var defaultValue = this.defaultValue;
+  var isValidValue = this.isValidValue;
   if (Storage.canGet()) {
     Storage.get(this.key, function (value) {
       if (value === 'true') {
@@ -65,7 +80,7 @@ Option.prototype.getValue = function (callback) {
       if (value === 'false') {
         value = false;
       }
-      if (value !== undefined && value !== null) {
+      if (value !== undefined && value !== null && isValidValue(value)) {
         callback(value);
       } else {
         callback(defaultValue);
@@ -100,27 +115,45 @@ Option.prototype.setValue = function (newValue) {
 /**
  * @field
  */
-Option.AUTO_OPEN = new Option('auto_open', false);
+Option.AUTO_OPEN = new Option({
+  key: 'auto_open',
+  defaultValue: false
+});
 
 /**
  * @field
  */
-Option.HIDE_PACKAGE_FRAME = new Option('hide_package_frame', true);
+Option.HIDE_PACKAGE_FRAME = new Option({
+  key: 'hide_package_frame',
+  defaultValue: true
+});
 
 /**
  * @field
  */
-Option.PACKAGE_MENU = new Option('package_menu',
-    "<a href='http://www.koders.com/?s=##PACKAGE_NAME##' target='classFrame'>@1:search(koders)</a><br/>\n" +
-    "<a href='http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##' target='classFrame'>@2:search(Docjar)</a><br/>\n");
+Option.PACKAGE_MENU = new Option({
+  key: 'package_menu',
+  defaultValue:
+    '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##\n' +
+    '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##',
+  isValidValue: function (value) {
+    return !value || value.indexOf('->') !== -1;
+  }
+});
 
 /**
  * @field
  */
-Option.CLASS_MENU = new Option('class_menu',
-    "<a href='http://www.koders.com/?s=##PACKAGE_NAME##+##CLASS_NAME##+##METHOD_NAME##' target='classFrame'>@1:search(koders)</a><br/>\n" +
-    "<a href='http://www.docjar.com/s.jsp?q=##CLASS_NAME##' target='classFrame'>@2:search(Docjar)</a><br/>\n" +
-    "<a href='http://www.docjar.com/html/api/##PACKAGE_PATH##/##CLASS_NAME##.java.html' target='classFrame'>@3:source(Docjar)</a><br/>\n");
+Option.CLASS_MENU = new Option({
+  key: 'class_menu',
+  defaultValue:
+    '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##+##CLASS_NAME##+##METHOD_NAME##\n' +
+    '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
+    '@3:source(Docjar) -> http://www.docjar.com/html/api/##PACKAGE_PATH##/##CLASS_NAME##.java.html',
+  isValidValue: function (value) {
+    return !value || value.indexOf('->') !== -1;
+  }
+});
 
 /**#@-
  */
