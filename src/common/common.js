@@ -781,12 +781,11 @@ View._createSearchField = function (eventHandlers) {
   var s = document.createElement('input');
   s.setAttribute('type', 'text');
   s.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
-  s.addEventListener('onchange', eventHandlers.searchFieldChanged, false);
+  s.addEventListener('input', eventHandlers.searchFieldChanged, false);
   s.addEventListener('focus', eventHandlers.searchFieldFocus, false);
   if (this.searchAccessKey) {
     s.setAttribute('accesskey', this.searchAccessKey);
   }
-  this._watch(s, eventHandlers.searchFieldChanged, 200);
   return s;
 };
 
@@ -813,21 +812,6 @@ View._createOptionsLink = function (eventHandlers) {
   fontElement.setAttribute('size', '-2');
   fontElement.appendChild(anchorElement);
   return fontElement;
-};
-
-View._watch = function (element, callback, msec) {
-  var elementChanged = false;
-  var old = element.value;
-  setInterval(function () {
-    var q = element.value;
-    if (elementChanged && old === q) {
-      elementChanged = false;
-      callback(q);
-    } else if (old !== q) {
-      elementChanged = true;
-    }
-    old = q;
-  }, msec)
 };
 
 
