@@ -1,5 +1,5 @@
 {
-  "name": "Javadoc Search Frame Extension",
+  "name": "Javadoc Search Frame",
   "version": "1.0",
   "description": "Javadoc incremental search for packages and classes.",
   "background_page": "background.html",
@@ -31,9 +31,7 @@
           "file://*/*"
       ],
       "js": [
-          "lib/Storage.js",
-          "lib/Option.js",
-          "parent-frame.js"
+          "hide-packages-frame.js"
       ],
       "all_frames": true
     }
