@@ -19,8 +19,6 @@
           "file://*/*/package-frame.html"
       ],
       "js": [
-          "lib/Storage.js",
-          "lib/Option.js",
           "allclasses-frame.js"
       ],
       "all_frames": true
