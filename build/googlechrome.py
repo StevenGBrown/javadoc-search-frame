@@ -42,7 +42,7 @@ def buildGoogleChromeExtension():
 
   copyFile(name='allclasses-frame.js', fromDir='googlechrome', toDir='.',
     transformations=(
-      insertExternalFiles(['common', 'common/lib', 'googlechrome/lib']),
+      insertExternalFiles(['common/includes', 'googlechrome/includes']),
       insertValue('version', '\'' + readVersionFromManifest() + '\''),
       insertValue('buildDate', '\'' + formattedBuildDate() + '\'')
     )
@@ -50,7 +50,7 @@ def buildGoogleChromeExtension():
 
   copyFile(name='options.js', fromDir='googlechrome', toDir='.',
     transformations=(
-      insertExternalFiles(['common', 'common/lib', 'googlechrome/lib']),
+      insertExternalFiles(['common/includes', 'googlechrome/includes']),
     )
   )
 
