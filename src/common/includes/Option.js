@@ -34,23 +34,11 @@
  *          key:          the key associated with this option
  *          defaultValue: the default used when the value cannot be retrieved
  *                        or has not yet been configured
- *          isValidValue (optional):
- *                        a function that returns true if a given value is
- *                        valid and false otherwise. Invalid values will be
- *                        replaced with the default. If this function is not
- *                        provided then all values are considered valid
  * @private
  */
 Option = function (properties) {
   this.key = properties.key;
   this.defaultValue = properties.defaultValue;
-  this.isValidValue = properties.isValidValue;
-
-  if (!this.isValidValue) {
-    this.isValidValue = function (value) {
-      return true;
-    };
-  }
 };
 
 /**
@@ -71,7 +59,6 @@ Option.canGetAndSet = function () {
  */
 Option.prototype.getValue = function (callback) {
   var defaultValue = this.defaultValue;
-  var isValidValue = this.isValidValue;
   if (Storage.canGet()) {
     Storage.get(this.key, function (value) {
       if (value === 'true') {
@@ -80,7 +67,7 @@ Option.prototype.getValue = function (callback) {
       if (value === 'false') {
         value = false;
       }
-      if (value !== undefined && value !== null && isValidValue(value)) {
+      if (value !== undefined && value !== null) {
         callback(value);
       } else {
         callback(defaultValue);
@@ -135,10 +122,7 @@ Option.PACKAGE_MENU = new Option({
   key: 'package_menu',
   defaultValue:
     '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##\n' +
-    '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##',
-  isValidValue: function (value) {
-    return !value || value.indexOf('->') !== -1;
-  }
+    '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##'
 });
 
 /**
@@ -149,10 +133,7 @@ Option.CLASS_MENU = new Option({
   defaultValue:
     '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##+##CLASS_NAME##+##METHOD_NAME##\n' +
     '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
-    '@3:source(Docjar) -> http://www.docjar.com/html/api/##PACKAGE_PATH##/##CLASS_NAME##.java.html',
-  isValidValue: function (value) {
-    return !value || value.indexOf('->') !== -1;
-  }
+    '@3:source(Docjar) -> http://www.docjar.com/html/api/##PACKAGE_PATH##/##CLASS_NAME##.java.html'
 });
 
 /**#@-

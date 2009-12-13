@@ -94,6 +94,20 @@
 
 
 /**
+ * If the given menu option does not match the new format, set it to the
+ * default.
+ * @param option the menu option
+ */
+function updateMenuOption(option) {
+  option.getValue(function (value) {
+    if (value && value.indexOf('->') === -1) {
+      option.setValue(option.getDefaultValue());
+    }
+  });
+}
+
+
+/**
  * Entry point of this script; called when the script has loaded.
  */
 function main() {
@@ -112,6 +126,9 @@ function main() {
       return;
     }
   }
+
+  updateMenuOption(Option.CLASS_MENU);
+  updateMenuOption(Option.PACKAGE_MENU);
 
   // Build date of this script. This value is set by the build script.
   var buildDate = #INCLUDE buildDate#;
