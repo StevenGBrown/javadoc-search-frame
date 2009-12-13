@@ -595,7 +595,7 @@ MethodLink.prototype.getHtml = function () {
  * @returns {@LinkType} the type of this link
  */
 MethodLink.prototype.getType = function () {
-  return this.type;
+  return LinkType.METHOD;
 };
 
 /**
@@ -652,7 +652,7 @@ KeywordLink.prototype.getHtml = function () {
  * @returns {@LinkType} the type of this link
  */
 KeywordLink.prototype.getType = function () {
-  return this.type;
+  return LinkType.KEYWORD;
 };
 
 /**
