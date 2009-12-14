@@ -28,9 +28,12 @@
 
 
 chrome.extension.sendRequest(
-  {operation:'get', key:'hide_package_frame'},
+  {
+    operation:'get',
+    key:'hide_package_frame'
+  },
   function (hidePackageFrame) {
-    if (hidePackageFrame === 'true') {
+    if (hidePackageFrame !== 'false') {
       var framesets = document.getElementsByTagName('frameset');
       if (framesets) {
         for (var i = 0; i < framesets.length; i++) {
