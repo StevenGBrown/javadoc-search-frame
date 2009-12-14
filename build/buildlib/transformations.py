@@ -74,12 +74,16 @@ def insertExternalFiles(includesDirectories):
         licenseHeaderMatch = licenseHeaderRegex.match(includeFileContents)
         if licenseHeaderMatch:
           includeFileContents = licenseHeaderMatch.group(1)
+        leadingFileContents = fileContents[:includesMatch.start()]
+        trailingFileContents = fileContents[includesMatch.end():]
+        if len(trailingFileContents) >= 2 and trailingFileContents[:2] != '\n\n':
+          trailingFileContents = '\n\n' + trailingFileContents
         fileContents =\
-            fileContents[:includesMatch.start()] +\
+            leadingFileContents +\
             '//' + includesMatch.group() + '\n' +\
             '\n' +\
             includeFileContents.strip() +\
-            fileContents[includesMatch.end():]
+            trailingFileContents
     return fileContents
 
   return insertExternalFilesTransformation
