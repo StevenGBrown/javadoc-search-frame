@@ -34,11 +34,13 @@
  *          key:          the key associated with this option
  *          defaultValue: the default used when the value cannot be retrieved
  *                        or has not yet been configured
+ *          type:         the type of values accepted for this option
  * @private
  */
 Option = function (properties) {
   this.key = properties.key;
   this.defaultValue = properties.defaultValue;
+  this.type = properties.type;
 };
 
 /**
@@ -59,18 +61,14 @@ Option.canGetAndSet = function () {
  */
 Option.prototype.getValue = function (callback) {
   var defaultValue = this.defaultValue;
+  var type = this.type;
   if (Storage.canGet()) {
     Storage.get(this.key, function (value) {
-      if (value === 'true') {
-        value = true;
-      }
-      if (value === 'false') {
-        value = false;
-      }
-      if (value !== undefined && value !== null) {
-        callback(value);
+      if (type === Boolean) {
+        value = '' + value;
+        callback(defaultValue ? value !== 'false' : value === 'true');
       } else {
-        callback(defaultValue);
+        callback(value === undefined || value === null ? defaultValue : value);
       }
     });
   } else {
@@ -104,7 +102,8 @@ Option.prototype.setValue = function (newValue) {
  */
 Option.AUTO_OPEN = new Option({
   key: 'auto_open',
-  defaultValue: false
+  defaultValue: false,
+  type: Boolean
 });
 
 /**
@@ -112,7 +111,8 @@ Option.AUTO_OPEN = new Option({
  */
 Option.HIDE_PACKAGE_FRAME = new Option({
   key: 'hide_package_frame',
-  defaultValue: true
+  defaultValue: true,
+  type: Boolean
 });
 
 /**
@@ -122,7 +122,8 @@ Option.PACKAGE_MENU = new Option({
   key: 'package_menu',
   defaultValue:
     '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##\n' +
-    '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##'
+    '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##',
+  type: String
 });
 
 /**
@@ -133,7 +134,8 @@ Option.CLASS_MENU = new Option({
   defaultValue:
     '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##+##CLASS_NAME##+##METHOD_NAME##\n' +
     '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
-    '@3:source(Docjar) -> http://www.docjar.com/html/api/##PACKAGE_PATH##/##CLASS_NAME##.java.html'
+    '@3:source(Docjar) -> http://www.docjar.com/html/api/##PACKAGE_PATH##/##CLASS_NAME##.java.html',
+  type: String
 });
 
 /**#@-
