@@ -2109,9 +2109,9 @@ EventHandlers.searchFieldKeyup = function (evt) {
 
 /**
  * Called when the contents of the search field has changed.
- * @param searchFieldContents
  */
-EventHandlers.searchFieldChanged = function (searchFieldContents) {
+EventHandlers.searchFieldChanged = function () {
+  var searchFieldContents = View.getSearchFieldValue();
   Query.update(searchFieldContents);
   Search.performIfSearchStringHasChanged();
 };
