@@ -233,8 +233,12 @@ UnitTestAssertionFailure = function (functionUnderTestName, description, actual,
  * @returns a description of this unit test failure
  */
 UnitTestAssertionFailure.prototype.toString = function () {
-  return this.functionUnderTestName + '\n' + this.description + '\n'
-      + 'Expected "' + this.expected + '" but was "' + this.actual + '"';
+  var failureString = this.functionUnderTestName + '\n';
+  if (this.description) {
+    failureString += this.description + '\n';
+  }
+  failureString += 'Expected "' + this.expected + '" but was "' + this.actual + '"';
+  return failureString;
 };
 
 
@@ -373,20 +377,27 @@ LinkType.forEach = function (forEachFunction) {
  */
 
 /**
- * Extract a URL from the given anchor element HTML.
- * @param anchorElementHtml
+ * Extract a URL from the given {@PackageLink} or {@ClassLink}.
+ * @param packageOrClassLink the {@PackageLink} or {@ClassLink}
  * @returns the URL
  */
-function extractUrl(anchorElementHtml) {
-  var rx = /href\s*=\s*(?:"|')([^"']+)(?:"|')/i;
-  var matches;
-  if ((matches = rx.exec(anchorElementHtml)) !== null) {
-    var relativeUrl = matches[1];
-    var windowUrl = location.href;
-    var absoluteUrl = windowUrl.substring(0, windowUrl.lastIndexOf('/') + 1) + relativeUrl;
-    return absoluteUrl;
-  }
-  return null;
+function extractUrl(packageOrClassLink) {
+  var html = packageOrClassLink.getHtml();
+  // Assume that the HTML starts with <A HREF="..."
+  var firstQuoteIndex = html.indexOf('"');
+  var secondQuoteIndex = html.indexOf('"', firstQuoteIndex + 1);
+  var relativeUrl = html.substring(firstQuoteIndex + 1, secondQuoteIndex);
+  return toAbsoluteUrl(relativeUrl);
+}
+
+/**
+ * Convert the given relative URL to an absolute URL.
+ * @param relativeUrl the relative URL
+ * @returns the absolute URL
+ */
+function toAbsoluteUrl(relativeUrl) {
+  var windowUrl = location.href;
+  return windowUrl.substring(0, windowUrl.lastIndexOf('/') + 1) + relativeUrl;
 }
 
 
@@ -418,7 +429,7 @@ PackageLink.prototype.getHtml = function () {
 };
 
 UnitTestSuite.testFunctionFor('PackageLink.getHtml', function () {
-  assertThat('package anchor html', new PackageLink('java.applet').getHtml(),
+  assertThat('', new PackageLink('java.applet').getHtml(),
       is('<A HREF="java/applet/package-summary.html" target="classFrame">java.applet</A>'));
 });
 
@@ -440,11 +451,13 @@ PackageLink.prototype.getPackageName = function () {
  * @returns the URL of this link
  */
 PackageLink.prototype.getUrl = function () {
-  if (!this.url) {
-    this.url = extractUrl(this.html);
-  }
-  return this.url;
+  return extractUrl(this);
 };
+
+UnitTestSuite.testFunctionFor('PackageLink.getUrl', function () {
+  assertThat('', new PackageLink('java.applet').getUrl(),
+      is(toAbsoluteUrl('java/applet/package-summary.html')));
+});
 
 /**
  * Equals function.
@@ -474,7 +487,6 @@ PackageLink.prototype.toString = function () {
 ClassLink = function (type, packageName, className) {
   this.type = type;
   this.className = className;
-  this.url = null;
   this.canonicalName = packageName + '.' + className;
 
   this.innerClassNames = [];
@@ -525,17 +537,17 @@ ClassLink.prototype.getHtml = function () {
 };
 
 UnitTestSuite.testFunctionFor('ClassLink.getHtml', function () {
-  assertThat('interface anchor html', new ClassLink(LinkType.INTERFACE, 'javax.swing.text', 'AbstractDocument.AttributeContext').getHtml(),
+  assertThat('interface', new ClassLink(LinkType.INTERFACE, 'javax.swing.text', 'AbstractDocument.AttributeContext').getHtml(),
       is('<A HREF="javax/swing/text/AbstractDocument.AttributeContext.html" title="interface in javax.swing.text" target="classFrame"><I>AbstractDocument.AttributeContext</I></A>&nbsp;[&nbsp;javax.swing.text&nbsp;]'));
-  assertThat('class anchor html', new ClassLink(LinkType.CLASS, 'javax.lang.model.util', 'AbstractAnnotationValueVisitor6').getHtml(),
+  assertThat('class', new ClassLink(LinkType.CLASS, 'javax.lang.model.util', 'AbstractAnnotationValueVisitor6').getHtml(),
       is('<A HREF="javax/lang/model/util/AbstractAnnotationValueVisitor6.html" title="class in javax.lang.model.util" target="classFrame">AbstractAnnotationValueVisitor6</A>&nbsp;[&nbsp;javax.lang.model.util&nbsp;]'));
-  assertThat('enum anchor html', new ClassLink(LinkType.ENUM, 'java.lang', 'Thread.State').getHtml(),
+  assertThat('enum', new ClassLink(LinkType.ENUM, 'java.lang', 'Thread.State').getHtml(),
       is('<A HREF="java/lang/Thread.State.html" title="enum in java.lang" target="classFrame">Thread.State</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
-  assertThat('exception anchor html', new ClassLink(LinkType.EXCEPTION, 'java.security', 'AccessControlException').getHtml(),
+  assertThat('exception', new ClassLink(LinkType.EXCEPTION, 'java.security', 'AccessControlException').getHtml(),
       is('<A HREF="java/security/AccessControlException.html" title="class in java.security" target="classFrame">AccessControlException</A>&nbsp;[&nbsp;java.security&nbsp;]'));
-  assertThat('error anchor html', new ClassLink(LinkType.ERROR, 'java.lang.annotation', 'AnnotationFormatError').getHtml(),
+  assertThat('error', new ClassLink(LinkType.ERROR, 'java.lang.annotation', 'AnnotationFormatError').getHtml(),
       is('<A HREF="java/lang/annotation/AnnotationFormatError.html" title="class in java.lang.annotation" target="classFrame">AnnotationFormatError</A>&nbsp;[&nbsp;java.lang.annotation&nbsp;]'));
-  assertThat('annotation anchor html', new ClassLink(LinkType.ANNOTATION, 'java.lang', 'Deprecated').getHtml(),
+  assertThat('annotation', new ClassLink(LinkType.ANNOTATION, 'java.lang', 'Deprecated').getHtml(),
       is('<A HREF="java/lang/Deprecated.html" title="annotation in java.lang" target="classFrame">Deprecated</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
 });
 
@@ -571,11 +583,23 @@ ClassLink.prototype.getCanonicalName = function () {
  * @returns the URL of this link
  */
 ClassLink.prototype.getUrl = function () {
-  if (!this.url) {
-    this.url = extractUrl(this.html);
-  }
-  return this.url;
+  return extractUrl(this);
 };
+
+UnitTestSuite.testFunctionFor('ClassLink.getUrl', function () {
+  assertThat('interface', new ClassLink(LinkType.INTERFACE, 'javax.swing.text', 'AbstractDocument.AttributeContext').getUrl(),
+      is(toAbsoluteUrl('javax/swing/text/AbstractDocument.AttributeContext.html')));
+  assertThat('class', new ClassLink(LinkType.CLASS, 'javax.lang.model.util', 'AbstractAnnotationValueVisitor6').getUrl(),
+      is(toAbsoluteUrl('javax/lang/model/util/AbstractAnnotationValueVisitor6.html')));
+  assertThat('enum', new ClassLink(LinkType.ENUM, 'java.lang', 'Thread.State').getUrl(),
+      is(toAbsoluteUrl('java/lang/Thread.State.html')));
+  assertThat('exception', new ClassLink(LinkType.EXCEPTION, 'java.security', 'AccessControlException').getUrl(),
+      is(toAbsoluteUrl('java/security/AccessControlException.html')));
+  assertThat('error', new ClassLink(LinkType.ERROR, 'java.lang.annotation', 'AnnotationFormatError').getUrl(),
+      is(toAbsoluteUrl('java/lang/annotation/AnnotationFormatError.html')));
+  assertThat('annotation', new ClassLink(LinkType.ANNOTATION, 'java.lang', 'Deprecated').getUrl(),
+      is(toAbsoluteUrl('java/lang/Deprecated.html')));
+});
 
 /**
  * Equals function.
