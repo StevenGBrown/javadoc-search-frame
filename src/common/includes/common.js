@@ -417,7 +417,7 @@ PackageLink.prototype.getHtml = function () {
   return this.html;
 };
 
-UnitTestSuite.testFunctionFor('PackageLink.getHtml()', function () {
+UnitTestSuite.testFunctionFor('PackageLink.getHtml', function () {
   assertThat('package anchor html', new PackageLink('java.applet').getHtml(),
       is('<A HREF="java/applet/package-summary.html" target="classFrame">java.applet</A>'));
 });
@@ -524,7 +524,7 @@ ClassLink.prototype.getHtml = function () {
   return this.html;
 };
 
-UnitTestSuite.testFunctionFor('ClassLink.getHtml()', function () {
+UnitTestSuite.testFunctionFor('ClassLink.getHtml', function () {
   assertThat('interface anchor html', new ClassLink(LinkType.INTERFACE, 'javax.swing.text', 'AbstractDocument.AttributeContext').getHtml(),
       is('<A HREF="javax/swing/text/AbstractDocument.AttributeContext.html" title="interface in javax.swing.text" target="classFrame"><I>AbstractDocument.AttributeContext</I></A>&nbsp;[&nbsp;javax.swing.text&nbsp;]'));
   assertThat('class anchor html', new ClassLink(LinkType.CLASS, 'javax.lang.model.util', 'AbstractAnnotationValueVisitor6').getHtml(),
@@ -1001,7 +1001,7 @@ RegexLibrary.createCondition = function (searchString) {
   };
 };
 
-UnitTestSuite.testFunctionFor('RegexLibrary.createCondition()', function () {
+UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function () {
   var javaAwtGeomPoint2DClass = new ClassLink(LinkType.CLASS, 'java.awt.geom', 'Point2D');
   var javaAwtGeomPoint2DDoubleClass = new ClassLink(LinkType.CLASS, 'java.awt.geom', 'Point2D.Double');
   var javaIoPackage = new PackageLink('java.io');
@@ -1234,7 +1234,7 @@ RegexLibrary._getRegex = function (searchString) {
   return new RegExp(pattern);
 };
 
-UnitTestSuite.testFunctionFor('RegexLibrary._getRegex()', function () {
+UnitTestSuite.testFunctionFor('RegexLibrary._getRegex', function () {
   assertThat('removal of excess asterisk characters',
          RegexLibrary._getRegex('java.**.***o**e*').pattern, is(RegexLibrary._getRegex('java.*.*o*e').pattern));
 });
@@ -1397,7 +1397,7 @@ Search._PackagesAndClasses._getTopLink = function (links, bestMatch) {
   return null;
 };
 
-UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink(links, bestMatch)', function () {
+UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink', function () {
   var linkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component');
   var linkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
   var getTopLink = Search._PackagesAndClasses._getTopLink;
@@ -1446,7 +1446,7 @@ Search._PackagesAndClasses._getBestMatch = function (searchString, links) {
   return bestMatchLinks.length > 0 ? bestMatchLinks[0] : null;
 };
 
-UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch(searchString, links)', function () {
+UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch', function () {
   var hudsonPackage = new PackageLink('hudson');
   var javaIoPackage = new PackageLink('java.io');
   var javaLangPackage = new PackageLink('java.lang');
@@ -1854,7 +1854,7 @@ function getPackageLinks(classLinks) {
   return packageLinks;
 }
 
-UnitTestSuite.testFunctionFor('getPackageLinks(classLinks)', function () {
+UnitTestSuite.testFunctionFor('getPackageLinks', function () {
 
   var classLinks = [
       new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder'),
@@ -1959,7 +1959,7 @@ function getClassLinks(classesInnerHtml) {
   return classLinks;
 }
 
-UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHtml)', function () {
+UnitTestSuite.testFunctionFor('getClassLinks', function () {
 
   function assert(args, html, description) {
     var link = new ClassLink(args.type, args.package, args.class);
@@ -2068,7 +2068,7 @@ function endsWith(stringOne, stringTwo) {
   return strIndex >= 0 && stringOne.substring(strIndex) === stringTwo;
 }
 
-UnitTestSuite.testFunctionFor('endsWith(stringOne, stringTwo)', function () {
+UnitTestSuite.testFunctionFor('endsWith', function () {
 
   var assertThatEndsWith = function (stringOne, stringTwo, expectedResult) {
     assertThat(
@@ -2094,7 +2094,7 @@ function trimFromEnd(stringToTrim) {
   return stringToTrim.replace(/\s+$/, '');
 }
 
-UnitTestSuite.testFunctionFor('trimFromEnd(stringToTrim)', function () {
+UnitTestSuite.testFunctionFor('trimFromEnd', function () {
 
   var assertThatTrimFromEnd = function (stringToTrim, expectedResult) {
     assertThat(UnitTestSuite.quote(stringToTrim), trimFromEnd(stringToTrim), expectedResult);
