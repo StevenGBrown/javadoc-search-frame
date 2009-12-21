@@ -377,17 +377,16 @@ LinkType.forEach = function (forEachFunction) {
  */
 
 /**
- * Extract a URL from the given {@PackageLink} or {@ClassLink}.
- * @param packageOrClassLink the {@PackageLink} or {@ClassLink}
+ * Extract a URL from the given link.
+ * @param link the link
  * @returns the URL
  */
-function extractUrl(packageOrClassLink) {
-  var html = packageOrClassLink.getHtml();
+function extractUrl(link) {
+  var html = link.getHtml();
   // Assume that the HTML starts with <A HREF="..."
   var firstQuoteIndex = html.indexOf('"');
   var secondQuoteIndex = html.indexOf('"', firstQuoteIndex + 1);
-  var relativeUrl = html.substring(firstQuoteIndex + 1, secondQuoteIndex);
-  return toAbsoluteUrl(relativeUrl);
+  return html.substring(firstQuoteIndex + 1, secondQuoteIndex);
 }
 
 /**
@@ -451,7 +450,7 @@ PackageLink.prototype.getPackageName = function () {
  * @returns the URL of this link
  */
 PackageLink.prototype.getUrl = function () {
-  return extractUrl(this);
+  return toAbsoluteUrl(extractUrl(this));
 };
 
 UnitTestSuite.testFunctionFor('PackageLink.getUrl', function () {
@@ -583,7 +582,7 @@ ClassLink.prototype.getCanonicalName = function () {
  * @returns the URL of this link
  */
 ClassLink.prototype.getUrl = function () {
-  return extractUrl(this);
+  return toAbsoluteUrl(extractUrl(this));
 };
 
 UnitTestSuite.testFunctionFor('ClassLink.getUrl', function () {
@@ -627,8 +626,9 @@ ClassLink.prototype.toString = function () {
  */
 MethodLink = function (baseUrl, name) {
   this.name = name;
-  this.url = baseUrl + '#' + name;
-  this.html = this._getHtml(name, this.url);
+  this.html = '<A HREF="' + baseUrl + '#' + name +
+      '" target="classFrame" class="anchorLink">' +
+      name.replace(/ /g, '&nbsp;') + '</A><BR/>';
 };
 
 /**
@@ -659,7 +659,7 @@ MethodLink.prototype.getType = function () {
  * @returns the URL of this link
  */
 MethodLink.prototype.getUrl = function () {
-  return this.url;
+  return extractUrl(this);
 };
 
 /**
@@ -673,19 +673,15 @@ MethodLink.prototype.getMethodName = function () {
   }
 };
 
-MethodLink.prototype._getHtml = function (name, url) {
-  return '<a href="' + url + '" target="classFrame" class="anchorLink">' +
-      name.replace(/ /g, '&nbsp;') + '</a><br/>';
-};
-
 
 /**
  * @class KeywordLink Keyword link found on a package or class page.
  */
 KeywordLink = function (baseUrl, name) {
   this.name = name;
-  this.url = baseUrl + '#' + name;
-  this.html = this._getHtml(name, this.url);
+  this.html = '<A HREF="' + baseUrl + '#' + name +
+      '" target="classFrame" class="anchorLink" style="color:#666">' +
+      name.replace(/ /g, '&nbsp;') + '</A><BR/>';
 };
 
 /**
@@ -716,12 +712,7 @@ KeywordLink.prototype.getType = function () {
  * @returns the URL of this link
  */
 KeywordLink.prototype.getUrl = function () {
-  return this.url;
-};
-
-KeywordLink.prototype._getHtml = function (name, url) {
-  return '<a href="' + url + '" target="classFrame" class="anchorLink" style="color:#666">' +
-      name.replace(/ /g, '&nbsp;') + '</a><br/>';
+  return extractUrl(this);
 };
 
 
@@ -1587,10 +1578,11 @@ Search._MethodsAndKeywords._perform = function (searchContext, searchString) {
     Search.perform();
   };
 
-  Search._MethodsAndKeywords.httpRequest.load(topPackageOrClassLink.getUrl(), progressCallback);
+  var url = topPackageOrClassLink.getUrl();
+  Search._MethodsAndKeywords.httpRequest.load(url, progressCallback);
   if (Search._MethodsAndKeywords.httpRequest.isComplete()) {
     var packageOrClassPageHtml = Search._MethodsAndKeywords.httpRequest.getResource();
-    var methodAndKeywordLinks = this._getMethodAndKeywordLinks(packageOrClassPageHtml);
+    var methodAndKeywordLinks = this._getMethodAndKeywordLinks(url, packageOrClassPageHtml);
     var condition = RegexLibrary.createCondition(searchString);
     this._append(searchContext, topPackageOrClassLink, methodAndKeywordLinks, condition);
   } else {
@@ -1601,9 +1593,9 @@ Search._MethodsAndKeywords._perform = function (searchContext, searchString) {
   }
 };
 
-Search._MethodsAndKeywords._getMethodAndKeywordLinks = function (packageOrClassPageHtml) {
+Search._MethodsAndKeywords._getMethodAndKeywordLinks = function (baseUrl, packageOrClassPageHtml) {
   var names = this._getAnchorNames(packageOrClassPageHtml);
-  return this._createMethodAndKeywordLinks(this.url, names);
+  return this._createMethodAndKeywordLinks(baseUrl, names);
 };
 
 Search._MethodsAndKeywords._getAnchorNames = function (packageOrClassPageHtml) {
