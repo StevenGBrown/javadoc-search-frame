@@ -396,9 +396,8 @@ function extractUrl(anchorElementHtml) {
  */
 PackageLink = function (packageName) {
   this.packageName = packageName;
-  this.html = '<a href="' + packageName.replace(/\./g, '/') +
-      '/package-summary.html" target="classFrame">' +
-      packageName + '</a>';
+  this.html = '<A HREF="' + packageName.replace(/\./g, '/') +
+      '/package-summary.html" target="classFrame">' + packageName + '</A>';
 };
 
 /**
@@ -417,6 +416,11 @@ PackageLink.prototype.matches = function (regex) {
 PackageLink.prototype.getHtml = function () {
   return this.html;
 };
+
+UnitTestSuite.testFunctionFor('PackageLink.getHtml()', function () {
+  assertThat('package anchor html', new PackageLink('java.applet').getHtml(),
+      is('<A HREF="java/applet/package-summary.html" target="classFrame">java.applet</A>'));
+});
 
 /**
  * @returns {@LinkType} the type of this link
@@ -467,10 +471,9 @@ PackageLink.prototype.toString = function () {
  *                  {@LinkType.EXCEPTION}, {@LinkType.ERROR} or
  *                  {@LinkType.ANNOTATION}.
  */
-ClassLink = function (type, packageName, className, html) {
+ClassLink = function (type, packageName, className) {
   this.type = type;
   this.className = className;
-  this.html = html || '<br/>';
   this.url = null;
   this.canonicalName = packageName + '.' + className;
 
@@ -484,6 +487,21 @@ ClassLink = function (type, packageName, className, html) {
     name = name.substring(index + 1);
     this.innerClassNames.push(name);
   }
+
+  var typeInHtml = type;
+  if (type === LinkType.EXCEPTION || type === LinkType.ERROR) {
+    typeInHtml = LinkType.CLASS;
+  }
+  var openingTag = '';
+  var closingTag = '';
+  if (type === LinkType.INTERFACE) {
+    openingTag = '<I>';
+    closingTag = '</I>';
+  }
+  this.html = '<A HREF="' + packageName.replace(/\./g, '/') + '/' + className +
+      '.html" title="' + typeInHtml.getSingularName().toLowerCase() + ' in ' +
+      packageName + '" target="classFrame">' + openingTag + className +
+      closingTag + '</A>&nbsp;[&nbsp;' + packageName + '&nbsp;]';
 };
 
 /**
@@ -505,6 +523,21 @@ ClassLink.prototype.matches = function (regex) {
 ClassLink.prototype.getHtml = function () {
   return this.html;
 };
+
+UnitTestSuite.testFunctionFor('ClassLink.getHtml()', function () {
+  assertThat('interface anchor html', new ClassLink(LinkType.INTERFACE, 'javax.swing.text', 'AbstractDocument.AttributeContext').getHtml(),
+      is('<A HREF="javax/swing/text/AbstractDocument.AttributeContext.html" title="interface in javax.swing.text" target="classFrame"><I>AbstractDocument.AttributeContext</I></A>&nbsp;[&nbsp;javax.swing.text&nbsp;]'));
+  assertThat('class anchor html', new ClassLink(LinkType.CLASS, 'javax.lang.model.util', 'AbstractAnnotationValueVisitor6').getHtml(),
+      is('<A HREF="javax/lang/model/util/AbstractAnnotationValueVisitor6.html" title="class in javax.lang.model.util" target="classFrame">AbstractAnnotationValueVisitor6</A>&nbsp;[&nbsp;javax.lang.model.util&nbsp;]'));
+  assertThat('enum anchor html', new ClassLink(LinkType.ENUM, 'java.lang', 'Thread.State').getHtml(),
+      is('<A HREF="java/lang/Thread.State.html" title="enum in java.lang" target="classFrame">Thread.State</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
+  assertThat('exception anchor html', new ClassLink(LinkType.EXCEPTION, 'java.security', 'AccessControlException').getHtml(),
+      is('<A HREF="java/security/AccessControlException.html" title="class in java.security" target="classFrame">AccessControlException</A>&nbsp;[&nbsp;java.security&nbsp;]'));
+  assertThat('error anchor html', new ClassLink(LinkType.ERROR, 'java.lang.annotation', 'AnnotationFormatError').getHtml(),
+      is('<A HREF="java/lang/annotation/AnnotationFormatError.html" title="class in java.lang.annotation" target="classFrame">AnnotationFormatError</A>&nbsp;[&nbsp;java.lang.annotation&nbsp;]'));
+  assertThat('annotation anchor html', new ClassLink(LinkType.ANNOTATION, 'java.lang', 'Deprecated').getHtml(),
+      is('<A HREF="java/lang/Deprecated.html" title="annotation in java.lang" target="classFrame">Deprecated</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
+});
 
 /**
  * @returns {@LinkType} the type of this link
@@ -553,15 +586,15 @@ ClassLink.prototype.getUrl = function () {
 ClassLink.prototype.equals = function (obj) {
   return obj instanceof ClassLink &&
        this.type === obj.type &&
-       this.canonicalName === obj.canonicalName &&
-       this.html === obj.html;
+       this.className === obj.className &&
+       this.canonicalName === obj.canonicalName;
 };
 
 /**
  * @returns a string representation of this link
  */
 ClassLink.prototype.toString = function () {
-  return this.html + ' (' + this.canonicalName + ')';
+  return this.canonicalName;
 };
 
 
@@ -1365,8 +1398,8 @@ Search._PackagesAndClasses._getTopLink = function (links, bestMatch) {
 };
 
 UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink(links, bestMatch)', function () {
-  var linkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component', 'java/awt/Component');
-  var linkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object', 'java/lang/Object');
+  var linkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component');
+  var linkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
   var getTopLink = Search._PackagesAndClasses._getTopLink;
 
   assertThat('no links, best match undefined', getTopLink([]), is(null));
@@ -1824,9 +1857,9 @@ function getPackageLinks(classLinks) {
 UnitTestSuite.testFunctionFor('getPackageLinks(classLinks)', function () {
 
   var classLinks = [
-      new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder', ''),
-      new ClassLink(LinkType.CLASS, 'java.awt', 'Button', ''),
-      new ClassLink(LinkType.CLASS, 'javax.swing', 'SwingWorker', '')
+      new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder'),
+      new ClassLink(LinkType.CLASS, 'java.awt', 'Button'),
+      new ClassLink(LinkType.CLASS, 'javax.swing', 'SwingWorker')
   ];
 
   var expectedPackageLinks = [
@@ -1893,16 +1926,13 @@ function getClassLinks(classesInnerHtml) {
       /title\s*=\s*\"\s*([^\s]+)\s+in\s+([^\s\"]+)[^>]+>(?:\s*<i\s*>)?\s*([^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
   var anchorWithTitleFound = false;
   while ((matches = classesRegexWithTitle.exec(classesInnerHtml)) !== null) {
-    var entireMatch = classesInnerHtml.substring(
-        classesInnerHtml.lastIndexOf('<a', classesRegexWithTitle.lastIndex), classesRegexWithTitle.lastIndex);
     var typeInTitle = matches[1];
     var packageName = matches[2];
     var className = trimFromEnd(matches[3]);
     var type = LinkType.getByName(typeInTitle);
     type = checkForExceptionOrErrorType(type, className);
 
-    cl = new ClassLink(
-        type, packageName, className, entireMatch + '&nbsp;[&nbsp;' + packageName + '&nbsp;]');
+    cl = new ClassLink(type, packageName, className);
     classLinksMap[type].push(cl);
     anchorWithTitleFound = true;
   }
@@ -1911,16 +1941,13 @@ function getClassLinks(classesInnerHtml) {
     var classesWithoutTitleRegex =
         /<a\s+href\s*=\s*\"([^\"]+)(?:\/|\\)[^\"]+\"[^>]*>(\s*<i\s*>)?\s*([^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
     while ((matches = classesWithoutTitleRegex.exec(classesInnerHtml)) !== null) {
-      var entireMatch = matches[0];
-      var packageNameInHref = matches[1];
+      var packageName = matches[1].replace(/\/|\\/g, '.');
       var openingItalicTag = matches[2];
       var className = trimFromEnd(matches[3]);
       var type = openingItalicTag ? LinkType.INTERFACE : LinkType.CLASS;
       type = checkForExceptionOrErrorType(type, className);
 
-      var packageName = packageNameInHref.replace(/\/|\\/g, '.');
-      cl = new ClassLink(
-          type, packageName, className, entireMatch + '&nbsp;[&nbsp;' + packageName + '&nbsp;]');
+      cl = new ClassLink(type, packageName, className);
       classLinksMap[type].push(cl);
     }
   }
@@ -1935,8 +1962,7 @@ function getClassLinks(classesInnerHtml) {
 UnitTestSuite.testFunctionFor('getClassLinks(classesInnerHtml)', function () {
 
   function assert(args, html, description) {
-    var link = new ClassLink(
-      args.type, args.package, args.class, html + '&nbsp;[&nbsp;' + args.package + '&nbsp;]');
+    var link = new ClassLink(args.type, args.package, args.class);
     assertThat(description, getClassLinks(html), is([link]));
   }
 
