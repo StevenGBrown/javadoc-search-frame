@@ -394,10 +394,11 @@ function extractUrl(anchorElementHtml) {
  * @class PackageLink Link to a package. These links are of type
  *                    {@LinkType.PACKAGE}.
  */
-PackageLink = function (packageName, html) {
+PackageLink = function (packageName) {
   this.packageName = packageName;
-  this.html = html || '<br/>';
-  this.url = null;
+  this.html = '<a href="' + packageName.replace(/\./g, '/') +
+      '/package-summary.html" target="classFrame">' +
+      packageName + '</a>';
 };
 
 /**
@@ -449,15 +450,14 @@ PackageLink.prototype.getUrl = function () {
  */
 PackageLink.prototype.equals = function (obj) {
   return obj instanceof PackageLink &&
-       this.packageName === obj.packageName &&
-       this.html === obj.html;
+       this.packageName === obj.packageName;
 };
 
 /**
  * @returns a string representation of this link
  */
 PackageLink.prototype.toString = function () {
-  return this.html + ' (' + this.packageName + ')';
+  return this.packageName;
 };
 
 
@@ -1795,13 +1795,11 @@ function getPackageLinks(classLinks) {
   var packageLinks = [];
   var packageLinksAdded = {};
   var packageName;
-  var packageUrl;
 
   classLinks.forEach(function (classLink) {
     packageName = classLink.getPackageName();
     if (!packageLinksAdded[packageName]) {
-      packageUrl = '<A HREF="' + packageName.replace(/\./g, '/') + '/package-summary.html" target="classFrame">' + packageName + '</A>';
-      packageLinks.push(new PackageLink(packageName, packageUrl));
+      packageLinks.push(new PackageLink(packageName));
       packageLinksAdded[packageName] = true;
     }
   });
@@ -1832,9 +1830,9 @@ UnitTestSuite.testFunctionFor('getPackageLinks(classLinks)', function () {
   ];
 
   var expectedPackageLinks = [
-      new PackageLink('java.awt', '<A HREF="java/awt/package-summary.html" target="classFrame">java.awt</A>'),
-      new PackageLink('javax.swing', '<A HREF="javax/swing/package-summary.html" target="classFrame">javax.swing</A>'),
-      new PackageLink('javax.swing.border', '<A HREF="javax/swing/border/package-summary.html" target="classFrame">javax.swing.border</A>')
+      new PackageLink('java.awt'),
+      new PackageLink('javax.swing'),
+      new PackageLink('javax.swing.border')
   ];
 
   assertThat('getPackageLinks([javax.swing.border.AbstractBorder, java.awt.Button, javax.swing.SwingWorker])',
