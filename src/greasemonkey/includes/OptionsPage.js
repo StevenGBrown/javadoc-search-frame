@@ -1,8 +1,8 @@
 /**
- * This script is distributed under the MIT licence.
- * http://en.wikipedia.org/wiki/MIT_License
+ * The MIT License
  * 
  * Copyright (c) 2009 Steven G. Brown
+ * Copyright (c) 2006 KOSEKI Kengo
  * 
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation

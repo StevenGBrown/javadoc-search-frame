@@ -70,8 +70,13 @@ def readVersionFromManifest():
 
   manifestPath = os.path.join(
       sys.path[0], '..', 'src', 'googlechrome', 'manifest.json')
+  licenseHeaderRegex = re.compile(r'^.*?\n\s\*/\n\n(.*)', re.DOTALL)
   with io.open(manifestPath) as manifestFile:
-    return json.loads(manifestFile.read())['version']
+    manifestFileContents = manifestFile.read()
+    licenseHeaderMatch = licenseHeaderRegex.match(manifestFileContents)
+    if licenseHeaderMatch:
+      manifestFileContents = licenseHeaderMatch.group(1)
+    return json.loads(manifestFileContents)['version']
 
 
 if __name__ == "__main__":
