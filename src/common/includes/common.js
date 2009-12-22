@@ -1288,6 +1288,7 @@ RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
  */
 Search = {
   previousEntireSearchString : null,
+  timeoutId : null,
   topLink : null
 };
 
@@ -1301,13 +1302,17 @@ Search.perform = function () {
 };
 
 /**
- * Perform a search only if the search string has changed.
+ * Perform a search after a short delay only if the search string has changed.
  */
 Search.performIfSearchStringHasChanged = function () {
   var entireSearchString = Query.getEntireSearchString();
-  if (this.previousEntireSearchString === null ||
-      entireSearchString !== this.previousEntireSearchString) {
-    this._performSearch(entireSearchString);
+  if (entireSearchString !== this.previousEntireSearchString) {
+    if (this.timeoutId !== null) {
+      clearTimeout(this.timeoutId);
+    }
+    this.timeoutId = setTimeout(function () {
+      Search.perform.apply(Search);
+    }, 100);
   }
   this.previousEntireSearchString = entireSearchString;
 };
