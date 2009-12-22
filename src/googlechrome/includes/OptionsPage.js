@@ -42,6 +42,7 @@ OptionsPage = {};
  * Open the options page.
  */
 OptionsPage.open = function () {
-  var optionsPageURL = chrome.extension.getURL('options.html');
-  window.open(optionsPageURL);
+  var url = chrome.extension.getURL('options.html');
+  chrome.extension.sendRequest(
+      {operation: 'openInNewTab', urlToOpen: url});
 };
