@@ -1679,14 +1679,14 @@ Search._Menu._perform = function (searchContext, searchString) {
     return;
   }
 
-  var menuHtml = this._constructMenuHtml(searchContext, topPackageOrClassLink, topMethodOrKeywordLink);
+  var menu = this._constructMenu(searchContext, topPackageOrClassLink, topMethodOrKeywordLink);
 
   searchContext.getContentsHtmlCallback = new Callback(function () {
     var html = topPackageOrClassLink.getHtml();
     if (topMethodOrKeywordLink) {
       html += '<br/>' + topMethodOrKeywordLink.getHtml();
     }
-    html += '<p>' + menuHtml + '</p>';
+    html += '<p>' + this._constructMenuHtml(menu) + '</p>';
     return html;
   }, this);
 
@@ -1694,63 +1694,58 @@ Search._Menu._perform = function (searchContext, searchString) {
     return;
   }
 
-  var node = document.createElement('p');
-  node.innerHTML = menuHtml;
-  // It is necessary to add the context node to the document for the
-  // document.evaluate function to return any results in Firefox 1.5.
-  document.body.appendChild(node);
-  var xpathResult = document.evaluate('//a', node, null, XPathResult.ANY_TYPE, null);
-  var anchorNode;
-  while ((anchorNode = xpathResult.iterateNext()) !== null) {
-    var textNode = anchorNode.firstChild;
-    if (textNode
-        && textNode.nodeType === 3 /* Node.TEXT_NODE */
-        && textNode.nodeValue.indexOf('@' + searchString) === 0) {
-      Frames.openLinkInNewTab(anchorNode.getAttribute('href'));
-      break;
+  for (var i = 0; i < menu.length; i++) {
+    var menuElement = menu[i];
+    if (menuElement.mnemonic === '@' + searchString) {
+      Frames.openLinkInNewTab(menuElement.url);
     }
   }
-  document.body.removeChild(node);
 
   searchContext.menuPageOpened = true;
 };
 
-Search._Menu._constructMenuHtml = function (searchContext, classOrPackageLink, methodOrKeywordLink) {
+Search._Menu._constructMenu = function (searchContext, classOrPackageLink, methodOrKeywordLink) {
   var methodLink;
   if (methodOrKeywordLink &&
       methodOrKeywordLink.getType() === LinkType.METHOD) {
     methodLink = methodOrKeywordLink;
   };
 
-  var menu;
+  var menuDefinition;
   if (classOrPackageLink && classOrPackageLink.getType() === LinkType.PACKAGE) {
-    menu = searchContext.packageMenu;
+    menuDefinition = searchContext.packageMenu;
   } else {
-    menu = searchContext.classMenu;
+    menuDefinition = searchContext.classMenu;
   }
 
-  var menuHtml = '';
+  var menu = [];
   var menuReplacement = this._getMenuReplacement();
-  menu.split('\n').forEach(function (menuAnchorDefinition) {
-    var labelAndHtml = menuAnchorDefinition.split('->');
-    var menuAnchorLabel = labelAndHtml[0];
-    var menuAnchorHref = labelAndHtml[1];
-    if (labelAndHtml.length === 2) {
-      var matches;
-      while ((matches = /##(\w+)##/.exec(menuAnchorHref)) !== null) {
-        var f = menuReplacement[matches[1]];
-        var rx2 = new RegExp(matches[0], 'g');
-        if (f) {
-          menuAnchorHref = menuAnchorHref.replace(rx2, f(classOrPackageLink, methodLink));
-        } else {
-          menuAnchorHref = menuAnchorHref.replace(rx2, '');
+  menuDefinition.split('\n').forEach(function (menuAnchorDefinition) {
+    var splitOnArrow = menuAnchorDefinition.split('->', 2);
+    if (splitOnArrow.length === 2) {
+      var mnemonicAndLabel = splitOnArrow[0].split(':', 2);
+      if (mnemonicAndLabel.length === 2) {
+        var mnemonic = mnemonicAndLabel[0];
+        var label = mnemonicAndLabel[1];
+        var url = splitOnArrow[1];
+
+        var matches;
+        while ((matches = /##(\w+)##/.exec(url)) !== null) {
+          var f = menuReplacement[matches[1]];
+          var rx2 = new RegExp(matches[0], 'g');
+          if (f) {
+            url = url.replace(rx2, f(classOrPackageLink, methodLink));
+          } else {
+            url = url.replace(rx2, '');
+          }
         }
+
+        menu.push({mnemonic: mnemonic, label: label, url: url});
       }
-      menuHtml +='<a href="' + menuAnchorHref + '">' + menuAnchorLabel + '</a><br/>';
     }
   });
 
-  return menuHtml;
+  return menu;
 };
 
 /**
@@ -1781,6 +1776,15 @@ Search._Menu._getMenuReplacement = function () {
     };
   }
   return this.menuReplacement;
+};
+
+Search._Menu._constructMenuHtml = function (menu) {
+  var menuHtml = '';
+  menu.forEach(function (menuElement) {
+    menuHtml +='<A HREF="' + menuElement.url + '">' + menuElement.mnemonic +
+        ':' + menuElement.label + '</A><BR/>';
+  });
+  return menuHtml;
 };
 
 
