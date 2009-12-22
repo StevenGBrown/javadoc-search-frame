@@ -2207,7 +2207,7 @@ EventHandlers._returnKeyPressed = function (ctrlModifier) {
   var url = Search.getTopLinkUrl();
   if (url) {
     if (ctrlModifier) {
-      window.open(url);
+      Frames.openLinkInNewTab(url);
     } else {
       Frames.openLinkInSummaryFrame(url);
     }
