@@ -1,14 +1,7 @@
 /**
- * JAVADOC SEARCH FRAME for Google Chrome.
- * 
- * This script is distributed under the MIT licence.
- * http://en.wikipedia.org/wiki/MIT_License
+ * The MIT License
  * 
  * Copyright (c) 2009 Steven G. Brown
- * 
- * The initial (24th February 2008) release was a fork of the Javadoc
- * Incremental Search user script version 0.5 available at
- * http://www.teria.com/~koseki/tools/gm/javadoc_isearch/index.html
  * Copyright (c) 2006 KOSEKI Kengo
  * 
  * Permission is hereby granted, free of charge, to any person
