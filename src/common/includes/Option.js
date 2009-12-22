@@ -36,11 +36,11 @@
 /**
  * Create a new Option.
  * @class Provides persistent configuration of the script options.
- * @param properties the properties for this option:
- *          key:          the key associated with this option
- *          defaultValue: the default used when the value cannot be retrieved
- *                        or has not yet been configured
- *          type:         the type of values accepted for this option
+ * @param properties               the properties for this option
+ * @param properties.key           the key associated with this option
+ * @param properties.defaultValue  the default used when the value cannot be
+ *                                 retrieved or has not yet been configured
+ * @param properties.type          the type of values accepted for this option
  * @private
  */
 Option = function (properties) {
@@ -63,9 +63,18 @@ Option.canGetAndSet = function () {
  *                 option. If the option cannot be retrieved, has not yet been
  *                 configured, or is invalid, the default value will be
  *                 returned
+ * @param thisObject (optional) Used as the "this" for each invocation of the
+ *                   callback. If it is not provided, or is null, the global
+ *                   object associated with callback is used instead
  * @see Option.canGetAndSet
  */
-Option.prototype.getValue = function (callback) {
+Option.prototype.getValue = function (callback, thisObject) {
+  if (thisObject) {
+    var providedCallback = callback;
+    callback = function (value) {
+      providedCallback.apply(thisObject, [value]);
+    }
+  }
   var defaultValue = this.defaultValue;
   var type = this.type;
   if (Storage.canGet()) {
