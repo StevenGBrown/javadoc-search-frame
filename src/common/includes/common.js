@@ -939,22 +939,12 @@ Query._processInput = function (searchFieldContents) {
 };
 
 Query._updateView = function () {
-  var searchString = this.getEntireSearchString();
-
-  var fieldValue = searchString;
-  if (fieldValue.indexOf('#') !== -1) {
-    var splitOnHashCharacter = fieldValue.split('#', 2);
-    fieldValue = '#' + splitOnHashCharacter[1];
-  }
-  var indexOfAtCharacter = fieldValue.indexOf('@');
-  if (indexOfAtCharacter !== -1) {
-    var splitOnAtCharacter = fieldValue.split('@', 2);
-    if (splitOnAtCharacter[1].length > 0) {
-      fieldValue = splitOnAtCharacter[0];
-    } else {
-      fieldValue = '@';
+  var fieldValue = this.getEntireSearchString();
+  ['#', '@'].forEach(function (prefix) {
+    if (fieldValue.indexOf(prefix) !== -1) {
+      fieldValue = prefix + fieldValue.split(prefix, 2)[1];
     }
-  }
+  });
 
   View.setSearchFieldValue(fieldValue);
 };
@@ -1347,11 +1337,21 @@ Search._performSearch = function (entireSearchString) {
         var contentsHtml = searchContext.getContentsHtmlCallback.invoke();
         View.setContentsHtml(contentsHtml);
       }
-      this.topLink = searchContext.topMethodOrKeywordLink || searchContext.topPackageOrClassLink;
 
+      this.topLink = searchContext.topMethodOrKeywordLink || searchContext.topPackageOrClassLink;
       this._autoOpen();
+
+      if (searchContext.menuPageOpened) {
+        this._collapseMenu();
+      }
+
     }, this);
   }, this);
+};
+
+Search._collapseMenu = function () {
+  Query.update('');
+  Search.perform();
 };
 
 Search._autoOpen = function () {
@@ -1711,6 +1711,8 @@ Search._Menu._perform = function (searchContext, searchString) {
     }
   }
   document.body.removeChild(node);
+
+  searchContext.menuPageOpened = true;
 };
 
 Search._Menu._constructMenuHtml = function (searchContext, classOrPackageLink, methodOrKeywordLink) {
