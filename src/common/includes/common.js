@@ -368,15 +368,43 @@ function extractUrl(link) {
   return html.substring(firstQuoteIndex + 1, secondQuoteIndex);
 }
 
+UnitTestSuite.testFunctionFor('extractUrl', function () {
+  var mockLink = {};
+  mockLink.getHtml = function () {
+    return '<A HREF="urlOfLink"';
+  };
+  assertThat('', extractUrl(mockLink), is('urlOfLink'));
+});
+
 /**
  * Convert the given relative URL to an absolute URL.
  * @param relativeUrl the relative URL
+ * @param documentUrl (optional) the document's current URL, given by
+ *                    location.href
  * @returns the absolute URL
  */
-function toAbsoluteUrl(relativeUrl) {
-  var windowUrl = location.href;
-  return windowUrl.substring(0, windowUrl.lastIndexOf('/') + 1) + relativeUrl;
+function toAbsoluteUrl(relativeUrl, documentUrl) {
+  if (!documentUrl) {
+    documentUrl = location.href;
+  }
+  var documentUrlPath = documentUrl.substring(0, documentUrl.lastIndexOf('/') + 1);
+
+  var relativeUrlPath = relativeUrl.substring(0, relativeUrl.lastIndexOf('/') + 1);
+  if (endsWith(documentUrlPath, relativeUrlPath)) {
+    documentUrlPath = documentUrlPath.substring(0, documentUrlPath.length - relativeUrlPath.length);
+  }
+
+  return documentUrlPath + relativeUrl;
 }
+
+UnitTestSuite.testFunctionFor('toAbsoluteUrl', function () {
+  assertThat('relative to "all classes" url',
+      toAbsoluteUrl('java/applet/AppletContext.html', 'http://java.sun.com/javase/6/docs/api/allclasses-frame.html'),
+      is('http://java.sun.com/javase/6/docs/api/java/applet/AppletContext.html'));
+  assertThat('relative to package url',
+      toAbsoluteUrl('java/applet/AppletContext.html', 'http://java.sun.com/javase/6/docs/api/java/applet/package-frame.html'),
+      is('http://java.sun.com/javase/6/docs/api/java/applet/AppletContext.html'));
+});
 
 
 /**
