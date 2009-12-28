@@ -1707,7 +1707,8 @@ Search._Menu._perform = function (searchContext, searchString) {
     return;
   }
 
-  var menu = this._constructMenu(searchContext, topPackageOrClassLink, topMethodOrKeywordLink);
+  var menuReplacement = this._getMenuReplacement();
+  var menu = this._constructMenu(searchContext, menuReplacement, topPackageOrClassLink, topMethodOrKeywordLink);
 
   searchContext.getContentsHtmlCallback = new Callback(function () {
     var html = topPackageOrClassLink.getHtml();
@@ -1732,7 +1733,7 @@ Search._Menu._perform = function (searchContext, searchString) {
   searchContext.menuPageOpened = true;
 };
 
-Search._Menu._constructMenu = function (searchContext, classOrPackageLink, methodOrKeywordLink) {
+Search._Menu._constructMenu = function (searchContext, menuReplacement, classOrPackageLink, methodOrKeywordLink) {
   var methodLink;
   if (methodOrKeywordLink &&
       methodOrKeywordLink.getType() === LinkType.METHOD) {
@@ -1747,11 +1748,10 @@ Search._Menu._constructMenu = function (searchContext, classOrPackageLink, metho
   }
 
   var menu = [];
-  var menuReplacement = this._getMenuReplacement();
   menuDefinition.split('\n').forEach(function (menuAnchorDefinition) {
-    var splitOnArrow = menuAnchorDefinition.split('->', 2);
+    var splitOnArrow = splitOnFirst(menuAnchorDefinition, '->');
     if (splitOnArrow.length === 2) {
-      var mnemonicAndLabel = splitOnArrow[0].split(':', 2);
+      var mnemonicAndLabel = splitOnFirst(splitOnArrow[0], ':');
       if (mnemonicAndLabel.length === 2) {
         var mnemonic = mnemonicAndLabel[0];
         var label = mnemonicAndLabel[1];
@@ -2147,6 +2147,27 @@ UnitTestSuite.testFunctionFor('endsWith', function () {
 });
 
 /**
+ * Trim whitespace from the start of the given string.
+ * @param {String} stringToTrim the string to trim
+ * @returns {String} the trimmed string
+ */
+function trimFromStart(stringToTrim) {
+  return stringToTrim.replace(/^\s+/, '');
+}
+
+UnitTestSuite.testFunctionFor('trimFromStart', function () {
+
+  var assertThatTrimFromStart = function (stringToTrim, expectedResult) {
+    assertThat(UnitTestSuite.quote(stringToTrim), trimFromStart(stringToTrim), expectedResult);
+  };
+
+  assertThatTrimFromStart('string', is('string'));
+  assertThatTrimFromStart('string   ', is('string   '));
+  assertThatTrimFromStart('   string', is('string'));
+  assertThatTrimFromStart('   string   ', is('string   '));
+});
+
+/**
  * Trim whitespace from the end of the given string.
  * @param {String} stringToTrim the string to trim
  * @returns {String} the trimmed string
@@ -2165,6 +2186,44 @@ UnitTestSuite.testFunctionFor('trimFromEnd', function () {
   assertThatTrimFromEnd('string   ', is('string'));
   assertThatTrimFromEnd('   string', is('   string'));
   assertThatTrimFromEnd('   string   ', is('   string'));
+});
+
+/**
+ * Split the given string on the first occurence of the given separator string.
+ * Any whitespace surrounding the first occurence of the separator will be
+ * removed.
+ * @param {String} stringToSplit the string to split
+ * @param {String} separator the separator string
+ * @returns {Array} an array containing two elements: the portion of the string
+ *                  found before the first occurence of the separator, and the
+ *                  portion of the string found after the first occurence of
+ *                  the separator
+ */
+function splitOnFirst(stringToSplit, separator) {
+  var firstOccurrence = stringToSplit.indexOf(separator);
+  if (firstOccurrence === -1) {
+    return [stringToSplit, ''];
+  }
+  return [
+      trimFromEnd(stringToSplit.substring(0, firstOccurrence)),
+      trimFromStart(stringToSplit.substring(firstOccurrence + separator.length, stringToSplit.length))
+  ];
+};
+
+UnitTestSuite.testFunctionFor('splitOnFirst', function () {
+
+  var assertThatSplitOnFirst = function (stringToSplit, separator, expectedResult) {
+    assertThat(
+        'split ' + UnitTestSuite.quote(stringToSplit) + ' on first ' + UnitTestSuite.quote(separator),
+        splitOnFirst(stringToSplit, separator),
+        expectedResult);
+  };
+
+  assertThatSplitOnFirst(' one ', ',', is([' one ', '']));
+  assertThatSplitOnFirst(' one , two ', ',', is([' one', 'two ']));
+  assertThatSplitOnFirst(' one , two , three ', ',', is([' one', 'two , three ']));
+  assertThatSplitOnFirst('one,two,three', ',', is(['one', 'two,three']));
+  assertThatSplitOnFirst('one->two->three', '->', is(['one', 'two->three']));
 });
 
 
