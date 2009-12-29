@@ -879,7 +879,8 @@ View._createOptionsLink = function (eventHandlers) {
 Query = {
   packageOrClassSearchString : '',
   methodOrKeywordSearchString : null,
-  menuSearchString : null
+  menuSearchString : null,
+  timeoutId : null
 };
 
 /**
@@ -928,7 +929,16 @@ Query.getEntireSearchString = function () {
  */
 Query.update = function (searchFieldContents) {
   this._processInput(searchFieldContents);
-  this._updateView();
+
+  // Update the view on a timer. This is necessary to prevent the caret from
+  // disappearing when running in Google Chrome.
+  if (this.timeoutId !== null) {
+    clearTimeout(this.timeoutId);
+  }
+  var thisObj = this;
+  this.timeoutId = setTimeout(function () {
+    thisObj._updateView.apply(thisObj);
+  }, 0);
 };
 
 Query._processInput = function (searchFieldContents) {
@@ -1330,8 +1340,9 @@ Search.performIfSearchStringHasChanged = function () {
     if (this.timeoutId !== null) {
       clearTimeout(this.timeoutId);
     }
+    var thisObj = this;
     this.timeoutId = setTimeout(function () {
-      Search.perform.apply(Search);
+      thisObj.perform.apply(thisObj);
     }, 100);
   }
   this.previousEntireSearchString = entireSearchString;
