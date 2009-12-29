@@ -879,7 +879,8 @@ View._createOptionsLink = function (eventHandlers) {
 Query = {
   packageOrClassSearchString : '',
   methodOrKeywordSearchString : null,
-  menuSearchString : null
+  menuSearchString : null,
+  searchStringAfterErase : ''
 };
 
 /**
@@ -924,55 +925,39 @@ Query.getEntireSearchString = function () {
 
 /**
  * Update this query based on the contents of the search field.
- * @param searchFieldContents
  */
-Query.update = function (searchFieldContents) {
-  this._processInput(searchFieldContents);
-  this._updateView();
-};
-
-Query._processInput = function (searchFieldContents) {
-  var searchString;
-  if (this.menuSearchString !== null) {
-    searchString = this.packageOrClassSearchString;
-    if (this.methodOrKeywordSearchString !== null) {
-      searchString += '#' + this.methodOrKeywordSearchString;
-    }
-    if (searchFieldContents.indexOf('@') !== -1) {
-      searchString += searchFieldContents;
-    }
-  } else if (this.methodOrKeywordSearchString !== null) {
-    searchString = this.packageOrClassSearchString + searchFieldContents;
-  } else {
-    searchString = searchFieldContents;
-  }
-
+Query.update = function () {
+  var remainingSearchString = View.getSearchFieldValue();
   var tokens = [];
   var splitOnPrefix;
+  var searchStringAfterErase = '';
+
   ['@', '#'].forEach(function (prefix) {
-    if (searchString.indexOf(prefix) !== -1) {
-      splitOnPrefix = searchString.split(prefix, 2);
+    if (remainingSearchString.indexOf(prefix) !== -1) {
+      splitOnPrefix = remainingSearchString.split(prefix, 2);
       tokens.push(splitOnPrefix[1]);
-      searchString = splitOnPrefix[0];
+      remainingSearchString = splitOnPrefix[0];
+      if (!searchStringAfterErase) {
+        searchStringAfterErase = remainingSearchString;
+      }
     } else {
       tokens.push(null);
     }
   });
 
-  this.packageOrClassSearchString = searchString;
+  this.packageOrClassSearchString = remainingSearchString;
   this.methodOrKeywordSearchString = tokens[1];
   this.menuSearchString = tokens[0];
+  this.searchStringAfterErase = searchStringAfterErase;
 };
 
-Query._updateView = function () {
-  var fieldValue = this.getEntireSearchString();
-  ['#', '@'].forEach(function (prefix) {
-    if (fieldValue.indexOf(prefix) !== -1) {
-      fieldValue = prefix + fieldValue.split(prefix, 2)[1];
-    }
-  });
-
-  View.setSearchFieldValue(fieldValue);
+/**
+ * Erase the rightmost portion of the query from the search field.
+ */
+Query.erase = function () {
+  Query.update();
+  View.setSearchFieldValue(this.searchStringAfterErase);
+  Query.update();
 };
 
 
@@ -1376,7 +1361,7 @@ Search._performSearch = function (entireSearchString) {
 };
 
 Search._collapseMenu = function () {
-  Query.update('');
+  Query.erase();
   Search.perform();
 };
 
@@ -2253,8 +2238,7 @@ EventHandlers.searchFieldKeyup = function (evt) {
  * Called when the contents of the search field has changed.
  */
 EventHandlers.searchFieldChanged = function () {
-  var searchFieldContents = View.getSearchFieldValue();
-  Query.update(searchFieldContents);
+  Query.update();
   Search.performIfSearchStringHasChanged();
 };
 
@@ -2269,7 +2253,7 @@ EventHandlers.searchFieldFocus = function () {
  * Caled when the erase button has been clicked.
  */
 EventHandlers.eraseButtonClick = function () {
-  Query.update('');
+  Query.erase();
   View.focusOnSearchField();
   Search.performIfSearchStringHasChanged();
 };
@@ -2291,8 +2275,7 @@ EventHandlers.optionsLinkClicked = function (evt) {
  * @private
  */
 EventHandlers._returnKeyPressed = function (ctrlModifier) {
-  var searchFieldValue = View.getSearchFieldValue();
-  Query.update(searchFieldValue);
+  Query.update();
   Search.performIfSearchStringHasChanged();
 
   var url = Search.getTopLinkUrl();
@@ -2313,7 +2296,7 @@ EventHandlers._returnKeyPressed = function (ctrlModifier) {
 EventHandlers._escapeKeyPressed = function () {
   var searchFieldValue = View.getSearchFieldValue();
   if (searchFieldValue) {
-    Query.update('');
+    Query.erase();
     Search.performIfSearchStringHasChanged();
   }
 };
