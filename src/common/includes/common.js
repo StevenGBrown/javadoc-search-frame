@@ -831,29 +831,27 @@ View._create = function (eventHandlers) {
 };
 
 View._createSearchField = function (eventHandlers) {
-  var s = document.createElement('input');
-  s.setAttribute('type', 'text');
-  s.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
-  s.addEventListener('input', eventHandlers.searchFieldChanged, false);
-  s.addEventListener('focus', eventHandlers.searchFieldFocus, false);
+  var searchField = document.createElement('input');
+  searchField.setAttribute('type', 'text');
+  searchField.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
+  searchField.addEventListener('input', eventHandlers.searchFieldChanged, false);
+  searchField.addEventListener('focus', eventHandlers.searchFieldFocus, false);
   if (this.searchAccessKey) {
-    s.setAttribute('accesskey', this.searchAccessKey);
+    searchField.setAttribute('accesskey', this.searchAccessKey);
   }
-  return s;
+  return searchField;
 };
 
 View._createEraseButton = function (eventHandlers) {
-  var iconErase = 'data:image/gif;base64,R0lGODlhDQANAJEDAM%2FPz%2F%2F%2F%2F93d3UpihSH5BAEAAAMALAAAAAANAA0AAAIwnCegcpcg4nIw2sRGDZYnBAWiIHJQRZbec5XXEqnrmXIupMWdZGCXlAGhJg0h7lAAADs%3D';
-
-  var e = document.createElement('input');
-  e.setAttribute('type', 'image');
-  e.setAttribute('src', iconErase);
-  e.setAttribute('style', 'margin-left: 2px');
-  e.addEventListener('click', eventHandlers.eraseButtonClick, false);
+  var eraseButton = document.createElement('input');
+  eraseButton.setAttribute('type', 'image');
+  eraseButton.setAttribute('src', 'data:image/gif;base64,R0lGODlhDQANAJEDAM%2FPz%2F%2F%2F%2F93d3UpihSH5BAEAAAMALAAAAAANAA0AAAIwnCegcpcg4nIw2sRGDZYnBAWiIHJQRZbec5XXEqnrmXIupMWdZGCXlAGhJg0h7lAAADs%3D');
+  eraseButton.setAttribute('style', 'margin-left: 2px');
+  eraseButton.addEventListener('click', eventHandlers.eraseButtonClick, false);
   if (this.eraseAccessKey) {
-    e.setAttribute('accesskey', this.eraseAccessKey);
+    eraseButton.setAttribute('accesskey', this.eraseAccessKey);
   }
-  return e;
+  return eraseButton;
 };
 
 View._createOptionsLink = function (eventHandlers) {
