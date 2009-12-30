@@ -833,6 +833,7 @@ View._create = function (eventHandlers) {
 View._createSearchField = function (eventHandlers) {
   var searchField = document.createElement('input');
   searchField.setAttribute('type', 'text');
+  searchField.setAttribute('spellcheck', 'false');
   searchField.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
   searchField.addEventListener('input', eventHandlers.searchFieldChanged, false);
   searchField.addEventListener('focus', eventHandlers.searchFieldFocus, false);
