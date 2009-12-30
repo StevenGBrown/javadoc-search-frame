@@ -62,10 +62,22 @@ Frames.hideAllPackagesFrame = function () {
 
 /**
  * Open the given URL in the summary frame. If the summary frame is not
- * displayed, the URL will be opened in a new tab or window.
+ * displayed, the URL will not be opened.
  * @param url
  */
 Frames.openLinkInSummaryFrame = function (url) {
+  var summaryFrame = this._getFrame('classFrame');
+  if (summaryFrame) {
+    window.open(url, 'classFrame');
+  }
+};
+
+/**
+ * Open the given URL in the summary frame. If the summary frame is not
+ * displayed, the URL will be opened in a new tab or window.
+ * @param url
+ */
+Frames.openLinkInSummaryFrameOrNewTab = function (url) {
   var summaryFrame = this._getFrame('classFrame');
   if (summaryFrame) {
     window.open(url, 'classFrame');
