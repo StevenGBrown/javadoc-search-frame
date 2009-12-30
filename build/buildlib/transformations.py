@@ -62,7 +62,6 @@ def insertExternalFiles(includesDirectories):
   ]
 
   includesRegex = re.compile(r'^#INCLUDE (.*)$', re.MULTILINE)
-  licenseHeaderRegex = re.compile(r'^.*?\n\s\*/\n\n(.*)', re.DOTALL)
 
   def insertExternalFilesTransformation(fileContents):
     while True:
@@ -70,10 +69,7 @@ def insertExternalFiles(includesDirectories):
       if not includesMatch:
         break
       with io.open(_findFile(includesDirectories, includesMatch.group(1))) as includeFile:
-        includeFileContents = includeFile.read()
-        licenseHeaderMatch = licenseHeaderRegex.match(includeFileContents)
-        if licenseHeaderMatch:
-          includeFileContents = licenseHeaderMatch.group(1)
+        includeFileContents = removeLicenseHeader()(includeFile.read())
         leadingFileContents = fileContents[:includesMatch.start()]
         trailingFileContents = fileContents[includesMatch.end():]
         if len(trailingFileContents) >= 2 and trailingFileContents[:2] != '\n\n':
@@ -100,6 +96,23 @@ def _findFile(searchDirectories, filename):
     if os.path.exists(absolutePath):
       return absolutePath
   raise ValueError('\'' + filename + '\' not found in ' + str(searchDirectories))
+
+
+def removeLicenseHeader():
+  """
+  Return a function that will transform the script contents by removing the
+  license header.
+  """
+
+  licenseHeaderRegex = re.compile(r'^.*?\n\s\*/\n\n\s*(.*)', re.DOTALL)
+
+  def removeLicenseHeaderTransformation(fileContents):
+    licenseHeaderMatch = licenseHeaderRegex.match(fileContents)
+    if licenseHeaderMatch:
+      fileContents = licenseHeaderMatch.group(1)
+    return fileContents
+
+  return removeLicenseHeaderTransformation
 
 
 def prepend(filePath):
