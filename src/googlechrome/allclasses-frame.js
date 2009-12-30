@@ -47,8 +47,8 @@ function main() {
   var buildDate = #INCLUDE buildDate#;
 
   var startupLogMessage =
-      'Javadoc Search Frame for Google Chrome\n' +
-      'Version ' + version + ' (' + buildDate + ')\n' +
+      'Javadoc Search Frame (Google Chrome Extension)\n' +
+      'Version ' + version + ', ' + buildDate + '\n' +
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
