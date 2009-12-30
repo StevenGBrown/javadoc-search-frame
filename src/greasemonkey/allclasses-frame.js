@@ -79,7 +79,7 @@ function main() {
   var buildDate = #INCLUDE buildDate#;
 
   var startupLogMessage =
-      'Javadoc Search Frame for Greasemonkey\n' +
+      'Javadoc Search Frame (Greasemonkey User Script)\n' +
       buildDate + '\n' +
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
