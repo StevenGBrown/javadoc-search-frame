@@ -40,6 +40,12 @@ def buildGoogleChromeExtension():
   This extension will be created in the current working directory.
   """
 
+  copyFile(name='manifest.json', fromDir='googlechrome', toDir='.',
+    transformations=(
+      removeLicenseHeader(),
+    )
+  )
+
   copyFile(name='allclasses-frame.js', fromDir='googlechrome', toDir='.',
     transformations=(
       insertExternalFiles(['common/includes', 'googlechrome/includes']),
@@ -55,12 +61,14 @@ def buildGoogleChromeExtension():
   )
 
   copyFiles(
-    names=('background.html', 'manifest.json', 'hide-packages-frame.js', 'options.html'),
-    fromDir='googlechrome', toDir='.')
+    names=('background.html', 'hide-packages-frame.js', 'options.html'),
+    fromDir='googlechrome', toDir='.'
+  )
 
   copyFiles(
     names=('icon16.png', 'icon32.png', 'icon48.png', 'icon128.png'),
-    fromDir='googlechrome/icons', toDir='icons')
+    fromDir='googlechrome/icons', toDir='icons'
+  )
 
 
 def readVersionFromManifest():
@@ -70,12 +78,8 @@ def readVersionFromManifest():
 
   manifestPath = os.path.join(
       sys.path[0], '..', 'src', 'googlechrome', 'manifest.json')
-  licenseHeaderRegex = re.compile(r'^.*?\n\s\*/\n\n(.*)', re.DOTALL)
   with io.open(manifestPath) as manifestFile:
-    manifestFileContents = manifestFile.read()
-    licenseHeaderMatch = licenseHeaderRegex.match(manifestFileContents)
-    if licenseHeaderMatch:
-      manifestFileContents = licenseHeaderMatch.group(1)
+    manifestFileContents = removeLicenseHeader()(manifestFile.read())
     return json.loads(manifestFileContents)['version']
 
 
