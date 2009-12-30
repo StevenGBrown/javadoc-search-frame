@@ -2311,7 +2311,7 @@ EventHandlers._returnKeyPressed = function (ctrlModifier) {
     if (ctrlModifier) {
       Frames.openLinkInNewTab(url);
     } else {
-      Frames.openLinkInSummaryFrame(url);
+      Frames.openLinkInSummaryFrameOrNewTab(url);
     }
   }
 };
