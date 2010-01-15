@@ -1,0 +1,88 @@
+<!--
+The MIT License
+
+Copyright (c) 2009 Steven G. Brown
+Copyright (c) 2006 KOSEKI Kengo
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+-->
+
+
+<html>
+<head>
+<script>
+
+  chrome.extension.onRequest.addListener(
+    function (request, sender, sendResponse) {
+      var response = {};
+      if (request.operation === 'get') {
+        response = localStorage.getItem(request.key);
+      } else if (request.operation === 'set') {
+        localStorage.setItem(request.key, request.value);
+      } else if (request.operation === 'openInNewTab') {
+        var tabProperties = {
+            windowId: sender.tab.windowId,
+            index: sender.tab.index + 1,
+            url: request.urlToOpen
+        };
+        chrome.tabs.create(tabProperties);
+      }
+      sendResponse(response);
+    }
+  );
+
+  chrome.extension.onConnect.addListener(function(port) {
+    console.assert(port.name === 'httpRequest');
+    var xmlHttpRequest = new XMLHttpRequest();
+
+    port.onMessage.addListener(function (msg) {
+      xmlHttpRequest.onprogress = function (e) {
+        var bytesDownloaded = e.position;
+        if (bytesDownloaded > 1048576) {
+          var mbDownloaded = Math.floor(bytesDownloaded / 1048576);
+          port.postMessage({type:'status', status: 'loading... (' + mbDownloaded + ' MB)'});
+        } else if (bytesDownloaded > 1024) {
+          var kbDownloaded = Math.floor(bytesDownloaded / 1024);
+          port.postMessage({type:'status', status: 'loading... (' + kbDownloaded + ' kB)'});
+        } else {
+          port.postMessage({type:'status', status: 'loading... (' + bytesDownloaded + ' bytes)'});
+        }
+      };
+      xmlHttpRequest.open('GET', msg.httpRequestUrl);
+      xmlHttpRequest.onload = function (e) {
+        port.postMessage({type: 'resource', resource: xmlHttpRequest.responseText});
+      };
+      xmlHttpRequest.onerror = function (e) {
+        port.postMessage({type:'status', status: 'ERROR'});
+      };
+      xmlHttpRequest.overrideMimeType('text/plain; charset=x-user-defined');
+      xmlHttpRequest.send(null);
+    });
+
+    port.onDisconnect.addListener(function () {
+      xmlHttpRequest.abort();
+    });
+  });
+
+</script>
+</head>
+</html>
