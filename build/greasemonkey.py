@@ -1,7 +1,7 @@
 """
 The MIT License
 
-Copyright (c) 2009 Steven G. Brown
+Copyright (c) 2010 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -42,12 +42,13 @@ def buildGreasemonkeyUserScript():
 
   copyAndRenameFile(
     fromPath='greasemonkey/allclasses-frame.js',
-    toPath='javadoc_search_frame_' + buildDate().strftime('%Y%m%d') + '.user.js',
+    toPath='javadoc_search_frame_' + formattedBuildDateISO() + '.user.js',
     transformations=(
       prepend('greasemonkey/metadata_block.txt'),
       insertValue('unquotedBuildDate', formattedBuildDate()),
       insertExternalFiles(['common/includes', 'greasemonkey/includes']),
       insertValue('buildDate', '\'' + formattedBuildDate() + '\''),
+      insertValue('buildYear', buildYear())
     )
   )
 

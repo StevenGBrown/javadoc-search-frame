@@ -1,7 +1,7 @@
 """
 The MIT License
 
-Copyright (c) 2009 Steven G. Brown
+Copyright (c) 2010 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -40,28 +40,25 @@ def buildGoogleChromeExtension():
   This extension will be created in the current working directory.
   """
 
-  copyFile(name='manifest.json', fromDir='googlechrome', toDir='.',
-    transformations=(
-      removeLicenseHeader(),
-    )
-  )
-
   copyFile(name='allclasses-frame.js', fromDir='googlechrome', toDir='.',
     transformations=(
       insertExternalFiles(['common/includes', 'googlechrome/includes']),
       insertValue('version', '\'' + readVersionFromManifest() + '\''),
-      insertValue('buildDate', '\'' + formattedBuildDate() + '\'')
+      insertValue('buildDate', '\'' + formattedBuildDate() + '\''),
+      insertValue('buildYear', buildYear())
     )
   )
 
   copyFile(name='options.js', fromDir='googlechrome', toDir='.',
     transformations=(
       insertExternalFiles(['common/includes', 'googlechrome/includes']),
+      insertValue('buildYear', buildYear())
     )
   )
 
   copyFiles(
-    names=('background.html', 'hide-packages-frame.js', 'options.html'),
+    names=('background.html', 'hide-packages-frame.js',
+           'manifest.json', 'options.html'),
     fromDir='googlechrome', toDir='.'
   )
 
@@ -79,8 +76,7 @@ def readVersionFromManifest():
   manifestPath = os.path.join(
       sys.path[0], '..', 'src', 'googlechrome', 'manifest.json')
   with io.open(manifestPath) as manifestFile:
-    manifestFileContents = removeLicenseHeader()(manifestFile.read())
-    return json.loads(manifestFileContents)['version']
+    return json.loads(manifestFile.read())['version']
 
 
 if __name__ == "__main__":
