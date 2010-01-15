@@ -756,9 +756,10 @@ View.eraseAccessKey = 'a';
 /**
  * Initialise the search field frame.
  * @param eventHandlers
+ * @param packageFrameHidden
  */
-View.initialise = function (eventHandlers) {
-  this._create(eventHandlers);
+View.initialise = function (eventHandlers, packageFrameHidden) {
+  this._create(eventHandlers, packageFrameHidden);
 };
 
 /**
@@ -796,14 +797,15 @@ View.focusOnSearchField = function () {
   this.searchField.focus();
 };
 
-View._create = function (eventHandlers) {
+View._create = function (eventHandlers, packageFrameHidden) {
   var tableElement = document.createElement('table');
   var tableRowElementOne = document.createElement('tr');
   var tableDataCellElementOne = document.createElement('td');
   var tableRowElementTwo = document.createElement('tr');
   var tableDataCellElementTwo = document.createElement('td');
 
-  this.searchField = this._createSearchField(eventHandlers);
+  this.searchField = this._createSearchField(
+      eventHandlers, packageFrameHidden);
   var eraseButton = this._createEraseButton(eventHandlers);
   var optionsLink = this._createOptionsLink(eventHandlers);
   this.contentNodeParent = tableRowElementTwo;
@@ -830,10 +832,20 @@ View._create = function (eventHandlers) {
   document.body.appendChild(tableElement);
 };
 
-View._createSearchField = function (eventHandlers) {
+View._createSearchField = function (eventHandlers, packageFrameHidden) {
   var searchField = document.createElement('input');
   searchField.setAttribute('type', 'text');
   searchField.setAttribute('spellcheck', 'false');
+
+  var placeholderText;
+  if (packageFrameHidden) {
+    placeholderText = 'Search Packages and Classes';
+  } else {
+    placeholderText = 'Search Classes';
+  }
+  searchField.setAttribute('placeholder', placeholderText);
+
+  searchField.style.width = '180px';
   searchField.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
   searchField.addEventListener('input', eventHandlers.searchFieldChanged, false);
   searchField.addEventListener('focus', eventHandlers.searchFieldFocus, false);
@@ -1857,7 +1869,7 @@ function init(unitTestResultsCallback) {
     }
 
     // Initialise class frame.
-    View.initialise(EventHandlers);
+    View.initialise(EventHandlers, hidePackageFrame);
 
     // Perform an initial search. This will populate the class frame with the
     // entire list of packages and classes.
