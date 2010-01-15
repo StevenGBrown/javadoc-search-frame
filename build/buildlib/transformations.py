@@ -1,7 +1,7 @@
 """
 The MIT License
 
-Copyright (c) 2009 Steven G. Brown
+Copyright (c) 2010 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -69,7 +69,7 @@ def insertExternalFiles(includesDirectories):
       if not includesMatch:
         break
       with io.open(_findFile(includesDirectories, includesMatch.group(1))) as includeFile:
-        includeFileContents = removeLicenseHeader()(includeFile.read())
+        includeFileContents = _removeLicenseHeader(includeFile.read())
         leadingFileContents = fileContents[:includesMatch.start()]
         trailingFileContents = fileContents[includesMatch.end():]
         if len(trailingFileContents) >= 2 and trailingFileContents[:2] != '\n\n':
@@ -98,21 +98,16 @@ def _findFile(searchDirectories, filename):
   raise ValueError('\'' + filename + '\' not found in ' + str(searchDirectories))
 
 
-def removeLicenseHeader():
+def _removeLicenseHeader(scriptContents):
   """
-  Return a function that will transform the script contents by removing the
-  license header.
+  Return the given script contents with the license header removed.
   """
 
   licenseHeaderRegex = re.compile(r'^.*?\n\s\*/\n\n\s*(.*)', re.DOTALL)
-
-  def removeLicenseHeaderTransformation(fileContents):
-    licenseHeaderMatch = licenseHeaderRegex.match(fileContents)
-    if licenseHeaderMatch:
-      fileContents = licenseHeaderMatch.group(1)
-    return fileContents
-
-  return removeLicenseHeaderTransformation
+  licenseHeaderMatch = licenseHeaderRegex.match(scriptContents)
+  if licenseHeaderMatch:
+    scriptContents = licenseHeaderMatch.group(1)
+  return scriptContents
 
 
 def prepend(filePath):

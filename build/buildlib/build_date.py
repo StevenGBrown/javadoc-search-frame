@@ -1,7 +1,7 @@
 """
 The MIT License
 
-Copyright (c) 2009 Steven G. Brown
+Copyright (c) 2010 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -40,6 +40,12 @@ def buildDate():
   return scriptBuildDate
 
 
+def buildYear():
+  """Return the year component of the build date."""
+
+  return buildDate().strftime('%Y')
+
+
 def formattedBuildDate():
   """Return the build date in a human-readable format."""
 
@@ -48,6 +54,12 @@ def formattedBuildDate():
   if formattedBuildDate[0] == '0':
     formattedBuildDate = formattedBuildDate[1:]
   return formattedBuildDate
+
+
+def formattedBuildDateISO():
+  """Return the build date in ISO YYYYMMDD format."""
+
+  return buildDate().strftime('%Y%m%d')
 
 
 def _getOrdinalIndicator(number):
