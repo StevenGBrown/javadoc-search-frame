@@ -834,7 +834,7 @@ View._create = function (eventHandlers, packageFrameHidden) {
 
 View._createSearchField = function (eventHandlers, packageFrameHidden) {
   var searchField = document.createElement('input');
-  searchField.setAttribute('type', 'text');
+  searchField.setAttribute('type', 'search');
   searchField.setAttribute('spellcheck', 'false');
 
   var placeholderText;
