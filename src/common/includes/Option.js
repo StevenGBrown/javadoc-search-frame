@@ -1,7 +1,7 @@
 /**
  * The MIT License
  * 
- * Copyright (c) 2009 Steven G. Brown
+ * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  * 
  * Permission is hereby granted, free of charge, to any person
@@ -147,7 +147,7 @@ Option.PACKAGE_MENU = new Option({
 Option.CLASS_MENU = new Option({
   key: 'class_menu',
   defaultValue:
-    '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##+##CLASS_NAME##+##METHOD_NAME##\n' +
+    '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##+##CLASS_NAME##+##MEMBER_NAME##\n' +
     '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
     '@3:source(Docjar) -> http://www.docjar.com/html/api/##PACKAGE_PATH##/##CLASS_NAME##.java.html',
   type: String
