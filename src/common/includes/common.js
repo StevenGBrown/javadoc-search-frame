@@ -836,6 +836,7 @@ View._createSearchField = function (eventHandlers, packageFrameHidden) {
   var searchField = document.createElement('input');
   searchField.setAttribute('type', 'search');
   searchField.setAttribute('spellcheck', 'false');
+  searchField.setAttribute('autofocus', 'true');
 
   var placeholderText;
   if (packageFrameHidden) {
@@ -1884,8 +1885,11 @@ function init(unitTestResultsCallback) {
       Frames.hideAllPackagesFrame();
     }
 
-    // Give focus to the search field.
-    View.focusOnSearchField();
+    // If the autofocus attribute is not supported, manually give focus to the
+    // search field.
+    if (!('autofocus' in document.createElement('input'))) {
+      View.focusOnSearchField();
+    }
 
     // Provide the unit test results to the callback function.
     unitTestResultsCallback(unitTestResults);
