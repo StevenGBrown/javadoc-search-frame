@@ -265,7 +265,7 @@ UnitTestExceptionThrownFailure.prototype.toString = function () {
  */
 
 /**
- * @class LinkType Package, class, method and keyword link types.
+ * @class LinkType Package, class, class member and keyword link types.
  */
 LinkType = function(singularName, pluralName) {
   this.singularName = singularName;
@@ -329,9 +329,9 @@ LinkType.ERROR = new LinkType('Error', 'Errors');
 LinkType.ANNOTATION = new LinkType('Annotation', 'Annotation Types');
 
 /**
- * Method link type.
+ * Class member link type.
  */
-LinkType.METHOD = new LinkType('Method', 'Methods');
+LinkType.CLASS_MEMBER = new LinkType('Method or Field', 'Methods and Fields');
 
 /**
  * Keyword link type.
@@ -351,7 +351,7 @@ LinkType.getByName = function (singularName) {
 
 /*
  * ----------------------------------------------------------------------------
- * PackageLink, ClassLink, MethodLink and KeywordLink
+ * PackageLink, ClassLink, MemberLink and KeywordLink
  * ----------------------------------------------------------------------------
  */
 
@@ -629,9 +629,9 @@ ClassLink.prototype.toString = function () {
 
 
 /**
- * @class MethodLink Link to a method.
+ * @class MemberLink Link to a method or field of a class.
  */
-MethodLink = function (baseUrl, name) {
+MemberLink = function (baseUrl, name) {
   this.name = name;
   this.html = '<A HREF="' + baseUrl + '#' + name +
       '" target="classFrame" class="anchorLink">' +
@@ -644,35 +644,35 @@ MethodLink = function (baseUrl, name) {
  * @param regex the regular expression
  * @returns true if this link is a match, false otherwise
  */
-MethodLink.prototype.matches = function (regex) {
+MemberLink.prototype.matches = function (regex) {
   return regex.test(this.name);
 };
 
 /**
  * @returns this link in HTML format
  */
-MethodLink.prototype.getHtml = function () {
+MemberLink.prototype.getHtml = function () {
   return this.html;
 };
 
 /**
  * @returns {@LinkType} the type of this link
  */
-MethodLink.prototype.getType = function () {
-  return LinkType.METHOD;
+MemberLink.prototype.getType = function () {
+  return LinkType.CLASS_MEMBER;
 };
 
 /**
  * @returns the URL of this link
  */
-MethodLink.prototype.getUrl = function () {
+MemberLink.prototype.getUrl = function () {
   return extractUrl(this);
 };
 
 /**
- * @returns the name of this method
+ * @returns the name of this class member
  */
-MethodLink.prototype.getMethodName = function () {
+MemberLink.prototype.getName = function () {
   if (this.name.indexOf('(') !== -1) {
     return this.name.substring(0, this.name.indexOf('('));
   } else {
@@ -836,6 +836,7 @@ View._createSearchField = function (eventHandlers, packageFrameHidden) {
   var searchField = document.createElement('input');
   searchField.setAttribute('type', 'text');
   searchField.setAttribute('spellcheck', 'false');
+  searchField.setAttribute('autofocus', 'true');
 
   var placeholderText;
   if (packageFrameHidden) {
@@ -845,7 +846,7 @@ View._createSearchField = function (eventHandlers, packageFrameHidden) {
   }
   searchField.setAttribute('placeholder', placeholderText);
 
-  searchField.style.width = '180px';
+  searchField.style.width = '200px';
   searchField.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
   searchField.addEventListener('input', eventHandlers.searchFieldChanged, false);
   searchField.addEventListener('focus', eventHandlers.searchFieldFocus, false);
@@ -891,7 +892,7 @@ View._createOptionsLink = function (eventHandlers) {
  */
 Query = {
   packageOrClassSearchString : '',
-  methodOrKeywordSearchString : null,
+  memberOrKeywordSearchString : null,
   menuSearchString : null,
   timeoutId : null
 };
@@ -905,11 +906,11 @@ Query.getPackageOrClassSearchString = function () {
 };
 
 /**
- * @returns the portion of the search query that relates to the methods and
- *          keywords search
+ * @returns the portion of the search query that relates to the class members
+ *          and keywords search
  */
-Query.getMethodOrKeywordSearchString = function () {
-  return this.methodOrKeywordSearchString;
+Query.getMemberOrKeywordSearchString = function () {
+  return this.memberOrKeywordSearchString;
 };
 
 /**
@@ -925,9 +926,9 @@ Query.getMenuSearchString = function () {
  */
 Query.getEntireSearchString = function () {
   var searchString = this.packageOrClassSearchString;
-  if (this.methodOrKeywordSearchString !== null) {
+  if (this.memberOrKeywordSearchString !== null) {
     searchString += '#';
-    searchString += this.methodOrKeywordSearchString;
+    searchString += this.memberOrKeywordSearchString;
   }
   if (this.menuSearchString !== null) {
     searchString += '@';
@@ -958,13 +959,13 @@ Query._processInput = function (searchFieldContents) {
   var searchString;
   if (this.menuSearchString !== null) {
     searchString = this.packageOrClassSearchString;
-    if (this.methodOrKeywordSearchString !== null) {
-      searchString += '#' + this.methodOrKeywordSearchString;
+    if (this.memberOrKeywordSearchString !== null) {
+      searchString += '#' + this.memberOrKeywordSearchString;
     }
     if (searchFieldContents.indexOf('@') !== -1) {
       searchString += searchFieldContents;
     }
-  } else if (this.methodOrKeywordSearchString !== null) {
+  } else if (this.memberOrKeywordSearchString !== null) {
     searchString = this.packageOrClassSearchString + searchFieldContents;
   } else {
     searchString = searchFieldContents;
@@ -983,7 +984,7 @@ Query._processInput = function (searchFieldContents) {
   });
 
   this.packageOrClassSearchString = searchString;
-  this.methodOrKeywordSearchString = tokens[1];
+  this.memberOrKeywordSearchString = tokens[1];
   this.menuSearchString = tokens[0];
 };
 
@@ -1012,7 +1013,7 @@ RegexLibrary = {};
 
 /**
  * Create and return a function that will take a {@PackageLink}, {@ClassLink},
- * {@MethodLink} or {@KeywordLink} as an argument and return true if that link
+ * {@MemberLink} or {@KeywordLink} as an argument and return true if that link
  * matches the given search string and return false otherwise.
  * 
  * @param searchString
@@ -1144,7 +1145,7 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function () {
 
 /**
  * Create and return a function that will take a {@PackageLink}, {@ClassLink},
- * {@MethodLink} or {@KeywordLink} as an argument and return true if that link
+ * {@MemberLink} or {@KeywordLink} as an argument and return true if that link
  * is a case-sensitive exact match for the given search string and return false
  * otherwise.
  * 
@@ -1157,7 +1158,7 @@ RegexLibrary.createCaseInsensitiveExactMatchCondition = function (searchString) 
 
 /**
  * Create and return a function that will take a {@PackageLink}, {@ClassLink},
- * {@MethodLink} or {@KeywordLink} as an argument and return true if that link
+ * {@MemberLink} or {@KeywordLink} as an argument and return true if that link
  * is a case-sensitive exact match for the given search string and return false
  * otherwise.
  * 
@@ -1380,7 +1381,7 @@ Search._performSearch = function (entireSearchString) {
       searchContext.packageMenu = packageMenu;
 
       this._PackagesAndClasses._perform(searchContext, Query.getPackageOrClassSearchString());
-      this._MethodsAndKeywords._perform(searchContext, Query.getMethodOrKeywordSearchString());
+      this._ClassMembersAndKeywords._perform(searchContext, Query.getMemberOrKeywordSearchString());
       this._Menu._perform(searchContext, Query.getMenuSearchString());
 
       if (searchContext.getContentsHtmlCallback) {
@@ -1388,7 +1389,7 @@ Search._performSearch = function (entireSearchString) {
         View.setContentsHtml(contentsHtml);
       }
 
-      this.topLink = searchContext.topMethodOrKeywordLink || searchContext.topPackageOrClassLink;
+      this.topLink = searchContext.topMemberOrKeywordLink || searchContext.topPackageOrClassLink;
       this._autoOpen();
 
       if (searchContext.menuPageOpened) {
@@ -1587,16 +1588,17 @@ Search._PackagesAndClasses._constructHtml = function () {
 
 /*
  * ----------------------------------------------------------------------------
- * Search._MethodsAndKeywords
+ * Search._ClassMembersAndKeywords
  * ----------------------------------------------------------------------------
  */
 
 /**
- * @class Search._MethodsAndKeywords Component of the search functionality that
- *                                   deals with method and keyword links.
+ * @class Search._ClassMembersAndKeywords Component of the search functionality
+ *                                        that deals with class members and
+ *                                        keyword links.
  * @private
  */
-Search._MethodsAndKeywords = {
+Search._ClassMembersAndKeywords = {
   httpRequest : new HttpRequest(),
 
   keywords : {
@@ -1622,7 +1624,7 @@ Search._MethodsAndKeywords = {
   ]
 };
 
-Search._MethodsAndKeywords._perform = function (searchContext, searchString) {
+Search._ClassMembersAndKeywords._perform = function (searchContext, searchString) {
   var topPackageOrClassLink = searchContext.topPackageOrClassLink;
   if (searchString === null || !topPackageOrClassLink) {
     this.httpRequest.abort();
@@ -1636,19 +1638,19 @@ Search._MethodsAndKeywords._perform = function (searchContext, searchString) {
   this.httpRequest.load(topPackageOrClassLink.getUrl(), progressCallback);
   if (this.httpRequest.isComplete()) {
     var packageOrClassPageHtml = this.httpRequest.getResource();
-    var methodAndKeywordLinks = this._getMethodAndKeywordLinks(topPackageOrClassLink.getUrl(), packageOrClassPageHtml);
+    var memberAndKeywordLinks = this._getMemberAndKeywordLinks(topPackageOrClassLink.getUrl(), packageOrClassPageHtml);
     var condition = RegexLibrary.createCondition(searchString);
 
-    var matchingMethodAndKeywordLinks = methodAndKeywordLinks.filter(condition);
-    searchContext.topMethodOrKeywordLink = matchingMethodAndKeywordLinks.length > 0 ? matchingMethodAndKeywordLinks[0] : null;
+    var matchingMemberAndKeywordLinks = memberAndKeywordLinks.filter(condition);
+    searchContext.topMemberOrKeywordLink = matchingMemberAndKeywordLinks.length > 0 ? matchingMemberAndKeywordLinks[0] : null;
 
     searchContext.getContentsHtmlCallback = new Callback(function () {
       var html = '';
-      if (matchingMethodAndKeywordLinks.length === 0) {
+      if (matchingMemberAndKeywordLinks.length === 0) {
         html += 'No search results.';
       } else {
-        matchingMethodAndKeywordLinks.forEach(function (methodOrKeywordLink) {
-          html += methodOrKeywordLink.getHtml();
+        matchingMemberAndKeywordLinks.forEach(function (memberOrKeywordLink) {
+          html += memberOrKeywordLink.getHtml();
         });
       }
       return topPackageOrClassLink.getHtml() + '<p>' + html + '</p>';
@@ -1657,16 +1659,16 @@ Search._MethodsAndKeywords._perform = function (searchContext, searchString) {
     searchContext.getContentsHtmlCallback = new Callback(function () {
       return topPackageOrClassLink.getHtml() + '<p>' + this.httpRequest.getStatusMessage() + '</p>';
     }, this);
-    searchContext.methodAndKeywordLinksLoading = true;
+    searchContext.memberAndKeywordLinksLoading = true;
   }
 };
 
-Search._MethodsAndKeywords._getMethodAndKeywordLinks = function (baseUrl, packageOrClassPageHtml) {
+Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function (baseUrl, packageOrClassPageHtml) {
   var names = this._getAnchorNames(packageOrClassPageHtml);
-  return this._createMethodAndKeywordLinks(baseUrl, names);
+  return this._createMemberAndKeywordLinks(baseUrl, names);
 };
 
-Search._MethodsAndKeywords._getAnchorNames = function (packageOrClassPageHtml) {
+Search._ClassMembersAndKeywords._getAnchorNames = function (packageOrClassPageHtml) {
   var anchorRegex = /<a name=\"([^\"]+)\"/gi;
   var matches;
   var names = [];
@@ -1676,14 +1678,14 @@ Search._MethodsAndKeywords._getAnchorNames = function (packageOrClassPageHtml) {
   return names;
 };
 
-Search._MethodsAndKeywords._createMethodAndKeywordLinks = function (baseUrl, names) {
+Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function (baseUrl, names) {
   var links = [];
   var keywordLinks = [];
   names.forEach(function (name) {
     if (this._isKeywordName(name)) {
       keywordLinks.push(new KeywordLink(baseUrl, name));
     } else {
-      links.push(new MethodLink(baseUrl, name));
+      links.push(new MemberLink(baseUrl, name));
     }
   }, this);
   keywordLinks.forEach(function (keywordLink) {
@@ -1692,7 +1694,7 @@ Search._MethodsAndKeywords._createMethodAndKeywordLinks = function (baseUrl, nam
   return links;
 };
 
-Search._MethodsAndKeywords._isKeywordName = function (name) {
+Search._ClassMembersAndKeywords._isKeywordName = function (name) {
   if (this.keywords[name] === 1) {
     return true;
   }
@@ -1721,21 +1723,21 @@ Search._Menu = {
 
 Search._Menu._perform = function (searchContext, searchString) {
   var topPackageOrClassLink = searchContext.topPackageOrClassLink;
-  var topMethodOrKeywordLink = searchContext.topMethodOrKeywordLink;
+  var topMemberOrKeywordLink = searchContext.topMemberOrKeywordLink;
 
   var performMenuSearch = searchString !== null && topPackageOrClassLink &&
-      !searchContext.methodAndKeywordLinksLoading && topMethodOrKeywordLink !== null;
+      !searchContext.memberAndKeywordLinksLoading && topMemberOrKeywordLink !== null;
   if (!performMenuSearch) {
     return;
   }
 
   var menuReplacement = this._getMenuReplacement();
-  var menu = this._constructMenu(searchContext, menuReplacement, topPackageOrClassLink, topMethodOrKeywordLink);
+  var menu = this._constructMenu(searchContext, menuReplacement, topPackageOrClassLink, topMemberOrKeywordLink);
 
   searchContext.getContentsHtmlCallback = new Callback(function () {
     var html = topPackageOrClassLink.getHtml();
-    if (topMethodOrKeywordLink) {
-      html += '<br/>' + topMethodOrKeywordLink.getHtml();
+    if (topMemberOrKeywordLink) {
+      html += '<br/>' + topMemberOrKeywordLink.getHtml();
     }
     html += '<p>' + this._constructMenuHtml(menu) + '</p>';
     return html;
@@ -1755,11 +1757,11 @@ Search._Menu._perform = function (searchContext, searchString) {
   searchContext.menuPageOpened = true;
 };
 
-Search._Menu._constructMenu = function (searchContext, menuReplacement, classOrPackageLink, methodOrKeywordLink) {
-  var methodLink;
-  if (methodOrKeywordLink &&
-      methodOrKeywordLink.getType() === LinkType.METHOD) {
-    methodLink = methodOrKeywordLink;
+Search._Menu._constructMenu = function (searchContext, menuReplacement, classOrPackageLink, memberOrKeywordLink) {
+  var classMemberLink;
+  if (memberOrKeywordLink &&
+      memberOrKeywordLink.getType() === LinkType.CLASS_MEMBER) {
+    classMemberLink = memberOrKeywordLink;
   };
 
   var menuDefinition;
@@ -1784,7 +1786,7 @@ Search._Menu._constructMenu = function (searchContext, menuReplacement, classOrP
           var f = menuReplacement[matches[1]];
           var rx2 = new RegExp(matches[0], 'g');
           if (f) {
-            url = url.replace(rx2, f(classOrPackageLink, methodLink));
+            url = url.replace(rx2, f(classOrPackageLink, classMemberLink));
           } else {
             url = url.replace(rx2, '');
           }
@@ -1806,6 +1808,9 @@ Search._Menu._constructMenu = function (searchContext, menuReplacement, classOrP
  */
 Search._Menu._getMenuReplacement = function () {
   if (!this.menuReplacement) {
+    var memberNameFunction = function (classOrPackageLink, classMemberLink) {
+      return classMemberLink ? classMemberLink.getName() : '';
+    };
     this.menuReplacement = {
       CLASS_NAME: function (classLink) { 
         return classLink ? classLink.getClassName() : '';
@@ -1816,13 +1821,10 @@ Search._Menu._getMenuReplacement = function () {
       PACKAGE_PATH: function (classOrPackageLink) { 
         return classOrPackageLink ? classOrPackageLink.getPackageName().replace(/\./g, '/') : '';
       },
-      METHOD_NAME: function (classOrPackageLink, methodLink) {
-        return methodLink ? methodLink.getMethodName() : '';
-      },
-      ANCHOR_NAME: function (classOrPackageLink, methodLink) {
-        // This is a deprecated alternative to METHOD_NAME.
-        return methodLink ? methodLink.getMethodName() : '';
-      }
+      MEMBER_NAME: memberNameFunction,
+      METHOD_NAME: memberNameFunction, // Synonym for METHOD_NAME.
+      FIELD_NAME: memberNameFunction,  // Synonym for METHOD_NAME.
+      ANCHOR_NAME: memberNameFunction  // Deprecated synonym for METHOD_NAME.
     };
   }
   return this.menuReplacement;
@@ -1883,8 +1885,11 @@ function init(unitTestResultsCallback) {
       Frames.hideAllPackagesFrame();
     }
 
-    // Give focus to the search field.
-    View.focusOnSearchField();
+    // If the autofocus attribute is not supported, manually give focus to the
+    // search field.
+    if (!('autofocus' in document.createElement('input'))) {
+      View.focusOnSearchField();
+    }
 
     // Provide the unit test results to the callback function.
     unitTestResultsCallback(unitTestResults);
