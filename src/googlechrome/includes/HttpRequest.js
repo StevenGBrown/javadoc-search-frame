@@ -1,7 +1,7 @@
 /**
  * The MIT License
  * 
- * Copyright (c) 2009 Steven G. Brown
+ * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  * 
  * Permission is hereby granted, free of charge, to any person
@@ -36,7 +36,8 @@
 /**
  * @class HttpRequest Asynchronously loads resources from external URLs.
  */
-HttpRequest = function () {
+HttpRequest = function (view) {
+  this.view = view;
   this.port = null;
   this.url = null;
   this.loadedResource = null;
@@ -59,10 +60,27 @@ HttpRequest.prototype.load = function (url, progressCallback) {
   this.abort();
   this.url = url;
 
+  var thisObj = this;
+
+  if (url.indexOf('file://') === 0) {
+    chrome.extension.sendRequest(
+        {
+          operation:'requestContent',
+          contentUrl:url
+        },
+        function (response) {
+          thisObj.view.removeInnerFrame(url);
+          thisObj.loadedResource = response;
+          progressCallback();
+        }
+    );
+    this.view.addInnerFrame(url);
+    return;
+  }
+
   var connectionInfo = {name: 'httpRequest', httpRequestUrl: url};
   this.port = chrome.extension.connect(connectionInfo);
 
-  var thisObj = this;
   this.port.onMessage.addListener(function (msg) {
     if (msg.type === 'status') {
       thisObj.statusMessage = msg.status;
