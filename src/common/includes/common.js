@@ -736,7 +736,8 @@ KeywordLink.prototype.getUrl = function () {
 View = {
   searchField : null,
   contentNodeParent : null,
-  contentNode : null
+  contentNode : null,
+  innerFrame : null
 };
 
 /**
@@ -795,6 +796,26 @@ View.getSearchFieldValue = function () {
  */
 View.focusOnSearchField = function () {
   this.searchField.focus();
+};
+
+/**
+ * Add an inner frame with the given URL.
+ * @param url
+ */
+View.addInnerFrame = function (url) {
+  this.innerFrame = document.createElement('iframe');
+  document.body.appendChild(this.innerFrame);
+  this.innerFrame.src = url;
+};
+
+/**
+ * Remove the previously added inner frame.
+ */
+View.removeInnerFrame = function () {
+  if (this.innerFrame) {
+    document.body.removeChild(this.innerFrame);
+  }
+  this.innerFrame = null;
 };
 
 View._create = function (eventHandlers, packageFrameHidden) {
@@ -1599,7 +1620,7 @@ Search._PackagesAndClasses._constructHtml = function () {
  * @private
  */
 Search._ClassMembersAndKeywords = {
-  httpRequest : new HttpRequest(),
+  httpRequest : new HttpRequest(View),
 
   keywords : {
     'navbar_top':1,

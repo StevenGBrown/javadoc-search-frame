@@ -1,7 +1,7 @@
 /**
  * The MIT License
  * 
- * Copyright (c) 2009 Steven G. Brown
+ * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  * 
  * Permission is hereby granted, free of charge, to any person
@@ -36,7 +36,7 @@
 /**
  * @class HttpRequest Asynchronously loads resources from external URLs.
  */
-HttpRequest = function () {
+HttpRequest = function (view) {
   this.xmlHttpRequest = null;
   this.url = null;
   this.loadedResource = null;
