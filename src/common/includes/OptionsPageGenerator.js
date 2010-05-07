@@ -1,7 +1,7 @@
 /**
  * The MIT License
  * 
- * Copyright (c) 2009 Steven G. Brown
+ * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  * 
  * Permission is hereby granted, free of charge, to any person
@@ -42,7 +42,7 @@ OptionsPageGenerator = {};
  * Generate the options page by replacing the current document.
  */
 OptionsPageGenerator.generate = function () {
-  document.title = 'Options: Javadoc Search Frame';
+  document.title = Messages.get('optionsTitle');
 
   while (document.body.firstChild) {
     document.body.removeChild(document.body.firstChild);
@@ -63,36 +63,38 @@ OptionsPageGenerator._createContents = function (pageDocument) {
     contents.push(pageDocument.createElement('p'));
   }
   contents.push(this._booleanOption(
-      pageDocument, Option.AUTO_OPEN, 'Automatic Opening of Links',
-      'On. Automatically open the first package, class or method in the list after each search.',
-      'Off. Wait for the <tt>Enter</tt> key to be pressed.'));
+      pageDocument, Option.AUTO_OPEN,
+      Messages.get('autoOpenOptionTitle'),
+      Messages.get('autoOpenOptionOn'),
+      Messages.get('autoOpenOptionOff')));
   contents.push(pageDocument.createElement('p'));
   contents.push(this._booleanOption(
-      pageDocument, Option.HIDE_PACKAGE_FRAME, 'Merge the Package and Class Frames',
-      'Yes. All packages and classes can be searched using a single combined frame.',
-      'No. The package frame will not be hidden. Only one package can be searched at a time.'));
+      pageDocument, Option.HIDE_PACKAGE_FRAME,
+      Messages.get('mergeFramesOptionTitle'),
+      Messages.get('mergeFramesOptionOn'),
+      Messages.get('mergeFramesOptionOff')));
   contents.push(pageDocument.createElement('p'));
   contents.push(this._menuOption(
-      pageDocument, Option.CLASS_MENU, 'Class/Method Menu',
-      'Menu displayed when pressing the <tt>@</tt> key if a class or method is ' +
-      'currently at the top of the search list.'));
+      pageDocument, Option.CLASS_MENU,
+      Messages.get('classOrMethodMenuTitle'),
+      Messages.get('classOrMethodMenuDescription')));
   contents.push(pageDocument.createElement('p'));
   contents.push(this._menuOption(
-      pageDocument, Option.PACKAGE_MENU, 'Package Menu',
-      'Menu displayed when pressing the <tt>@</tt> key if a package is currently ' +
-      'at the top of the search list.'));
+      pageDocument, Option.PACKAGE_MENU,
+      Messages.get('packageMenuTitle'),
+      Messages.get('packageMenuDescription')));
   return contents;
 };
 
 OptionsPageGenerator._createHeader = function (pageDocument) {
   var headerElement = pageDocument.createElement('h2');
-  headerElement.textContent = 'Options: Javadoc Search Frame';
+  headerElement.textContent = Messages.get('optionsTitle');
   return headerElement;
 };
 
 OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function (pageDocument) {
   var errorMessageElement = pageDocument.createElement('p');
-  errorMessageElement.innerHTML = 'Options cannot be configured.';
+  errorMessageElement.innerHTML = Messages.get('optionsReadOnly');
   errorMessageElement.style.color = 'red';
   return errorMessageElement;
 };
@@ -114,9 +116,9 @@ OptionsPageGenerator._booleanOption = function (pageDocument, option, title, tru
   });
 
   if (option.getDefaultValue()) {
-    trueText += ' (Default)';
+    trueText += ' ' + Messages.get('default');
   } else {
-    falseText += ' (Default)';
+    falseText += ' ' + Messages.get('default');
   }
 
   return this._createTable(pageDocument, title, '', [
@@ -158,7 +160,8 @@ OptionsPageGenerator._menuOption = function (pageDocument, option, title, subTit
 
   var restoreDefaultButtonElement = pageDocument.createElement('input');
   restoreDefaultButtonElement.setAttribute('type', 'button');
-  restoreDefaultButtonElement.setAttribute('value', 'Restore Default');
+  restoreDefaultButtonElement.setAttribute('value',
+      Messages.get('restoreDefault'));
   if (!Option.canGetAndSet()) {
     restoreDefaultButtonElement.setAttribute('disabled', true);
   }

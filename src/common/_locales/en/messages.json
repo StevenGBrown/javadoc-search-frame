@@ -1,0 +1,101 @@
+/**
+ * The MIT License
+ * 
+ * Copyright (c) 2010 Steven G. Brown
+ * 
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ * 
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+
+{
+  "extName": {
+    "message": "Javadoc Search Frame",
+    "description": "Extension name."
+  },
+  "extDescription": {
+    "message": "Javadoc incremental search for packages and classes.",
+    "description": "Extension description."
+  },
+  "optionsAnchor": {
+    "message": "Options",
+    "description": "Label used for the options page anchor."
+  },
+
+  // The remaining messages are all used for the options page only.
+
+  "optionsTitle": {
+    "message": "Options: Javadoc Search Frame",
+    "description": "Title of the options page."
+  },
+  "autoOpenOptionTitle": {
+    "message": "Automatic Opening of Links",
+    "description": "Title of the options page section used to configure the auto-open option."
+  },
+  "autoOpenOptionOn": {
+    "message": "On. Automatically open the first package, class or method in the list after each search.",
+    "description": "Label displayed for the button to turn on the auto-open option."
+  },
+  "autoOpenOptionOff": {
+    "message": "Off. Wait for the Enter key to be pressed.",
+    "description": "Label displayed for the button to turn off the auto-open option."
+  },
+  "mergeFramesOptionTitle": {
+    "message": "Merge the Package and Class Frames",
+    "description": "Title of the options page section used to configure the merge frames option."
+  },
+  "mergeFramesOptionOn": {
+    "message": "Yes. All packages and classes can be searched using a single combined frame.",
+    "description": "Label displayed next to the button to turn on the merge frames option."
+  },
+  "mergeFramesOptionOff": {
+    "message": "No. The package frame will not be hidden. Only one package can be searched at a time.",
+    "description": "Label displayed next to the button to turn off the merge frames option."
+  },
+  "classOrMethodMenuTitle": {
+    "message": "Class/Method Menu",
+    "description": "Title of the options page section used to configure the class/method menu."
+  },
+  "classOrMethodMenuDescription": {
+    "message": "Menu displayed when pressing the @ key if a class or method is currently at the top of the search list.",
+    "description": "Further description of the class/method menu."
+  },
+  "packageMenuTitle": {
+    "message": "Package Menu",
+    "description": "Title of the options page section used to configure the package menu."
+  },
+  "packageMenuDescription": {
+    "message": "Menu displayed when pressing the @ key if a package is currently at the top of the search list.",
+    "description": "Further description of the package menu."
+  },
+  "default": {
+    "message": "(Default)",
+    "description": "Tag displayed on the default option. This applies to the boolean options only."
+  },
+  "restoreDefault": {
+    "message": "Restore Default",
+    "description": "Label displayed on the each button to reset a menu option to the default value."
+  },
+  "optionsReadOnly": {
+    "message": "Options cannot be configured.",
+    "description": "Error message displayed when the options cannot be configured."
+  }
+}

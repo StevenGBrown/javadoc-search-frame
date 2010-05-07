@@ -46,7 +46,8 @@ def buildGreasemonkeyUserScript():
     transformations=(
       prepend('greasemonkey/metadata_block.txt'),
       insertValue('unquotedBuildDate', formattedBuildDate()),
-      insertExternalFiles(['common/includes', 'greasemonkey/includes']),
+      insertExternalFiles(
+          ['common/_locales/en', 'common/includes', 'greasemonkey/includes']),
       insertValue('buildDate', '\'' + formattedBuildDate() + '\''),
       insertValue('buildYear', buildYear())
     )
