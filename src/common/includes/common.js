@@ -817,6 +817,7 @@ View.removeInnerFrame = function () {
   this.innerFrame = null;
 };
 
+View._create = function (eventHandlers) {
   var tableElement = document.createElement('table');
   var tableRowElementOne = document.createElement('tr');
   var tableDataCellElementOne = document.createElement('td');
