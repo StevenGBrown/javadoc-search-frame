@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import distutils.dir_util, io, os, shutil, sys
+import distutils.dir_util, fnmatch, io, os, shutil, sys
 from . import static_analysis
 
 
@@ -98,7 +98,7 @@ def copyDir(fromDir, toDir):
       os.path.join(sys.path[0], '..', 'src', fromDir))
   absToDir = os.path.abspath(toDir)
   for root, dirs, files in os.walk(absFromDir):
-    for file in files:
+    for file in [f for f in files if not _junkFile(f)]:
       sourceFile = os.path.join(root, file)
       static_analysis.analyse(sourceFile)
       targetFile = os.path.join(absToDir,
@@ -107,3 +107,20 @@ def copyDir(fromDir, toDir):
       if not os.path.isdir(targetFileDir):
         os.makedirs(targetFileDir)
       shutil.copyfile(sourceFile, targetFile)
+
+
+def _junkFile(fileName):
+  """
+  Determine whether the given path points to a junk file.
+  filename: The file name path to test.
+  """
+
+  patterns = [
+    '.*.swp', # Vim swap file.
+    '*~',     # Vim backup file, created on save.
+    '*.orig'  # TortoiseHg backup file, created on revert.
+  ]
+  for pattern in patterns:
+    if fnmatch.fnmatch(fileName, pattern):
+      return True
+  return False
