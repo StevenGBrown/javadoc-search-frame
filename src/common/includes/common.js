@@ -880,7 +880,7 @@ View._createEraseButton = function (eventHandlers) {
 View._createOptionsLink = function (eventHandlers) {
   var anchorElement = document.createElement('a');
   anchorElement.setAttribute('href', 'javascript:void(0);');
-  anchorElement.textContent = 'Options';
+  anchorElement.textContent = Messages.get('optionsAnchor');
   anchorElement.addEventListener('click', eventHandlers.optionsLinkClicked, false);
   var fontElement = document.createElement('font');
   fontElement.setAttribute('size', '-2');

@@ -1,7 +1,7 @@
 """
 The MIT License
 
-Copyright (c) 2009 Steven G. Brown
+Copyright (c) 2010 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -85,3 +85,16 @@ def copyAndRenameFile(fromPath, toPath, transformations=()):
     with io.open(absToPath, 'w', newline='\n') as toFile:
       toFile.write(fileContents)
   static_analysis.analyse(absToPath)
+
+
+def copyDir(fromDir, toDir):
+  """
+  Copy a directory.
+  fromDir: Directory to copy, relative to the source directory.
+  toDir: Location to copy this directory to, relative to the current directory.
+  """
+
+  absFromDir = os.path.abspath(
+      os.path.join(sys.path[0], '..', 'src', fromDir))
+  absToDir = os.path.abspath(toDir)
+  distutils.dir_util.copy_tree(absFromDir, absToDir)

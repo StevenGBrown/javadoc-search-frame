@@ -67,6 +67,8 @@ def buildGoogleChromeExtension():
     fromDir='googlechrome/icons', toDir='icons'
   )
 
+  copyDir(fromDir='common/_locales', toDir='_locales')
+
 
 def readVersionFromManifest():
   """

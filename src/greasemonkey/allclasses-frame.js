@@ -3,6 +3,10 @@
 
 (function () {
 
+var messages =
+#INCLUDE messages.json
+
+#INCLUDE Messages.js
 #INCLUDE Storage.js
 #INCLUDE Option.js
 #INCLUDE Frames.js
