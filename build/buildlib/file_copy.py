@@ -97,4 +97,13 @@ def copyDir(fromDir, toDir):
   absFromDir = os.path.abspath(
       os.path.join(sys.path[0], '..', 'src', fromDir))
   absToDir = os.path.abspath(toDir)
-  distutils.dir_util.copy_tree(absFromDir, absToDir)
+  for root, dirs, files in os.walk(absFromDir):
+    for file in files:
+      sourceFile = os.path.join(root, file)
+      static_analysis.analyse(sourceFile)
+      targetFile = os.path.join(absToDir,
+          os.path.relpath(sourceFile, absFromDir))
+      targetFileDir = os.path.dirname(targetFile)
+      if not os.path.isdir(targetFileDir):
+        os.makedirs(targetFileDir)
+      shutil.copyfile(sourceFile, targetFile)
