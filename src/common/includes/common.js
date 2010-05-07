@@ -845,7 +845,7 @@ View._createSearchField = function (eventHandlers, packageFrameHidden) {
   }
   searchField.setAttribute('placeholder', placeholderText);
 
-  searchField.style.width = '200px';
+  searchField.style.width = '180px';
   searchField.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
   searchField.addEventListener('input', eventHandlers.searchFieldChanged, false);
   searchField.addEventListener('focus', eventHandlers.searchFieldFocus, false);
