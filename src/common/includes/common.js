@@ -1831,9 +1831,9 @@ Search._Menu._getMenuReplacement = function () {
         return classOrPackageLink ? classOrPackageLink.getPackageName().replace(/\./g, '/') : '';
       },
       MEMBER_NAME: memberNameFunction,
-      METHOD_NAME: memberNameFunction, // Synonym for METHOD_NAME.
-      FIELD_NAME: memberNameFunction,  // Synonym for METHOD_NAME.
-      ANCHOR_NAME: memberNameFunction  // Deprecated synonym for METHOD_NAME.
+      METHOD_NAME: memberNameFunction, // Synonym for MEMBER_NAME.
+      FIELD_NAME: memberNameFunction,  // Synonym for MEMBER_NAME.
+      ANCHOR_NAME: memberNameFunction  // Deprecated synonym for MEMBER_NAME.
     };
   }
   return this.menuReplacement;
