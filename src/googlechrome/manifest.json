@@ -14,8 +14,10 @@
     {
       "matches": [
           "http://*/*/allclasses-frame.html",
+          "https://*/*/allclasses-frame.html",
           "file://*/*/allclasses-frame.html",
           "http://*/*/package-frame.html",
+          "https://*/*/package-frame.html",
           "file://*/*/package-frame.html"
       ],
       "js": [
@@ -27,6 +29,7 @@
     {
       "matches": [
           "http://*/*",
+          "https://*/*",
           "file://*/*"
       ],
       "js": [
@@ -48,6 +51,7 @@
   "options_page": "options.html",
   "permissions": [
     "tabs",
-    "http://*/*"
+    "http://*/*",
+    "https://*/*"
   ]
 }
