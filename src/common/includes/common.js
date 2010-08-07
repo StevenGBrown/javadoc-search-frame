@@ -825,7 +825,9 @@ View._create = function (eventHandlers) {
   var tableDataCellElementTwo = document.createElement('td');
 
   this.searchField = this._createSearchField(eventHandlers);
-  var eraseButton = this._createEraseButton(eventHandlers);
+  if (this.searchField.type === 'text') {
+    var eraseButton = this._createEraseButton(eventHandlers);
+  }
   var optionsLink = this._createOptionsLink(eventHandlers);
   this.contentNodeParent = tableRowElementTwo;
   this.contentNode = tableDataCellElementTwo;
@@ -833,7 +835,9 @@ View._create = function (eventHandlers) {
   tableElement.appendChild(tableRowElementOne);
   tableRowElementOne.appendChild(tableDataCellElementOne);
   tableDataCellElementOne.appendChild(this.searchField);
-  tableDataCellElementOne.appendChild(eraseButton);
+  if (eraseButton) {
+    tableDataCellElementOne.appendChild(eraseButton);
+  }
   tableDataCellElementOne.appendChild(document.createElement('br'));
   tableDataCellElementOne.appendChild(optionsLink);
   tableElement.appendChild(tableRowElementTwo);
@@ -853,7 +857,7 @@ View._create = function (eventHandlers) {
 
 View._createSearchField = function (eventHandlers) {
   var searchField = document.createElement('input');
-  searchField.setAttribute('type', 'text');
+  searchField.setAttribute('type', 'search');
   searchField.setAttribute('spellcheck', 'false');
   searchField.setAttribute('autofocus', 'true');
   searchField.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
