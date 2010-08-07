@@ -23,8 +23,7 @@
       "js": [
           "allclasses-frame.js"
       ],
-      "all_frames": true,
-      "run_at": "document_end"
+      "all_frames": true
     },
     {
       "matches": [
@@ -35,8 +34,7 @@
       "js": [
           "hide-packages-frame.js"
       ],
-      "all_frames": true,
-      "run_at": "document_end"
+      "all_frames": true
     },
     {
       "matches": [
