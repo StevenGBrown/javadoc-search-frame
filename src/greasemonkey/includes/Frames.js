@@ -98,7 +98,7 @@ Frames.openLinkInNewTab = function(url) {
  * Get the frame with the given name. This frame will share a parent with the
  * current frame.
  * @param name
- * @return the frame, or null if it could not be found
+ * @return the frame, or null if it could not be found.
  * @private
  */
 Frames._getFrame = function(name) {

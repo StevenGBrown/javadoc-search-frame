@@ -51,7 +51,7 @@ Option = function(properties) {
 
 /**
  * @return {Boolean} true if options can be both retrieved and set, false
- *                    otherwise
+ *                    otherwise.
  */
 Option.canGetAndSet = function() {
   return Storage.canGet() && Storage.canSet();
@@ -92,7 +92,7 @@ Option.prototype.getValue = function(callback, thisObject) {
 };
 
 /**
- * @return the default value of this option
+ * @return the default value of this option.
  */
 Option.prototype.getDefaultValue = function() {
   return this.defaultValue;

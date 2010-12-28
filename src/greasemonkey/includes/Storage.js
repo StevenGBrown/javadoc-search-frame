@@ -39,7 +39,7 @@
 Storage = {};
 
 /**
- * @return {Boolean} true if retrieval of stored data is supported, false otherwise
+ * @return {Boolean} true if retrieval of stored data is supported, false otherwise.
  */
 Storage.canGet = function() {
   try {
@@ -60,7 +60,7 @@ Storage.get = function(key, callback) {
 };
 
 /**
- * @return {Boolean} true if modification of stored data is supported, false otherwise
+ * @return {Boolean} true if modification of stored data is supported, false otherwise.
  */
 Storage.canSet = function() {
   try {

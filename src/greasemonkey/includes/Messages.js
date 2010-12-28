@@ -40,7 +40,7 @@ Messages = {};
 /**
  * Retrieve a localised string.
  * @param key the key used to lookup the localised string.
- * @return {String} the localised string
+ * @return {String} the localised string.
  */
 Messages.get = function(key) {
   return messages[key].message;

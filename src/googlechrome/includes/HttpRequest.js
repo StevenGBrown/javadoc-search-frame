@@ -103,7 +103,7 @@ HttpRequest.prototype.isComplete = function() {
 };
 
 /**
- * @return a status message on the progress made towards loading the resource
+ * @return a status message on the progress made towards loading the resource.
  */
 HttpRequest.prototype.getStatusMessage = function() {
   if (this.statusMessage) {
@@ -113,7 +113,7 @@ HttpRequest.prototype.getStatusMessage = function() {
 };
 
 /**
- * @return the loaded resource, or null if the loading is not complete
+ * @return the loaded resource, or null if the loading is not complete.
  */
 HttpRequest.prototype.getResource = function() {
   return this.loadedResource;
