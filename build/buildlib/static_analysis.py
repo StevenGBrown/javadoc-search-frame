@@ -29,6 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 # Developed with Python v3.0.1
 
 import io, os, re
+from subprocess import *
 
 
 def analyse(filePath):
@@ -37,6 +38,7 @@ def analyse(filePath):
   """
 
   if isText(filePath):
+    closureLinter(filePath)
     with io.open(filePath) as file:
       fileContents = file.read()
     log = createLogger(filePath)
@@ -54,6 +56,18 @@ def isText(filePath):
 
   textExtensions = ['.js', '.json', 'html']
   return any([filePath.endswith(extension) for extension in textExtensions])
+
+
+def closureLinter(filePath):
+  """
+  Inspect the given file with Closure Linter.
+  http://code.google.com/p/closure-linter/
+  """
+
+  proc = Popen(['gjslint', filePath], stdout=PIPE, stderr=STDOUT)
+  output = proc.communicate()[0]
+  if proc.returncode != 0:
+    print(output.decode())
 
 
 def createLogger(filePath):
