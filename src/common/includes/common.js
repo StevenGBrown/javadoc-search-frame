@@ -74,7 +74,8 @@ UnitTestSuite.run = function() {
     try {
       unitTestFunction.run();
     } catch (ex) {
-      this.failures.push(new UnitTestExceptionThrownFailure(this.unitTestFunctionName, ex));
+      this.failures.push(
+          new UnitTestExceptionThrownFailure(this.unitTestFunctionName, ex));
     }
   };
 
@@ -91,7 +92,8 @@ UnitTestSuite.run = function() {
  */
 UnitTestSuite.assertThat = function(description, actual, expected) {
   if (!UnitTestSuite._equals(expected, actual)) {
-    var failure = new UnitTestAssertionFailure(UnitTestSuite.unitTestFunctionName, description, actual, expected);
+    var failure = new UnitTestAssertionFailure(
+        UnitTestSuite.unitTestFunctionName, description, actual, expected);
     UnitTestSuite.failures.push(failure);
   }
   UnitTestSuite.assertionsCount++;
@@ -215,7 +217,8 @@ UnitTestResult.prototype.toString = function() {
  * Create a new UnitTestAssertionFailure.
  * @class A unit test failure due to a failed assertion.
  */
-UnitTestAssertionFailure = function(functionUnderTestName, description, actual, expected) {
+UnitTestAssertionFailure = function(
+    functionUnderTestName, description, actual, expected) {
   this.functionUnderTestName = functionUnderTestName;
   this.description = description;
   this.actual = actual;
@@ -230,7 +233,8 @@ UnitTestAssertionFailure.prototype.toString = function() {
   if (this.description) {
     failureString += this.description + '\n';
   }
-  failureString += 'Expected "' + this.expected + '" but was "' + this.actual + '"';
+  failureString += 'Expected "' + this.expected + '"' +
+                   ' but was "' + this.actual + '"';
   return failureString;
 };
 
@@ -387,23 +391,27 @@ function toAbsoluteUrl(relativeUrl, documentUrl) {
   if (!documentUrl) {
     documentUrl = location.href;
   }
-  var documentUrlPath = documentUrl.substring(0, documentUrl.lastIndexOf('/') + 1);
+  var documentUrlPath = documentUrl.substring(
+      0, documentUrl.lastIndexOf('/') + 1);
 
-  var relativeUrlPath = relativeUrl.substring(0, relativeUrl.lastIndexOf('/') + 1);
+  var relativeUrlPath = relativeUrl.substring(
+      0, relativeUrl.lastIndexOf('/') + 1);
   if (endsWith(documentUrlPath, relativeUrlPath)) {
-    documentUrlPath = documentUrlPath.substring(0, documentUrlPath.length - relativeUrlPath.length);
+    documentUrlPath = documentUrlPath.substring(
+        0, documentUrlPath.length - relativeUrlPath.length);
   }
 
   return documentUrlPath + relativeUrl;
 }
 
 UnitTestSuite.testFunctionFor('toAbsoluteUrl', function() {
-  assertThat('relative to "all classes" url',
-      toAbsoluteUrl('java/applet/AppletContext.html', 'http://java.sun.com/javase/6/docs/api/allclasses-frame.html'),
-      is('http://java.sun.com/javase/6/docs/api/java/applet/AppletContext.html'));
-  assertThat('relative to package url',
-      toAbsoluteUrl('java/applet/AppletContext.html', 'http://java.sun.com/javase/6/docs/api/java/applet/package-frame.html'),
-      is('http://java.sun.com/javase/6/docs/api/java/applet/AppletContext.html'));
+  var api = 'http://java.sun.com/javase/6/docs/api/';
+  assertThat('relative to "all classes" url', toAbsoluteUrl(
+      'java/applet/AppletContext.html', api + 'allclasses-frame.html'),
+      is(baseUrl + 'java/applet/AppletContext.html'));
+  assertThat('relative to package url', toAbsoluteUrl(
+      'java/applet/AppletContext.html', api + 'java/applet/package-frame.html'),
+      is(api + 'java/applet/AppletContext.html'));
 });
 
 
@@ -435,8 +443,9 @@ PackageLink.prototype.getHtml = function() {
 };
 
 UnitTestSuite.testFunctionFor('PackageLink.getHtml', function() {
-  assertThat('', new PackageLink('java.applet').getHtml(),
-      is('<A HREF="java/applet/package-summary.html" target="classFrame">java.applet</A>'));
+  assertThat('', new PackageLink('java.applet').getHtml(), is(
+      '<A HREF="java/applet/package-summary.html" target="classFrame">' +
+      'java.applet</A>'));
 });
 
 /**
@@ -543,18 +552,36 @@ ClassLink.prototype.getHtml = function() {
 };
 
 UnitTestSuite.testFunctionFor('ClassLink.getHtml', function() {
-  assertThat('interface', new ClassLink(LinkType.INTERFACE, 'javax.swing.text', 'AbstractDocument.AttributeContext').getHtml(),
-      is('<A HREF="javax/swing/text/AbstractDocument.AttributeContext.html" title="interface in javax.swing.text" target="classFrame"><I>AbstractDocument.AttributeContext</I></A>&nbsp;[&nbsp;javax.swing.text&nbsp;]'));
-  assertThat('class', new ClassLink(LinkType.CLASS, 'javax.lang.model.util', 'AbstractAnnotationValueVisitor6').getHtml(),
-      is('<A HREF="javax/lang/model/util/AbstractAnnotationValueVisitor6.html" title="class in javax.lang.model.util" target="classFrame">AbstractAnnotationValueVisitor6</A>&nbsp;[&nbsp;javax.lang.model.util&nbsp;]'));
-  assertThat('enum', new ClassLink(LinkType.ENUM, 'java.lang', 'Thread.State').getHtml(),
-      is('<A HREF="java/lang/Thread.State.html" title="enum in java.lang" target="classFrame">Thread.State</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
-  assertThat('exception', new ClassLink(LinkType.EXCEPTION, 'java.security', 'AccessControlException').getHtml(),
-      is('<A HREF="java/security/AccessControlException.html" title="class in java.security" target="classFrame">AccessControlException</A>&nbsp;[&nbsp;java.security&nbsp;]'));
-  assertThat('error', new ClassLink(LinkType.ERROR, 'java.lang.annotation', 'AnnotationFormatError').getHtml(),
-      is('<A HREF="java/lang/annotation/AnnotationFormatError.html" title="class in java.lang.annotation" target="classFrame">AnnotationFormatError</A>&nbsp;[&nbsp;java.lang.annotation&nbsp;]'));
-  assertThat('annotation', new ClassLink(LinkType.ANNOTATION, 'java.lang', 'Deprecated').getHtml(),
-      is('<A HREF="java/lang/Deprecated.html" title="annotation in java.lang" target="classFrame">Deprecated</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
+  assertThat('interface', new ClassLink(LinkType.INTERFACE, 'javax.swing.text',
+      'AbstractDocument.AttributeContext').getHtml(), is(
+      '<A HREF="javax/swing/text/AbstractDocument.AttributeContext.html" ' +
+      'title="interface in javax.swing.text" target="classFrame"><I>' +
+      'AbstractDocument.AttributeContext</I></A>&nbsp;[&nbsp;' +
+      'javax.swing.text&nbsp;]'));
+  assertThat('class', new ClassLink(LinkType.CLASS, 'javax.lang.model.util',
+      'AbstractAnnotationValueVisitor6').getHtml(), is(
+      '<A HREF="javax/lang/model/util/AbstractAnnotationValueVisitor6.html" ' +
+      'title="class in javax.lang.model.util" target="classFrame">' +
+      'AbstractAnnotationValueVisitor6</A>&nbsp;[&nbsp;javax.lang.model.util' +
+      '&nbsp;]'));
+  assertThat('enum', new ClassLink(LinkType.ENUM, 'java.lang',
+      'Thread.State').getHtml(), is(
+      '<A HREF="java/lang/Thread.State.html" title="enum in java.lang" ' +
+      'target="classFrame">Thread.State</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
+  assertThat('exception', new ClassLink(LinkType.EXCEPTION, 'java.security',
+      'AccessControlException').getHtml(), is(
+      '<A HREF="java/security/AccessControlException.html" ' +
+      'title="class in java.security" target="classFrame">' +
+      'AccessControlException</A>&nbsp;[&nbsp;java.security&nbsp;]'));
+  assertThat('error', new ClassLink(LinkType.ERROR, 'java.lang.annotation',
+      'AnnotationFormatError').getHtml(), is(
+      '<A HREF="java/lang/annotation/AnnotationFormatError.html" ' +
+      'title="class in java.lang.annotation" target="classFrame">' +
+      'AnnotationFormatError</A>&nbsp;[&nbsp;java.lang.annotation&nbsp;]'));
+  assertThat('annotation', new ClassLink(LinkType.ANNOTATION, 'java.lang',
+      'Deprecated').getHtml(), is(
+      '<A HREF="java/lang/Deprecated.html" title="annotation in java.lang" ' +
+      'target="classFrame">Deprecated</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
 });
 
 /**
@@ -575,7 +602,8 @@ ClassLink.prototype.getClassName = function() {
  * @return the name of the package that contains this class.
  */
 ClassLink.prototype.getPackageName = function() {
-  return this.canonicalName.substring(0, this.canonicalName.length - this.className.length - 1);
+  return this.canonicalName.substring(
+      0, this.canonicalName.length - this.className.length - 1);
 };
 
 /**
@@ -593,18 +621,23 @@ ClassLink.prototype.getUrl = function() {
 };
 
 UnitTestSuite.testFunctionFor('ClassLink.getUrl', function() {
-  assertThat('interface', new ClassLink(LinkType.INTERFACE, 'javax.swing.text', 'AbstractDocument.AttributeContext').getUrl(),
-      is(toAbsoluteUrl('javax/swing/text/AbstractDocument.AttributeContext.html')));
-  assertThat('class', new ClassLink(LinkType.CLASS, 'javax.lang.model.util', 'AbstractAnnotationValueVisitor6').getUrl(),
-      is(toAbsoluteUrl('javax/lang/model/util/AbstractAnnotationValueVisitor6.html')));
-  assertThat('enum', new ClassLink(LinkType.ENUM, 'java.lang', 'Thread.State').getUrl(),
-      is(toAbsoluteUrl('java/lang/Thread.State.html')));
-  assertThat('exception', new ClassLink(LinkType.EXCEPTION, 'java.security', 'AccessControlException').getUrl(),
-      is(toAbsoluteUrl('java/security/AccessControlException.html')));
-  assertThat('error', new ClassLink(LinkType.ERROR, 'java.lang.annotation', 'AnnotationFormatError').getUrl(),
-      is(toAbsoluteUrl('java/lang/annotation/AnnotationFormatError.html')));
-  assertThat('annotation', new ClassLink(LinkType.ANNOTATION, 'java.lang', 'Deprecated').getUrl(),
-      is(toAbsoluteUrl('java/lang/Deprecated.html')));
+  assertThat('interface', new ClassLink(LinkType.INTERFACE, 'javax.swing.text',
+      'AbstractDocument.AttributeContext').getUrl(), is(toAbsoluteUrl(
+      'javax/swing/text/AbstractDocument.AttributeContext.html')));
+  assertThat('class', new ClassLink(LinkType.CLASS, 'javax.lang.model.util',
+      'AbstractAnnotationValueVisitor6').getUrl(), is(toAbsoluteUrl(
+      'javax/lang/model/util/AbstractAnnotationValueVisitor6.html')));
+  assertThat('enum', new ClassLink(LinkType.ENUM, 'java.lang',
+      'Thread.State').getUrl(), is(toAbsoluteUrl(
+      'java/lang/Thread.State.html')));
+  assertThat('exception', new ClassLink(LinkType.EXCEPTION, 'java.security',
+      'AccessControlException').getUrl(), is(toAbsoluteUrl(
+      'java/security/AccessControlException.html')));
+  assertThat('error', new ClassLink(LinkType.ERROR, 'java.lang.annotation',
+      'AnnotationFormatError').getUrl(), is(toAbsoluteUrl(
+      'java/lang/annotation/AnnotationFormatError.html')));
+  assertThat('annotation', new ClassLink(LinkType.ANNOTATION, 'java.lang',
+      'Deprecated').getUrl(), is(toAbsoluteUrl('java/lang/Deprecated.html')));
 });
 
 /**
@@ -861,7 +894,8 @@ View._createSearchField = function(eventHandlers) {
   searchField.setAttribute('spellcheck', 'false');
   searchField.setAttribute('autofocus', 'true');
   searchField.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
-  searchField.addEventListener('input', eventHandlers.searchFieldChanged, false);
+  searchField.addEventListener(
+      'input', eventHandlers.searchFieldChanged, false);
   searchField.addEventListener('focus', eventHandlers.searchFieldFocus, false);
   if (this.searchAccessKey) {
     searchField.setAttribute('accesskey', this.searchAccessKey);
@@ -872,7 +906,10 @@ View._createSearchField = function(eventHandlers) {
 View._createEraseButton = function(eventHandlers) {
   var eraseButton = document.createElement('input');
   eraseButton.setAttribute('type', 'image');
-  eraseButton.setAttribute('src', 'data:image/gif;base64,R0lGODlhDQANAJEDAM%2FPz%2F%2F%2F%2F93d3UpihSH5BAEAAAMALAAAAAANAA0AAAIwnCegcpcg4nIw2sRGDZYnBAWiIHJQRZbec5XXEqnrmXIupMWdZGCXlAGhJg0h7lAAADs%3D');
+  eraseButton.setAttribute('src', 'data:image/gif;base64,' +
+      'R0lGODlhDQANAJEDAM%2FPz%2F%2F%2F%2F93d3UpihSH5BAEAAAMALAAAAAANAA0AAAI' +
+      'wnCegcpcg4nIw2sRGDZYnBAWiIHJQRZbec5XXEqnrmXIupMWdZGCXlAGhJg0h7lAAADs%' +
+      '3D');
   eraseButton.setAttribute('style', 'margin-left: 2px');
   eraseButton.addEventListener('click', eventHandlers.eraseButtonClick, false);
   if (this.eraseAccessKey) {
@@ -885,7 +922,8 @@ View._createOptionsLink = function(eventHandlers) {
   var anchorElement = document.createElement('a');
   anchorElement.setAttribute('href', 'javascript:void(0);');
   anchorElement.textContent = Messages.get('optionsAnchor');
-  anchorElement.addEventListener('click', eventHandlers.optionsLinkClicked, false);
+  anchorElement.addEventListener(
+      'click', eventHandlers.optionsLinkClicked, false);
   var fontElement = document.createElement('font');
   fontElement.setAttribute('size', '-2');
   fontElement.appendChild(anchorElement);
@@ -1047,29 +1085,38 @@ RegexLibrary.createCondition = function(searchString) {
 };
 
 UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
-  var javaAwtGeomPoint2DClass = new ClassLink(LinkType.CLASS, 'java.awt.geom', 'Point2D');
-  var javaAwtGeomPoint2DDoubleClass = new ClassLink(LinkType.CLASS, 'java.awt.geom', 'Point2D.Double');
+  var javaAwtGeomPoint2DClass = new ClassLink(LinkType.CLASS,
+      'java.awt.geom', 'Point2D');
+  var javaAwtGeomPoint2DDoubleClass = new ClassLink(LinkType.CLASS,
+      'java.awt.geom', 'Point2D.Double');
   var javaIoPackage = new PackageLink('java.io');
   var javaLangPackage = new PackageLink('java.lang');
-  var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
-  var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
-  var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
-  var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
-  var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
+  var javaIoCloseableClass = new ClassLink(LinkType.CLASS,
+      'java.io', 'Closeable');
+  var javaLangObjectClass = new ClassLink(LinkType.CLASS,
+      'java.lang', 'Object');
+  var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS,
+      'javax.swing', 'BorderFactory');
+  var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS,
+      'javax.swing.border', 'AbstractBorder');
+  var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS,
+      'org.omg.CORBA', 'Object');
   var hudsonPackage = new PackageLink('hudson');
-  var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS, 'hudson.model', 'Hudson');
-  var testOuterAppleBananaClass = new ClassLink(LinkType.CLASS, 'test', 'Outer.Apple.Banana');
+  var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS,
+      'hudson.model', 'Hudson');
+  var testOuterAppleBananaClass = new ClassLink(LinkType.CLASS,
+      'test', 'Outer.Apple.Banana');
 
   var allLinks = [javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass,
-    javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
-    javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass,
-    orgOmgCorbaObjectClass, hudsonPackage, hudsonModelHudsonClass,
-    testOuterAppleBananaClass];
+      javaIoPackage, javaLangPackage, javaIoCloseableClass,
+      javaLangObjectClass, javaxSwingBorderFactoryClass,
+      javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass,
+      hudsonPackage, hudsonModelHudsonClass, testOuterAppleBananaClass];
 
   var assertThatSearchResultFor = function(searchString, searchResult) {
     assertThat(UnitTestSuite.quote(searchString),
-           allLinks.filter(RegexLibrary.createCondition(searchString)),
-           is(searchResult));
+        allLinks.filter(RegexLibrary.createCondition(searchString)),
+        is(searchResult));
   };
 
   assertThatSearchResultFor('java.io',
@@ -1079,17 +1126,20 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
   assertThatSearchResultFor('JW',
       is([]));
   assertThatSearchResultFor('j',
-      is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass, javaIoPackage,
-        javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
-        javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
+      is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass,
+          javaIoPackage, javaLangPackage, javaIoCloseableClass,
+          javaLangObjectClass, javaxSwingBorderFactoryClass,
+          javaxSwingBorderAbstractBorderClass]));
   assertThatSearchResultFor('J',
-      is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass, javaIoPackage,
-        javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
-        javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass]));
+      is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass,
+          javaIoPackage, javaLangPackage, javaIoCloseableClass,
+          javaLangObjectClass, javaxSwingBorderFactoryClass,
+          javaxSwingBorderAbstractBorderClass]));
   assertThatSearchResultFor('Object',
       is([javaLangObjectClass, orgOmgCorbaObjectClass]));
   assertThatSearchResultFor('O',
-      is([javaLangObjectClass, orgOmgCorbaObjectClass, testOuterAppleBananaClass]));
+      is([javaLangObjectClass, orgOmgCorbaObjectClass,
+        testOuterAppleBananaClass]));
   assertThatSearchResultFor('java.lang.Object',
       is([javaLangObjectClass]));
   assertThatSearchResultFor('JLO',
@@ -1103,9 +1153,11 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
   assertThatSearchResultFor('java.*.o*e',
       is([javaLangObjectClass]));
   assertThatSearchResultFor('java.*.*o*e',
-      is([javaAwtGeomPoint2DDoubleClass, javaIoCloseableClass, javaLangObjectClass]));
+      is([javaAwtGeomPoint2DDoubleClass, javaIoCloseableClass,
+          javaLangObjectClass]));
   assertThatSearchResultFor('java.**.***o**e*',
-      is([javaAwtGeomPoint2DDoubleClass, javaIoCloseableClass, javaLangObjectClass]));
+      is([javaAwtGeomPoint2DDoubleClass, javaIoCloseableClass,
+          javaLangObjectClass]));
   assertThatSearchResultFor('javax.swing.border.A',
       is([javaxSwingBorderAbstractBorderClass]));
   assertThatSearchResultFor('PoiD',
@@ -1182,7 +1234,8 @@ RegexLibrary.createCaseSensitiveExactMatchCondition = function(searchString) {
   return this._createExactMatchCondition(searchString, true);
 };
 
-RegexLibrary._createExactMatchCondition = function(searchString, caseSensitive) {
+RegexLibrary._createExactMatchCondition = function(
+    searchString, caseSensitive) {
   if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
     return function(link) {
       return false;
@@ -1215,14 +1268,16 @@ RegexLibrary._getRegex = function(searchString) {
 
       var leadingCharacter = token.charAt(0);
       var trailingCharacters = token.substring(1);
-      var trailingCharactersPattern = '[a-z\\d]*' + trailingCharacters + '[a-z\\d]*';
+      var trailingCharactersPattern = '[a-z\\d]*' + trailingCharacters +
+          '[a-z\\d]*';
 
       if (remainingSearchString === searchString) {
         // The Camel Case expression is at the start of the search string.
         // Perform a case-insensitive match of the leading character, then
         // match the trailing characters along with other lowercase characters
         // or digit characters.
-        pattern += '(' + leadingCharacter + '|' + leadingCharacter.toLowerCase() + ')' + trailingCharactersPattern;
+        pattern += '(' + leadingCharacter + '|' +
+            leadingCharacter.toLowerCase() + ')' + trailingCharactersPattern;
       } else {
         // The Camel Case expression is NOT at the start of the search string.
         pattern += '(' +
@@ -1238,7 +1293,9 @@ RegexLibrary._getRegex = function(searchString) {
             // lowercase, then match the trailing characters along with other
             // lowercase characters or digit characters. This clause allows
             // package names to be matched by this Camel Case expression.
-            '(' + (endsWith(previousToken, '.') ? '' : '\\.') + leadingCharacter.toLowerCase() + trailingCharactersPattern + ')' +
+            '(' + (endsWith(previousToken, '.') ? '' : '\\.') +
+                leadingCharacter.toLowerCase() + trailingCharactersPattern +
+                ')' +
             // OR
             '|' +
             // Match the Camel Case expression in lowercase. This clause
@@ -1255,7 +1312,8 @@ RegexLibrary._getRegex = function(searchString) {
 
         pattern += '(' + token.toUpperCase() + '|' + token + ')';
       } else if (token === '*') {
-        // Replace '*' with '.*' to allow the asterisk to be used as a wildcard.
+        // Replace '*' with '.*' to allow the asterisk to be used as a
+        // wildcard.
 
         pattern += '.*';
       } else if (RegexLibrary._isSpecialRegularExpressionCharacter(token)) {
@@ -1281,7 +1339,8 @@ RegexLibrary._getRegex = function(searchString) {
 
 UnitTestSuite.testFunctionFor('RegexLibrary._getRegex', function() {
   assertThat('removal of excess asterisk characters',
-         RegexLibrary._getRegex('java.**.***o**e*').pattern, is(RegexLibrary._getRegex('java.*.*o*e').pattern));
+      RegexLibrary._getRegex('java.**.***o**e*').pattern, is(
+      RegexLibrary._getRegex('java.*.*o*e').pattern));
 });
 
 RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
@@ -1301,7 +1360,9 @@ RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
 };
 
 RegexLibrary._isSpecialRegularExpressionCharacter = function(character) {
-  return ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*'].some(function(specialCharacter) {
+  var special =
+      ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*']
+  return special.some(function(specialCharacter) {
     return character === specialCharacter;
   });
 };
@@ -1393,8 +1454,10 @@ Search._performSearch = function(entireSearchString) {
       searchContext.classMenu = classMenu;
       searchContext.packageMenu = packageMenu;
 
-      this._PackagesAndClasses._perform(searchContext, Query.getPackageOrClassSearchString());
-      this._ClassMembersAndKeywords._perform(searchContext, Query.getMemberOrKeywordSearchString());
+      this._PackagesAndClasses._perform(
+          searchContext, Query.getPackageOrClassSearchString());
+      this._ClassMembersAndKeywords._perform(
+          searchContext, Query.getMemberOrKeywordSearchString());
       this._Menu._perform(searchContext, Query.getMenuSearchString());
 
       if (searchContext.getContentsHtmlCallback) {
@@ -1402,7 +1465,8 @@ Search._performSearch = function(entireSearchString) {
         View.setContentsHtml(contentsHtml);
       }
 
-      this.topLink = searchContext.topMemberOrKeywordLink || searchContext.topPackageOrClassLink;
+      this.topLink = searchContext.topMemberOrKeywordLink ||
+          searchContext.topPackageOrClassLink;
       this._autoOpen();
 
       if (searchContext.menuPageOpened) {
@@ -1451,9 +1515,11 @@ Search._PackagesAndClasses = {
 Search._PackagesAndClasses._perform = function(searchContext, searchString) {
   if (this.previousQuery === null || this.previousQuery !== searchString) {
 
-    if (this.previousQuery !== null && searchString.indexOf(this.previousQuery) === 0) {
+    if (this.previousQuery !== null &&
+        searchString.indexOf(this.previousQuery) === 0) {
       // Characters have been added to the end of the previous query. Start
-      // with the current search list and filter out any links that do not match.
+      // with the current search list and filter out any links that do not
+      // match.
     } else {
       // Otherwise, start with the complete search list.
       this.currentLinks = ALL_PACKAGE_AND_CLASS_LINKS.concat();
@@ -1468,7 +1534,8 @@ Search._PackagesAndClasses._perform = function(searchContext, searchString) {
   this.previousQuery = searchString;
 
   searchContext.topPackageOrClassLink = this.topLink;
-  searchContext.getContentsHtmlCallback = new Callback(this._constructHtml, this);
+  searchContext.getContentsHtmlCallback = new Callback(
+      this._constructHtml, this);
 };
 
 Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
@@ -1481,16 +1548,21 @@ Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
   return null;
 };
 
-UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink', function() {
+UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink',
+    function() {
   var linkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component');
   var linkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
   var getTopLink = Search._PackagesAndClasses._getTopLink;
 
   assertThat('no links, best match undefined', getTopLink([]), is(null));
-  assertThat('one link, best match undefined', getTopLink([linkOne]), is(linkOne));
-  assertThat('two links, best match undefined', getTopLink([linkOne, linkTwo]), is(linkOne));
-  assertThat('no links, best match defined', getTopLink([], linkOne), is(linkOne));
-  assertThat('one link, best match defined', getTopLink([linkOne], linkTwo), is(linkTwo));
+  assertThat('one link, best match undefined',
+      getTopLink([linkOne]), is(linkOne));
+  assertThat('two links, best match undefined',
+      getTopLink([linkOne, linkTwo]), is(linkOne));
+  assertThat('no links, best match defined',
+      getTopLink([], linkOne), is(linkOne));
+  assertThat('one link, best match defined',
+      getTopLink([linkOne], linkTwo), is(linkTwo));
 });
 
 /**
@@ -1498,7 +1570,8 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink', function
  * @private
  */
 Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
-  var caseInsensitiveExactMatchCondition = RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString);
+  var caseInsensitiveExactMatchCondition =
+      RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString);
   var exactMatchLinks = links.filter(caseInsensitiveExactMatchCondition);
   // If all of the links displayed in the search list are exact matches, do
   // not display a best match.
@@ -1506,8 +1579,10 @@ Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
     return null;
   }
   // Attempt to reduce the matches further by performing a case-sensitive match.
-  var caseSensitiveExactMatchCondition = RegexLibrary.createCaseSensitiveExactMatchCondition(searchString);
-  var caseSensitiveExactMatchLinks = exactMatchLinks.filter(caseSensitiveExactMatchCondition);
+  var caseSensitiveExactMatchCondition =
+      RegexLibrary.createCaseSensitiveExactMatchCondition(searchString);
+  var caseSensitiveExactMatchLinks =
+      exactMatchLinks.filter(caseSensitiveExactMatchCondition);
   if (caseSensitiveExactMatchLinks.length > 0) {
     exactMatchLinks = caseSensitiveExactMatchLinks;
   }
@@ -1517,7 +1592,8 @@ Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
   var name;
   var packageDepth;
   exactMatchLinks.forEach(function(link) {
-    name = (link.getType() === LinkType.PACKAGE ? link.getPackageName() : link.getCanonicalName());
+    name = (link.getType() === LinkType.PACKAGE ?
+        link.getPackageName() : link.getCanonicalName());
     packageDepth = name.split('.').length;
     if (!bestMatchPackageDepth || packageDepth < bestMatchPackageDepth) {
       bestMatchLinks = [link];
@@ -1526,32 +1602,42 @@ Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
       bestMatchLinks.push(link);
     }
   });
-  // Finally, select the first link from the remaining matches to be the best match.
+  // Finally, select the first link from the remaining matches to be the best
+  // match.
   return bestMatchLinks.length > 0 ? bestMatchLinks[0] : null;
 };
 
-UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch', function() {
+UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch',
+    function() {
   var hudsonPackage = new PackageLink('hudson');
   var javaIoPackage = new PackageLink('java.io');
   var javaLangPackage = new PackageLink('java.lang');
-  var javaUtilListClass = new ClassLink(LinkType.INTERFACE, 'java.util', 'List');
-  var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS, 'hudson.model', 'Hudson');
-  var javaAwtListClass = new ClassLink(LinkType.CLASS, 'java.awt', 'List');
-  var javaIoCloseableClass = new ClassLink(LinkType.CLASS, 'java.io', 'Closeable');
-  var javaLangObjectClass = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
-  var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS, 'javax.swing', 'BorderFactory');
-  var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
-  var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
+  var javaUtilListClass = new ClassLink(LinkType.INTERFACE,
+      'java.util', 'List');
+  var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS,
+      'hudson.model', 'Hudson');
+  var javaAwtListClass = new ClassLink(LinkType.CLASS,
+      'java.awt', 'List');
+  var javaIoCloseableClass = new ClassLink(LinkType.CLASS,
+      'java.io', 'Closeable');
+  var javaLangObjectClass = new ClassLink(LinkType.CLASS,
+      'java.lang', 'Object');
+  var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS,
+      'javax.swing', 'BorderFactory');
+  var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS,
+      'javax.swing.border', 'AbstractBorder');
+  var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS,
+      'org.omg.CORBA', 'Object');
 
   var allLinks = [hudsonPackage, javaIoPackage, javaLangPackage,
-    javaUtilListClass, hudsonModelHudsonClass, javaAwtListClass,
-    javaIoCloseableClass, javaLangObjectClass, javaxSwingBorderFactoryClass,
-    javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass];
+      javaUtilListClass, hudsonModelHudsonClass, javaAwtListClass,
+      javaIoCloseableClass, javaLangObjectClass, javaxSwingBorderFactoryClass,
+      javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass];
 
   var assertThatBestMatchFor = function(searchString, searchResult) {
     assertThat(UnitTestSuite.quote(searchString),
-           Search._PackagesAndClasses._getBestMatch(searchString, allLinks),
-           is(searchResult));
+        Search._PackagesAndClasses._getBestMatch(searchString, allLinks),
+        is(searchResult));
   };
 
   assertThatBestMatchFor('java.io', is(javaIoPackage));
@@ -1637,7 +1723,8 @@ Search._ClassMembersAndKeywords = {
   ]
 };
 
-Search._ClassMembersAndKeywords._perform = function(searchContext, searchString) {
+Search._ClassMembersAndKeywords._perform = function(
+    searchContext, searchString) {
   var topPackageOrClassLink = searchContext.topPackageOrClassLink;
   if (searchString === null || !topPackageOrClassLink) {
     this.httpRequest.abort();
@@ -1651,11 +1738,14 @@ Search._ClassMembersAndKeywords._perform = function(searchContext, searchString)
   this.httpRequest.load(topPackageOrClassLink.getUrl(), progressCallback);
   if (this.httpRequest.isComplete()) {
     var packageOrClassPageHtml = this.httpRequest.getResource();
-    var memberAndKeywordLinks = this._getMemberAndKeywordLinks(topPackageOrClassLink.getUrl(), packageOrClassPageHtml);
+    var memberAndKeywordLinks = this._getMemberAndKeywordLinks(
+        topPackageOrClassLink.getUrl(), packageOrClassPageHtml);
     var condition = RegexLibrary.createCondition(searchString);
 
     var matchingMemberAndKeywordLinks = memberAndKeywordLinks.filter(condition);
-    searchContext.topMemberOrKeywordLink = matchingMemberAndKeywordLinks.length > 0 ? matchingMemberAndKeywordLinks[0] : null;
+    searchContext.topMemberOrKeywordLink =
+        matchingMemberAndKeywordLinks.length > 0 ?
+        matchingMemberAndKeywordLinks[0] : null;
 
     searchContext.getContentsHtmlCallback = new Callback(function() {
       var html = '';
@@ -1670,18 +1760,21 @@ Search._ClassMembersAndKeywords._perform = function(searchContext, searchString)
     }, this);
   } else {
     searchContext.getContentsHtmlCallback = new Callback(function() {
-      return topPackageOrClassLink.getHtml() + '<p>' + this.httpRequest.getStatusMessage() + '</p>';
+      return topPackageOrClassLink.getHtml() + '<p>' +
+          this.httpRequest.getStatusMessage() + '</p>';
     }, this);
     searchContext.memberAndKeywordLinksLoading = true;
   }
 };
 
-Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(baseUrl, packageOrClassPageHtml) {
+Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
+    baseUrl, packageOrClassPageHtml) {
   var names = this._getAnchorNames(packageOrClassPageHtml);
   return this._createMemberAndKeywordLinks(baseUrl, names);
 };
 
-Search._ClassMembersAndKeywords._getAnchorNames = function(packageOrClassPageHtml) {
+Search._ClassMembersAndKeywords._getAnchorNames = function(
+    packageOrClassPageHtml) {
   var anchorRegex = /<a name=\"([^\"]+)\"/gi;
   var matches;
   var names = [];
@@ -1691,7 +1784,8 @@ Search._ClassMembersAndKeywords._getAnchorNames = function(packageOrClassPageHtm
   return names;
 };
 
-Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function(baseUrl, names) {
+Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function(
+    baseUrl, names) {
   var links = [];
   var keywordLinks = [];
   names.forEach(function(name) {
@@ -1739,13 +1833,15 @@ Search._Menu._perform = function(searchContext, searchString) {
   var topMemberOrKeywordLink = searchContext.topMemberOrKeywordLink;
 
   var performMenuSearch = searchString !== null && topPackageOrClassLink &&
-      !searchContext.memberAndKeywordLinksLoading && topMemberOrKeywordLink !== null;
+      !searchContext.memberAndKeywordLinksLoading &&
+      topMemberOrKeywordLink !== null;
   if (!performMenuSearch) {
     return;
   }
 
   var menuReplacement = this._getMenuReplacement();
-  var menu = this._constructMenu(searchContext, menuReplacement, topPackageOrClassLink, topMemberOrKeywordLink);
+  var menu = this._constructMenu(searchContext, menuReplacement,
+      topPackageOrClassLink, topMemberOrKeywordLink);
 
   searchContext.getContentsHtmlCallback = new Callback(function() {
     var html = topPackageOrClassLink.getHtml();
@@ -1770,7 +1866,8 @@ Search._Menu._perform = function(searchContext, searchString) {
   searchContext.menuPageOpened = true;
 };
 
-Search._Menu._constructMenu = function(searchContext, menuReplacement, classOrPackageLink, memberOrKeywordLink) {
+Search._Menu._constructMenu = function(searchContext, menuReplacement,
+    classOrPackageLink, memberOrKeywordLink) {
   var classMemberLink;
   if (memberOrKeywordLink &&
       memberOrKeywordLink.getType() === LinkType.CLASS_MEMBER) {
@@ -1778,7 +1875,8 @@ Search._Menu._constructMenu = function(searchContext, menuReplacement, classOrPa
   }
 
   var menuDefinition;
-  if (classOrPackageLink && classOrPackageLink.getType() === LinkType.PACKAGE) {
+  if (classOrPackageLink &&
+      classOrPackageLink.getType() === LinkType.PACKAGE) {
     menuDefinition = searchContext.packageMenu;
   } else {
     menuDefinition = searchContext.classMenu;
@@ -1832,7 +1930,8 @@ Search._Menu._getMenuReplacement = function() {
         return classOrPackageLink ? classOrPackageLink.getPackageName() : '';
       },
       PACKAGE_PATH: function(classOrPackageLink) {
-        return classOrPackageLink ? classOrPackageLink.getPackageName().replace(/\./g, '/') : '';
+        return classOrPackageLink ?
+            classOrPackageLink.getPackageName().replace(/\./g, '/') : '';
       },
       MEMBER_NAME: memberNameFunction,
       METHOD_NAME: memberNameFunction, // Synonym for MEMBER_NAME.
@@ -1932,7 +2031,8 @@ function getPackageLinks(classLinks) {
   packageLinks.sort(function(packageLinkOne, packageLinkTwo) {
     var packageNameOneComponents = packageLinkOne.getPackageName().split(/\./);
     var packageNameTwoComponents = packageLinkTwo.getPackageName().split(/\./);
-    var smallerLength = Math.min(packageNameOneComponents.length, packageNameTwoComponents.length);
+    var smallerLength = Math.min(
+        packageNameOneComponents.length, packageNameTwoComponents.length);
     for (i = 0; i < smallerLength; i++) {
       if (packageNameOneComponents[i] < packageNameTwoComponents[i]) {
         return -1;
@@ -1961,8 +2061,7 @@ UnitTestSuite.testFunctionFor('getPackageLinks', function() {
       new PackageLink('javax.swing.border')
   ];
 
-  assertThat('getPackageLinks([javax.swing.border.AbstractBorder, java.awt.Button, javax.swing.SwingWorker])',
-      getPackageLinks(classLinks), is(expectedPackageLinks));
+  assertThat('', getPackageLinks(classLinks), is(expectedPackageLinks));
 });
 
 /**
@@ -2067,12 +2166,14 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
       args.typeInTitle = args.type;
     }
 
-    var descriptionPrefix = args.type + ' ' + (includeTitle ? 'with title' : 'without title') + ',' +
+    var descriptionPrefix = args.type + ' ' +
+        (includeTitle ? 'with title' : 'without title') + ',' +
         (args.italic ? 'with italic tag' : 'without italic tag') + ': ';
 
     var lowerCaseHtml =
         '<a href="' + args.href + '"' +
-        (includeTitle ? ' title="' + args.typeInTitle + ' in ' + args.package : '') +
+        (includeTitle ?
+            ' title="' + args.typeInTitle + ' in ' + args.package : '') +
         '" target="classFrame">' +
         (args.italic ? '<i>' + args.class + '</i>' : args.class) +
         '</a>';
@@ -2080,7 +2181,8 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
 
     var upperCaseHtml =
         '<A HREF="' + args.href + '"' +
-        (includeTitle ? ' TITLE="' + args.typeInTitle + ' IN ' + args.package : '') +
+        (includeTitle ?
+            ' TITLE="' + args.typeInTitle + ' IN ' + args.package : '') +
         '" TARGET="classFrame">' +
         (args.italic ? '<I>' + args.class + '</I>' : args.class) +
         '</A>';
@@ -2088,20 +2190,23 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
 
     var lowerCaseWithWhitespaceHtml =
         '<a   href  =   "' + args.href + '"' +
-        (includeTitle ? '   title  =  "  ' + args.typeInTitle + '   in   ' + args.package : '') +
+        (includeTitle ? '   title  =  "  ' + args.typeInTitle + '   in   ' +
+            args.package : '') +
         '  "   target  =  "classFrame"  >  ' +
         (args.italic ? '<i  >  ' + args.class + '  </i  >' : args.class) +
         '   </a  >';
-    assert(args, lowerCaseWithWhitespaceHtml, descriptionPrefix + 'lowercase html tags with additonal whitespace');
+    assert(args, lowerCaseWithWhitespaceHtml, descriptionPrefix +
+        'lowercase html tags with additonal whitespace');
 
     var upperCaseWithWhitespaceHtml =
         '<A   HREF  =  "' + args.href + '"' +
         (includeTitle ? '   TITLE="' + args.typeInTitle +
-        '   in   ' + args.package : '') +
+            '   in   ' + args.package : '') +
         '   "   TARGET  =  "classFrame"  >  ' +
         (args.italic ? '<I  >  ' + args.class + '  </I  >' : args.class) +
         '   </A  >';
-    assert(args, upperCaseWithWhitespaceHtml, descriptionPrefix + 'uppercase html tags with additional whitespace');
+    assert(args, upperCaseWithWhitespaceHtml, descriptionPrefix +
+        'uppercase html tags with additional whitespace');
   }
 
   function runTitleTestCase(args) {
@@ -2124,29 +2229,37 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
   // the contents of the anchor must in italics to be recognised as an
   // interface.
   runTitleAndNoTitleTestCase({
-      href: 'javax/swing/text/AbstractDocument.AttributeContext.html', type: LinkType.INTERFACE,
-      package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext', italic: true});
+      href: 'javax/swing/text/AbstractDocument.AttributeContext.html',
+      type: LinkType.INTERFACE,
+      package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext',
+      italic: true});
   runTitleTestCase({
-      href: 'javax/swing/text/AbstractDocument.AttributeContext.html', type: LinkType.INTERFACE,
-      package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext', italic: false});
+      href: 'javax/swing/text/AbstractDocument.AttributeContext.html',
+      type: LinkType.INTERFACE,
+      package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext',
+      italic: false});
 
   // Assert that enumerations are matched correctly. Anchors must have a title
   // attribute to be recognised as an enumeration.
   runTitleTestCase({
       href: 'java/net/Authenticator.RequestorType.html', type: LinkType.ENUM,
-      package: 'java.net', class: 'Authenticator.RequestorType', italic: false});
+      package: 'java.net', class: 'Authenticator.RequestorType',
+      italic: false});
 
   // Assert that exceptions are matched correctly. Exceptions can be matched
   // with or without a title attribute.
   runTitleAndNoTitleTestCase({
-      href: 'java/security/AccessControlException.html', type: LinkType.EXCEPTION,
-      typeInTitle: 'class', package: 'java.security', class: 'AccessControlException', italic: false});
+      href: 'java/security/AccessControlException.html',
+      type: LinkType.EXCEPTION, typeInTitle: 'class',
+      package: 'java.security', class: 'AccessControlException',
+      italic: false});
 
   // Assert that errors are matched correctly. Errors can be matched with or
   // without a title attribute.
   runTitleAndNoTitleTestCase({
-      href: 'java/lang/AbstractMethodError.html', type: LinkType.ERROR,
-      typeInTitle: 'class', package: 'java.lang', class: 'AbstractMethodError', italic: false});
+      href: 'java/lang/AbstractMethodError.html',
+      type: LinkType.ERROR, typeInTitle: 'class',
+      package: 'java.lang', class: 'AbstractMethodError', italic: false});
 
   // Assert that annotations are matched correctly. Anchors must have a title
   // attribute to be recognised as an annotation.
@@ -2171,9 +2284,10 @@ function endsWith(stringOne, stringTwo) {
 
 UnitTestSuite.testFunctionFor('endsWith', function() {
 
+  var quote = UnitTestSuite.quote;
+
   var assertThatEndsWith = function(stringOne, stringTwo, expectedResult) {
-    assertThat(
-        UnitTestSuite.quote(stringOne) + ' ends with ' + UnitTestSuite.quote(stringTwo) + ':',
+    assertThat(quote(stringOne) + ' ends with ' + quote(stringTwo) + ':',
         endsWith(stringOne, stringTwo),
         expectedResult);
   };
@@ -2198,7 +2312,8 @@ function trimFromStart(stringToTrim) {
 UnitTestSuite.testFunctionFor('trimFromStart', function() {
 
   var assertThatTrimFromStart = function(stringToTrim, expectedResult) {
-    assertThat(UnitTestSuite.quote(stringToTrim), trimFromStart(stringToTrim), expectedResult);
+    assertThat(UnitTestSuite.quote(stringToTrim), trimFromStart(stringToTrim),
+        expectedResult);
   };
 
   assertThatTrimFromStart('string', is('string'));
@@ -2219,7 +2334,8 @@ function trimFromEnd(stringToTrim) {
 UnitTestSuite.testFunctionFor('trimFromEnd', function() {
 
   var assertThatTrimFromEnd = function(stringToTrim, expectedResult) {
-    assertThat(UnitTestSuite.quote(stringToTrim), trimFromEnd(stringToTrim), expectedResult);
+    assertThat(UnitTestSuite.quote(stringToTrim), trimFromEnd(stringToTrim),
+        expectedResult);
   };
 
   assertThatTrimFromEnd('string', is('string'));
@@ -2246,22 +2362,27 @@ function splitOnFirst(stringToSplit, separator) {
   }
   return [
       trimFromEnd(stringToSplit.substring(0, firstOccurrence)),
-      trimFromStart(stringToSplit.substring(firstOccurrence + separator.length, stringToSplit.length))
+      trimFromStart(stringToSplit.substring(
+          firstOccurrence + separator.length, stringToSplit.length))
   ];
 }
 
 UnitTestSuite.testFunctionFor('splitOnFirst', function() {
 
-  var assertThatSplitOnFirst = function(stringToSplit, separator, expectedResult) {
+  var quote = UnitTestSuite.quote;
+
+  var assertThatSplitOnFirst = function(
+      stringToSplit, separator, expectedResult) {
     assertThat(
-        'split ' + UnitTestSuite.quote(stringToSplit) + ' on first ' + UnitTestSuite.quote(separator),
+        'split ' + quote(stringToSplit) + ' on first ' + quote(separator),
         splitOnFirst(stringToSplit, separator),
         expectedResult);
   };
 
   assertThatSplitOnFirst(' one ', ',', is([' one ', '']));
   assertThatSplitOnFirst(' one , two ', ',', is([' one', 'two ']));
-  assertThatSplitOnFirst(' one , two , three ', ',', is([' one', 'two , three ']));
+  assertThatSplitOnFirst(' one , two , three ', ',', is(
+      [' one', 'two , three ']));
   assertThatSplitOnFirst('one,two,three', ',', is(['one', 'two,three']));
   assertThatSplitOnFirst('one->two->three', '->', is(['one', 'two->three']));
 });

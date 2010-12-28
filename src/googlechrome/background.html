@@ -36,7 +36,8 @@ OTHER DEALINGS IN THE SOFTWARE.
   chrome.extension.onRequest.addListener(
     function (request, sender, sendResponse) {
       if (request.operation === 'requestContent') {
-        requestsForContent.push({url:request.contentUrl, callback:sendResponse});
+        requestsForContent.push(
+            {url:request.contentUrl, callback:sendResponse});
         return;
       }
       
@@ -78,17 +79,22 @@ OTHER DEALINGS IN THE SOFTWARE.
         var bytesDownloaded = e.position;
         if (bytesDownloaded > 1048576) {
           var mbDownloaded = Math.floor(bytesDownloaded / 1048576);
-          port.postMessage({type:'status', status: 'loading... (' + mbDownloaded + ' MB)'});
+          port.postMessage(
+              {type:'status', status: 'loading... (' + mbDownloaded + ' MB)'});
         } else if (bytesDownloaded > 1024) {
           var kbDownloaded = Math.floor(bytesDownloaded / 1024);
-          port.postMessage({type:'status', status: 'loading... (' + kbDownloaded + ' kB)'});
+          port.postMessage(
+              {type:'status', status: 'loading... (' + kbDownloaded + ' kB)'});
         } else {
-          port.postMessage({type:'status', status: 'loading... (' + bytesDownloaded + ' bytes)'});
+          port.postMessage(
+              {type:'status', status: 'loading... (' + bytesDownloaded +
+              ' bytes)'});
         }
       };
       xmlHttpRequest.open('GET', msg.httpRequestUrl);
       xmlHttpRequest.onload = function (e) {
-        port.postMessage({type: 'resource', resource: xmlHttpRequest.responseText});
+        port.postMessage(
+            {type: 'resource', resource: xmlHttpRequest.responseText});
       };
       xmlHttpRequest.onerror = function (e) {
         port.postMessage({type:'status', status: 'ERROR'});

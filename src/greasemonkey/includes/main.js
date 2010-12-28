@@ -51,7 +51,8 @@ function main() {
     return;
   }
 
-  var isGoogleChromeVersionOne = navigator.userAgent.toLowerCase().indexOf('chrome/1') !== -1;
+  var isGoogleChromeVersionOne =
+      navigator.userAgent.toLowerCase().indexOf('chrome/1') !== -1;
   if (isGoogleChromeVersionOne) {
     // Google Chrome version 1 ignores the @include metadata tag, so check that
     // this is the correct document.
