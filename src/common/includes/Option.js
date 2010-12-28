@@ -1,9 +1,9 @@
 /**
  * The MIT License
- * 
+ *
  * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -36,24 +36,24 @@
 /**
  * Create a new Option.
  * @class Provides persistent configuration of the script options.
- * @param properties               the properties for this option
- * @param properties.key           the key associated with this option
+ * @param properties               the properties for this option.
+ * @param properties.key           the key associated with this option.
  * @param properties.defaultValue  the default used when the value cannot be
- *                                 retrieved or has not yet been configured
- * @param properties.type          the type of values accepted for this option
+ *                                 retrieved or has not yet been configured.
+ * @param properties.type          the type of values accepted for this option.
  * @private
  */
-Option = function (properties) {
+Option = function(properties) {
   this.key = properties.key;
   this.defaultValue = properties.defaultValue;
   this.type = properties.type;
 };
 
 /**
- * @returns {Boolean} true if options can be both retrieved and set, false
+ * @return {Boolean} true if options can be both retrieved and set, false
  *                    otherwise
  */
-Option.canGetAndSet = function () {
+Option.canGetAndSet = function() {
   return Storage.canGet() && Storage.canSet();
 };
 
@@ -62,23 +62,23 @@ Option.canGetAndSet = function () {
  * @param callback callback function that is provided with the value of this
  *                 option. If the option cannot be retrieved, has not yet been
  *                 configured, or is invalid, the default value will be
- *                 returned
+ *                 returned.
  * @param thisObject (optional) Used as the "this" for each invocation of the
  *                   callback. If it is not provided, or is null, the global
- *                   object associated with callback is used instead
+ *                   object associated with callback is used instead.
  * @see Option.canGetAndSet
  */
-Option.prototype.getValue = function (callback, thisObject) {
+Option.prototype.getValue = function(callback, thisObject) {
   if (thisObject) {
     var providedCallback = callback;
-    callback = function (value) {
+    callback = function(value) {
       providedCallback.apply(thisObject, [value]);
     }
   }
   var defaultValue = this.defaultValue;
   var type = this.type;
   if (Storage.canGet()) {
-    Storage.get(this.key, function (value) {
+    Storage.get(this.key, function(value) {
       if (type === Boolean) {
         value = '' + value;
         callback(defaultValue ? value !== 'false' : value === 'true');
@@ -92,9 +92,9 @@ Option.prototype.getValue = function (callback, thisObject) {
 };
 
 /**
- * @returns the default value of this option
+ * @return the default value of this option
  */
-Option.prototype.getDefaultValue = function () {
+Option.prototype.getDefaultValue = function() {
   return this.defaultValue;
 };
 
@@ -103,7 +103,7 @@ Option.prototype.getDefaultValue = function () {
  * @throws an exception if this option cannot be set
  * @see Option.canGetAndSet
  */
-Option.prototype.setValue = function (newValue) {
+Option.prototype.setValue = function(newValue) {
   Storage.set(this.key, newValue);
 };
 
