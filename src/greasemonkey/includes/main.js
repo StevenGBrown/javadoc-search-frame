@@ -1,9 +1,9 @@
 /**
  * The MIT License
- * 
+ *
  * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -30,10 +30,10 @@
 /**
  * If the given menu option does not match the new format, set it to the
  * default.
- * @param option the menu option
+ * @param option the menu option.
  */
 function updateMenuOption(option) {
-  option.getValue(function (value) {
+  option.getValue(function(value) {
     if (value && value.indexOf('->') === -1) {
       option.setValue(option.getDefaultValue());
     }
@@ -73,7 +73,7 @@ function main() {
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
-  init(function (unitTestResults) {
+  init(function(unitTestResults) {
     var logMessage = '\n' + startupLogMessage + unitTestResults;
     try {
       GM_log(logMessage);

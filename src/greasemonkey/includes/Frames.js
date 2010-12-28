@@ -1,9 +1,9 @@
 /**
  * The MIT License
- * 
+ *
  * Copyright (c) 2009 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -37,14 +37,14 @@
  * @class Provides functions to interact with other frames.
  */
 Frames = {
-  siblingFramesByName : {}
+  siblingFramesByName: {}
 };
 
 /**
  * Hide the packages frame. If the packages frame does not exist, calling this
  * function will have no effect.
  */
-Frames.hideAllPackagesFrame = function () {
+Frames.hideAllPackagesFrame = function() {
   if (this._getFrame('packageListFrame')) {
     var framesets = parent.document.getElementsByTagName('frameset');
     if (framesets) {
@@ -65,7 +65,7 @@ Frames.hideAllPackagesFrame = function () {
  * displayed, the URL will not be opened.
  * @param url
  */
-Frames.openLinkInSummaryFrame = function (url) {
+Frames.openLinkInSummaryFrame = function(url) {
   var summaryFrame = this._getFrame('classFrame');
   if (summaryFrame) {
     window.open(url, 'classFrame');
@@ -77,7 +77,7 @@ Frames.openLinkInSummaryFrame = function (url) {
  * displayed, the URL will be opened in a new tab or window.
  * @param url
  */
-Frames.openLinkInSummaryFrameOrNewTab = function (url) {
+Frames.openLinkInSummaryFrameOrNewTab = function(url) {
   var summaryFrame = this._getFrame('classFrame');
   if (summaryFrame) {
     window.open(url, 'classFrame');
@@ -90,7 +90,7 @@ Frames.openLinkInSummaryFrameOrNewTab = function (url) {
  * Open the given URL in a new tab.
  * @param url
  */
-Frames.openLinkInNewTab = function (url) {
+Frames.openLinkInNewTab = function(url) {
   window.open(url);
 };
 
@@ -98,10 +98,10 @@ Frames.openLinkInNewTab = function (url) {
  * Get the frame with the given name. This frame will share a parent with the
  * current frame.
  * @param name
- * @returns the frame, or null if it could not be found
+ * @return the frame, or null if it could not be found
  * @private
  */
-Frames._getFrame = function (name) {
+Frames._getFrame = function(name) {
   if (this.siblingFramesByName[name]) {
     return this.siblingFramesByName[name];
   }

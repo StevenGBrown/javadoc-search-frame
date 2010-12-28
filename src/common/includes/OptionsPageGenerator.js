@@ -1,9 +1,9 @@
 /**
  * The MIT License
- * 
+ *
  * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -41,7 +41,7 @@ OptionsPageGenerator = {};
 /**
  * Generate the options page by replacing the current document.
  */
-OptionsPageGenerator.generate = function () {
+OptionsPageGenerator.generate = function() {
   document.title = Messages.get('optionsTitle');
 
   while (document.body.firstChild) {
@@ -49,12 +49,12 @@ OptionsPageGenerator.generate = function () {
   }
 
   var contents = this._createContents(document);
-  contents.forEach(function (pageElement) {
+  contents.forEach(function(pageElement) {
     document.body.appendChild(pageElement);
   });
 };
 
-OptionsPageGenerator._createContents = function (pageDocument) {
+OptionsPageGenerator._createContents = function(pageDocument) {
   var contents = [];
   contents.push(this._createHeader(pageDocument));
   contents.push(pageDocument.createElement('p'));
@@ -86,28 +86,28 @@ OptionsPageGenerator._createContents = function (pageDocument) {
   return contents;
 };
 
-OptionsPageGenerator._createHeader = function (pageDocument) {
+OptionsPageGenerator._createHeader = function(pageDocument) {
   var headerElement = pageDocument.createElement('h2');
   headerElement.textContent = Messages.get('optionsTitle');
   return headerElement;
 };
 
-OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function (pageDocument) {
+OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function(pageDocument) {
   var errorMessageElement = pageDocument.createElement('p');
   errorMessageElement.innerHTML = Messages.get('optionsReadOnly');
   errorMessageElement.style.color = 'red';
   return errorMessageElement;
 };
 
-OptionsPageGenerator._booleanOption = function (pageDocument, option, title, trueText, falseText) {
+OptionsPageGenerator._booleanOption = function(pageDocument, option, title, trueText, falseText) {
   var trueRadioButtonElement = this._radioButton(pageDocument, option, title, true);
   var falseRadioButtonElement = this._radioButton(pageDocument, option, title, false);
 
-  option.getValue(function (value) {
+  option.getValue(function(value) {
     var radioButtonToCheck = value ? trueRadioButtonElement : falseRadioButtonElement;
     radioButtonToCheck.setAttribute('checked', true);
 
-    var clickEventListener = function () {
+    var clickEventListener = function() {
       option.setValue(trueRadioButtonElement.checked);
     };
 
@@ -127,7 +127,7 @@ OptionsPageGenerator._booleanOption = function (pageDocument, option, title, tru
   ]);
 };
 
-OptionsPageGenerator._radioButton = function (pageDocument, option, name, value) {
+OptionsPageGenerator._radioButton = function(pageDocument, option, name, value) {
   var radioButtonElement = pageDocument.createElement('input');
   radioButtonElement.setAttribute('type', 'radio');
   radioButtonElement.setAttribute('name', name);
@@ -138,7 +138,7 @@ OptionsPageGenerator._radioButton = function (pageDocument, option, name, value)
   return radioButtonElement;
 };
 
-OptionsPageGenerator._tableContentElementForRadioButton = function (pageDocument, radioButtonElement, text) {
+OptionsPageGenerator._tableContentElementForRadioButton = function(pageDocument, radioButtonElement, text) {
   var spanElement = pageDocument.createElement('span');
   spanElement.innerHTML = text;
 
@@ -149,7 +149,7 @@ OptionsPageGenerator._tableContentElementForRadioButton = function (pageDocument
   return labelElement;
 };
 
-OptionsPageGenerator._menuOption = function (pageDocument, option, title, subTitle) {
+OptionsPageGenerator._menuOption = function(pageDocument, option, title, subTitle) {
   var textAreaElement = pageDocument.createElement('textarea');
   textAreaElement.setAttribute('rows', 5);
   textAreaElement.setAttribute('cols', 100);
@@ -166,14 +166,14 @@ OptionsPageGenerator._menuOption = function (pageDocument, option, title, subTit
     restoreDefaultButtonElement.setAttribute('disabled', true);
   }
 
-  option.getValue(function (value) {
+  option.getValue(function(value) {
     textAreaElement.textContent = value;
 
-    textAreaElement.addEventListener('keyup', function () {
+    textAreaElement.addEventListener('keyup', function() {
       option.setValue(textAreaElement.value);
     }, false);
 
-    restoreDefaultButtonElement.addEventListener('click', function () {
+    restoreDefaultButtonElement.addEventListener('click', function() {
       textAreaElement.value = option.getDefaultValue();
       option.setValue(option.getDefaultValue());
     }, false);
@@ -182,7 +182,7 @@ OptionsPageGenerator._menuOption = function (pageDocument, option, title, subTit
   return this._createTable(pageDocument, title, subTitle, [textAreaElement, restoreDefaultButtonElement]);
 };
 
-OptionsPageGenerator._createTable = function (pageDocument, title, subTitle, contentElements) {
+OptionsPageGenerator._createTable = function(pageDocument, title, subTitle, contentElements) {
   var tableElement = pageDocument.createElement('table');
   tableElement.style.borderStyle = 'groove';
   tableElement.style.borderColor = 'blue';
@@ -208,7 +208,7 @@ OptionsPageGenerator._createTable = function (pageDocument, title, subTitle, con
   contentsTableRow.appendChild(contentsTableDataElement);
 
   var contentsParagraphElement = pageDocument.createElement('p');
-  contentElements.forEach(function (tableContentElement) {
+  contentElements.forEach(function(tableContentElement) {
     contentsParagraphElement.appendChild(tableContentElement);
     contentsParagraphElement.appendChild(pageDocument.createElement('br'));
   });

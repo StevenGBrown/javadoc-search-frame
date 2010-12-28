@@ -1,9 +1,9 @@
 /**
  * The MIT License
- * 
+ *
  * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -49,27 +49,27 @@ var ALL_PACKAGE_AND_CLASS_LINKS = [];
  * @class Unit test suite used by this script.
  */
 UnitTestSuite = {
-  unitTestFunctions : []
+  unitTestFunctions: []
 };
 
 /**
  * Add a test function to this suite.
- * @param {String} functionUnderTest the name of the function under test
- * @param {Function} unitTestFunction the test function
+ * @param {String} functionUnderTest the name of the function under test.
+ * @param {Function} unitTestFunction the test function.
  */
-UnitTestSuite.testFunctionFor = function (functionUnderTest, unitTestFunction) {
-  this.unitTestFunctions.push({name : functionUnderTest, run : unitTestFunction});
+UnitTestSuite.testFunctionFor = function(functionUnderTest, unitTestFunction) {
+  this.unitTestFunctions.push({name: functionUnderTest, run: unitTestFunction});
 };
 
 /**
  * Run all of the test functions that have been added to this suite.
- * @returns {UnitTestResult} the result of running this suite
+ * @return {UnitTestResult} the result of running this suite
  */
-UnitTestSuite.run = function () {
+UnitTestSuite.run = function() {
   this.assertionsCount = 0;
   this.failures = [];
 
-  var iteration = function (unitTestFunction) {
+  var iteration = function(unitTestFunction) {
     this.unitTestFunctionName = unitTestFunction.name;
     try {
       unitTestFunction.run();
@@ -84,12 +84,12 @@ UnitTestSuite.run = function () {
 
 /**
  * Assert that the actual value equals the expected value.
- * 
- * @param description a description of the assertion
- * @param actual the actual value
- * @param expected the expected value
+ *
+ * @param description a description of the assertion.
+ * @param actual the actual value.
+ * @param expected the expected value.
  */
-UnitTestSuite.assertThat = function (description, actual, expected) {
+UnitTestSuite.assertThat = function(description, actual, expected) {
   if (!UnitTestSuite._equals(expected, actual)) {
     var failure = new UnitTestAssertionFailure(UnitTestSuite.unitTestFunctionName, description, actual, expected);
     UnitTestSuite.failures.push(failure);
@@ -100,18 +100,18 @@ UnitTestSuite.assertThat = function (description, actual, expected) {
 /**
  * Has no effect; intended to make calls to the {@link UnitTestSuite.assertThat}
  * and {@link UnitTestSuite.assertThatEval} functions more readable.
- * @returns the value paramter (unchanged)
+ * @return the value paramter (unchanged)
  * @example assertThat(theSky, is(blue));
  */
-UnitTestSuite.is = function (value) {
+UnitTestSuite.is = function(value) {
   return value;
 };
 
 /**
  * Quotes the given string value in the same way as the Console or Error Log.
- * @returns the quoted string
+ * @return the quoted string
  */
-UnitTestSuite.quote = function (stringValue) {
+UnitTestSuite.quote = function(stringValue) {
   if (stringValue || stringValue === '') {
     return '\'' + stringValue + '\'';
   }
@@ -121,16 +121,16 @@ UnitTestSuite.quote = function (stringValue) {
 /**
  * Used by the {@link UnitTestSuite} assertion functions to determine if two
  * objects are equal.
- * @returns {Boolean} true if the two objects are equal, false otherwise
+ * @return {Boolean} true if the two objects are equal, false otherwise
  * @private
  */
-UnitTestSuite._equals = function (one, two) {
+UnitTestSuite._equals = function(one, two) {
   if (one instanceof Array && two instanceof Array) {
     if (one.length !== two.length) {
       return false;
     }
     var equalsFunction = arguments.callee;
-    return one.every(function (oneItem, index) {
+    return one.every(function(oneItem, index) {
       var twoItem = two[index];
       return equalsFunction(oneItem, twoItem);
     });
@@ -180,15 +180,15 @@ var is = UnitTestSuite.is;
  * Create a new UnitTestResult.
  * @class Unit test result; returned by {@link UnitTestSuite#run}.
  */
-UnitTestResult = function (numberOfAssertions, failures) {
+UnitTestResult = function(numberOfAssertions, failures) {
   this.numberOfAssertions = numberOfAssertions;
   this.failures = failures;
 };
 
 /**
- * @returns a description of this unit test result
+ * @return a description of this unit test result
  */
-UnitTestResult.prototype.toString = function () {
+UnitTestResult.prototype.toString = function() {
   var result = '';
   if (this.failures.length >= 1) {
     result += 'Unit test FAILED: ';
@@ -198,7 +198,7 @@ UnitTestResult.prototype.toString = function () {
       ' of ' +
       this.numberOfAssertions +
       ' unit test assertions passed.\n';
-  this.failures.forEach(function (unitTestFailure) {
+  this.failures.forEach(function(unitTestFailure) {
     result += '\n' + unitTestFailure + '\n';
   });
   return result;
@@ -215,7 +215,7 @@ UnitTestResult.prototype.toString = function () {
  * Create a new UnitTestAssertionFailure.
  * @class A unit test failure due to a failed assertion.
  */
-UnitTestAssertionFailure = function (functionUnderTestName, description, actual, expected) {
+UnitTestAssertionFailure = function(functionUnderTestName, description, actual, expected) {
   this.functionUnderTestName = functionUnderTestName;
   this.description = description;
   this.actual = actual;
@@ -223,9 +223,9 @@ UnitTestAssertionFailure = function (functionUnderTestName, description, actual,
 };
 
 /**
- * @returns a description of this unit test failure
+ * @return a description of this unit test failure
  */
-UnitTestAssertionFailure.prototype.toString = function () {
+UnitTestAssertionFailure.prototype.toString = function() {
   var failureString = this.functionUnderTestName + '\n';
   if (this.description) {
     failureString += this.description + '\n';
@@ -245,15 +245,15 @@ UnitTestAssertionFailure.prototype.toString = function () {
  * Create a new UnitTestExceptionThrownFailure.
  * @class A unit test failure due to a thrown exception.
  */
-UnitTestExceptionThrownFailure = function (functionUnderTestName, exception) {
+UnitTestExceptionThrownFailure = function(functionUnderTestName, exception) {
   this.functionUnderTestName = functionUnderTestName;
   this.exception = exception;
 };
 
 /**
- * @returns a description of this unit test failure
+ * @return a description of this unit test failure
  */
-UnitTestExceptionThrownFailure.prototype.toString = function () {
+UnitTestExceptionThrownFailure.prototype.toString = function() {
   return this.functionUnderTestName + '\n' + this.exception;
 };
 
@@ -273,23 +273,23 @@ LinkType = function(singularName, pluralName) {
 };
 
 /**
- * @returns {String} the singular name of this type
+ * @return {String} the singular name of this type
  */
-LinkType.prototype.getSingularName = function () {
+LinkType.prototype.getSingularName = function() {
   return this.singularName;
 };
 
 /**
- * @returns {String} the plural name of this type
+ * @return {String} the plural name of this type
  */
-LinkType.prototype.getPluralName = function () {
+LinkType.prototype.getPluralName = function() {
   return this.pluralName;
 };
 
 /**
- * @returns {String} a string representation of this type
+ * @return {String} a string representation of this type
  */
-LinkType.prototype.toString = function () {
+LinkType.prototype.toString = function() {
   return this.singularName;
 };
 
@@ -340,11 +340,11 @@ LinkType.KEYWORD = new LinkType('Keyword', 'Keywords');
 
 /**
  * Get the link type with the given singular name.
- * 
+ *
  * @param {String} singluarName
- * @returns {LinkType} the link type
+ * @return {LinkType} the link type
  */
-LinkType.getByName = function (singularName) {
+LinkType.getByName = function(singularName) {
   return LinkType[singularName.toUpperCase()];
 };
 
@@ -357,8 +357,8 @@ LinkType.getByName = function (singularName) {
 
 /**
  * Extract a URL from the given link.
- * @param link the link
- * @returns the URL
+ * @param link the link.
+ * @return the URL
  */
 function extractUrl(link) {
   var html = link.getHtml();
@@ -368,9 +368,9 @@ function extractUrl(link) {
   return html.substring(firstQuoteIndex + 1, secondQuoteIndex);
 }
 
-UnitTestSuite.testFunctionFor('extractUrl', function () {
+UnitTestSuite.testFunctionFor('extractUrl', function() {
   var mockLink = {};
-  mockLink.getHtml = function () {
+  mockLink.getHtml = function() {
     return '<A HREF="urlOfLink"';
   };
   assertThat('', extractUrl(mockLink), is('urlOfLink'));
@@ -378,10 +378,10 @@ UnitTestSuite.testFunctionFor('extractUrl', function () {
 
 /**
  * Convert the given relative URL to an absolute URL.
- * @param relativeUrl the relative URL
+ * @param relativeUrl the relative URL.
  * @param documentUrl (optional) the document's current URL, given by
- *                    location.href
- * @returns the absolute URL
+ *                    location.href.
+ * @return the absolute URL
  */
 function toAbsoluteUrl(relativeUrl, documentUrl) {
   if (!documentUrl) {
@@ -397,7 +397,7 @@ function toAbsoluteUrl(relativeUrl, documentUrl) {
   return documentUrlPath + relativeUrl;
 }
 
-UnitTestSuite.testFunctionFor('toAbsoluteUrl', function () {
+UnitTestSuite.testFunctionFor('toAbsoluteUrl', function() {
   assertThat('relative to "all classes" url',
       toAbsoluteUrl('java/applet/AppletContext.html', 'http://java.sun.com/javase/6/docs/api/allclasses-frame.html'),
       is('http://java.sun.com/javase/6/docs/api/java/applet/AppletContext.html'));
@@ -411,7 +411,7 @@ UnitTestSuite.testFunctionFor('toAbsoluteUrl', function () {
  * @class PackageLink Link to a package. These links are of type
  *                    {@LinkType.PACKAGE}.
  */
-PackageLink = function (packageName) {
+PackageLink = function(packageName) {
   this.packageName = packageName;
   this.html = '<A HREF="' + packageName.replace(/\./g, '/') +
       '/package-summary.html" target="classFrame">' + packageName + '</A>';
@@ -419,67 +419,67 @@ PackageLink = function (packageName) {
 
 /**
  * Determine whether this link matches the given regular expression.
- * 
- * @param regex the regular expression
- * @returns true if this link is a match, false otherwise
+ *
+ * @param regex the regular expression.
+ * @return true if this link is a match, false otherwise
  */
-PackageLink.prototype.matches = function (regex) {
+PackageLink.prototype.matches = function(regex) {
   return regex.test(this.packageName);
 };
 
 /**
- * @returns this link in HTML format
+ * @return this link in HTML format
  */
-PackageLink.prototype.getHtml = function () {
+PackageLink.prototype.getHtml = function() {
   return this.html;
 };
 
-UnitTestSuite.testFunctionFor('PackageLink.getHtml', function () {
+UnitTestSuite.testFunctionFor('PackageLink.getHtml', function() {
   assertThat('', new PackageLink('java.applet').getHtml(),
       is('<A HREF="java/applet/package-summary.html" target="classFrame">java.applet</A>'));
 });
 
 /**
- * @returns {@LinkType} the type of this link
+ * @return {@LinkType} the type of this link
  */
-PackageLink.prototype.getType = function () {
+PackageLink.prototype.getType = function() {
   return LinkType.PACKAGE;
 };
 
 /**
- * @returns the name of this package
+ * @return the name of this package
  */
-PackageLink.prototype.getPackageName = function () {
+PackageLink.prototype.getPackageName = function() {
   return this.packageName;
 };
 
 /**
- * @returns the URL of this link
+ * @return the URL of this link
  */
-PackageLink.prototype.getUrl = function () {
+PackageLink.prototype.getUrl = function() {
   return toAbsoluteUrl(extractUrl(this));
 };
 
-UnitTestSuite.testFunctionFor('PackageLink.getUrl', function () {
+UnitTestSuite.testFunctionFor('PackageLink.getUrl', function() {
   assertThat('', new PackageLink('java.applet').getUrl(),
       is(toAbsoluteUrl('java/applet/package-summary.html')));
 });
 
 /**
  * Equals function.
- * 
+ *
  * @param obj
- * @returns true if this link is equal to the given object, false otherwise
+ * @return true if this link is equal to the given object, false otherwise
  */
-PackageLink.prototype.equals = function (obj) {
+PackageLink.prototype.equals = function(obj) {
   return obj instanceof PackageLink &&
        this.packageName === obj.packageName;
 };
 
 /**
- * @returns a string representation of this link
+ * @return a string representation of this link
  */
-PackageLink.prototype.toString = function () {
+PackageLink.prototype.toString = function() {
   return this.packageName;
 };
 
@@ -490,7 +490,7 @@ PackageLink.prototype.toString = function () {
  *                  {@LinkType.EXCEPTION}, {@LinkType.ERROR} or
  *                  {@LinkType.ANNOTATION}.
  */
-ClassLink = function (type, packageName, className) {
+ClassLink = function(type, packageName, className) {
   this.type = type;
   this.className = className;
   this.canonicalName = packageName + '.' + className;
@@ -524,25 +524,25 @@ ClassLink = function (type, packageName, className) {
 
 /**
  * Determine whether this link matches the given regular expression.
- * 
- * @param regex the regular expression
- * @returns true if this link is a match, false otherwise
+ *
+ * @param regex the regular expression.
+ * @return true if this link is a match, false otherwise
  */
-ClassLink.prototype.matches = function (regex) {
+ClassLink.prototype.matches = function(regex) {
   return regex.test(this.className) || regex.test(this.canonicalName) ||
-      this.innerClassNames.some(function (innerClassName) {
+      this.innerClassNames.some(function(innerClassName) {
         return regex.test(innerClassName);
       });
 };
 
 /**
- * @returns this link in HTML format
+ * @return this link in HTML format
  */
-ClassLink.prototype.getHtml = function () {
+ClassLink.prototype.getHtml = function() {
   return this.html;
 };
 
-UnitTestSuite.testFunctionFor('ClassLink.getHtml', function () {
+UnitTestSuite.testFunctionFor('ClassLink.getHtml', function() {
   assertThat('interface', new ClassLink(LinkType.INTERFACE, 'javax.swing.text', 'AbstractDocument.AttributeContext').getHtml(),
       is('<A HREF="javax/swing/text/AbstractDocument.AttributeContext.html" title="interface in javax.swing.text" target="classFrame"><I>AbstractDocument.AttributeContext</I></A>&nbsp;[&nbsp;javax.swing.text&nbsp;]'));
   assertThat('class', new ClassLink(LinkType.CLASS, 'javax.lang.model.util', 'AbstractAnnotationValueVisitor6').getHtml(),
@@ -558,41 +558,41 @@ UnitTestSuite.testFunctionFor('ClassLink.getHtml', function () {
 });
 
 /**
- * @returns {@LinkType} the type of this link
+ * @return {@LinkType} the type of this link
  */
-ClassLink.prototype.getType = function () {
+ClassLink.prototype.getType = function() {
   return this.type;
 };
 
 /**
- * @returns the simple name of this class
+ * @return the simple name of this class
  */
-ClassLink.prototype.getClassName = function () {
+ClassLink.prototype.getClassName = function() {
   return this.className;
 };
 
 /**
- * @returns the name of the package that contains this class
+ * @return the name of the package that contains this class
  */
-ClassLink.prototype.getPackageName = function () {
+ClassLink.prototype.getPackageName = function() {
   return this.canonicalName.substring(0, this.canonicalName.length - this.className.length - 1);
 };
 
 /**
- * @returns the canonical name of this class
+ * @return the canonical name of this class
  */
-ClassLink.prototype.getCanonicalName = function () {
+ClassLink.prototype.getCanonicalName = function() {
   return this.canonicalName;
 };
 
 /**
- * @returns the URL of this link
+ * @return the URL of this link
  */
-ClassLink.prototype.getUrl = function () {
+ClassLink.prototype.getUrl = function() {
   return toAbsoluteUrl(extractUrl(this));
 };
 
-UnitTestSuite.testFunctionFor('ClassLink.getUrl', function () {
+UnitTestSuite.testFunctionFor('ClassLink.getUrl', function() {
   assertThat('interface', new ClassLink(LinkType.INTERFACE, 'javax.swing.text', 'AbstractDocument.AttributeContext').getUrl(),
       is(toAbsoluteUrl('javax/swing/text/AbstractDocument.AttributeContext.html')));
   assertThat('class', new ClassLink(LinkType.CLASS, 'javax.lang.model.util', 'AbstractAnnotationValueVisitor6').getUrl(),
@@ -609,11 +609,11 @@ UnitTestSuite.testFunctionFor('ClassLink.getUrl', function () {
 
 /**
  * Equals function.
- * 
+ *
  * @param obj
- * @returns true if this link is equal to the given object, false otherwise
+ * @return true if this link is equal to the given object, false otherwise
  */
-ClassLink.prototype.equals = function (obj) {
+ClassLink.prototype.equals = function(obj) {
   return obj instanceof ClassLink &&
        this.type === obj.type &&
        this.className === obj.className &&
@@ -621,9 +621,9 @@ ClassLink.prototype.equals = function (obj) {
 };
 
 /**
- * @returns a string representation of this link
+ * @return a string representation of this link
  */
-ClassLink.prototype.toString = function () {
+ClassLink.prototype.toString = function() {
   return this.canonicalName;
 };
 
@@ -631,7 +631,7 @@ ClassLink.prototype.toString = function () {
 /**
  * @class MemberLink Link to a method or field of a class.
  */
-MemberLink = function (baseUrl, name) {
+MemberLink = function(baseUrl, name) {
   this.name = name;
   this.html = '<A HREF="' + baseUrl + '#' + name +
       '" target="classFrame" class="anchorLink">' +
@@ -640,39 +640,39 @@ MemberLink = function (baseUrl, name) {
 
 /**
  * Determine whether this link matches the given regular expression.
- * 
- * @param regex the regular expression
- * @returns true if this link is a match, false otherwise
+ *
+ * @param regex the regular expression.
+ * @return true if this link is a match, false otherwise
  */
-MemberLink.prototype.matches = function (regex) {
+MemberLink.prototype.matches = function(regex) {
   return regex.test(this.name);
 };
 
 /**
- * @returns this link in HTML format
+ * @return this link in HTML format
  */
-MemberLink.prototype.getHtml = function () {
+MemberLink.prototype.getHtml = function() {
   return this.html;
 };
 
 /**
- * @returns {@LinkType} the type of this link
+ * @return {@LinkType} the type of this link
  */
-MemberLink.prototype.getType = function () {
+MemberLink.prototype.getType = function() {
   return LinkType.CLASS_MEMBER;
 };
 
 /**
- * @returns the URL of this link
+ * @return the URL of this link
  */
-MemberLink.prototype.getUrl = function () {
+MemberLink.prototype.getUrl = function() {
   return extractUrl(this);
 };
 
 /**
- * @returns the name of this class member
+ * @return the name of this class member
  */
-MemberLink.prototype.getName = function () {
+MemberLink.prototype.getName = function() {
   if (this.name.indexOf('(') !== -1) {
     return this.name.substring(0, this.name.indexOf('('));
   } else {
@@ -684,7 +684,7 @@ MemberLink.prototype.getName = function () {
 /**
  * @class KeywordLink Keyword link found on a package or class page.
  */
-KeywordLink = function (baseUrl, name) {
+KeywordLink = function(baseUrl, name) {
   this.name = name;
   this.html = '<A HREF="' + baseUrl + '#' + name +
       '" target="classFrame" class="anchorLink" style="color:#666">' +
@@ -693,32 +693,32 @@ KeywordLink = function (baseUrl, name) {
 
 /**
  * Determine whether this link matches the given regular expression.
- * 
- * @param regex the regular expression
- * @returns true if this link is a match, false otherwise
+ *
+ * @param regex the regular expression.
+ * @return true if this link is a match, false otherwise
  */
-KeywordLink.prototype.matches = function (regex) {
+KeywordLink.prototype.matches = function(regex) {
   return regex.test(this.name);
 };
 
 /**
- * @returns this link in HTML format
+ * @return this link in HTML format
  */
-KeywordLink.prototype.getHtml = function () {
+KeywordLink.prototype.getHtml = function() {
   return this.html;
 };
 
 /**
- * @returns {@LinkType} the type of this link
+ * @return {@LinkType} the type of this link
  */
-KeywordLink.prototype.getType = function () {
+KeywordLink.prototype.getType = function() {
   return LinkType.KEYWORD;
 };
 
 /**
- * @returns the URL of this link
+ * @return the URL of this link
  */
-KeywordLink.prototype.getUrl = function () {
+KeywordLink.prototype.getUrl = function() {
   return extractUrl(this);
 };
 
@@ -734,10 +734,10 @@ KeywordLink.prototype.getUrl = function () {
  *             search field.
  */
 View = {
-  searchField : null,
-  contentNodeParent : null,
-  contentNode : null,
-  innerFrame : null
+  searchField: null,
+  contentNodeParent: null,
+  contentNode: null,
+  innerFrame: null
 };
 
 /**
@@ -758,7 +758,7 @@ View.eraseAccessKey = 'a';
  * Initialise the search field frame.
  * @param eventHandlers
  */
-View.initialise = function (eventHandlers) {
+View.initialise = function(eventHandlers) {
   this._create(eventHandlers);
 };
 
@@ -766,7 +766,7 @@ View.initialise = function (eventHandlers) {
  * Set the HTML contents of the area below the search field.
  * @param contents
  */
-View.setContentsHtml = function (contents) {
+View.setContentsHtml = function(contents) {
   var newNode = this.contentNode.cloneNode(false);
   newNode.innerHTML = contents;
   this.contentNodeParent.replaceChild(newNode, this.contentNode);
@@ -777,23 +777,23 @@ View.setContentsHtml = function (contents) {
  * Set the value displayed in the search field.
  * @param value
  */
-View.setSearchFieldValue = function (value) {
+View.setSearchFieldValue = function(value) {
   if (this.searchField.value !== value) {
     this.searchField.value = value;
   }
 };
 
 /**
- * @returns the current value displayed in the search field.
+ * @return the current value displayed in the search field.
  */
-View.getSearchFieldValue = function () {
+View.getSearchFieldValue = function() {
   return this.searchField.value;
 };
 
 /**
  * Give focus to the search field.
  */
-View.focusOnSearchField = function () {
+View.focusOnSearchField = function() {
   this.searchField.focus();
 };
 
@@ -801,7 +801,7 @@ View.focusOnSearchField = function () {
  * Add an inner frame with the given URL.
  * @param url
  */
-View.addInnerFrame = function (url) {
+View.addInnerFrame = function(url) {
   this.innerFrame = document.createElement('iframe');
   document.body.appendChild(this.innerFrame);
   this.innerFrame.src = url;
@@ -810,14 +810,14 @@ View.addInnerFrame = function (url) {
 /**
  * Remove the previously added inner frame.
  */
-View.removeInnerFrame = function () {
+View.removeInnerFrame = function() {
   if (this.innerFrame) {
     document.body.removeChild(this.innerFrame);
   }
   this.innerFrame = null;
 };
 
-View._create = function (eventHandlers) {
+View._create = function(eventHandlers) {
   var tableElement = document.createElement('table');
   var tableRowElementOne = document.createElement('tr');
   var tableDataCellElementOne = document.createElement('td');
@@ -844,7 +844,7 @@ View._create = function (eventHandlers) {
   tableRowElementTwo.appendChild(tableDataCellElementTwo);
 
   [tableElement, tableRowElementOne, tableDataCellElementOne,
-      tableRowElementTwo, tableDataCellElementTwo].forEach(function (element) {
+      tableRowElementTwo, tableDataCellElementTwo].forEach(function(element) {
     element.style.border = '0';
     element.style.width = '100%';
   });
@@ -855,7 +855,7 @@ View._create = function (eventHandlers) {
   document.body.appendChild(tableElement);
 };
 
-View._createSearchField = function (eventHandlers) {
+View._createSearchField = function(eventHandlers) {
   var searchField = document.createElement('input');
   searchField.setAttribute('type', 'search');
   searchField.setAttribute('spellcheck', 'false');
@@ -869,7 +869,7 @@ View._createSearchField = function (eventHandlers) {
   return searchField;
 };
 
-View._createEraseButton = function (eventHandlers) {
+View._createEraseButton = function(eventHandlers) {
   var eraseButton = document.createElement('input');
   eraseButton.setAttribute('type', 'image');
   eraseButton.setAttribute('src', 'data:image/gif;base64,R0lGODlhDQANAJEDAM%2FPz%2F%2F%2F%2F93d3UpihSH5BAEAAAMALAAAAAANAA0AAAIwnCegcpcg4nIw2sRGDZYnBAWiIHJQRZbec5XXEqnrmXIupMWdZGCXlAGhJg0h7lAAADs%3D');
@@ -881,7 +881,7 @@ View._createEraseButton = function (eventHandlers) {
   return eraseButton;
 };
 
-View._createOptionsLink = function (eventHandlers) {
+View._createOptionsLink = function(eventHandlers) {
   var anchorElement = document.createElement('a');
   anchorElement.setAttribute('href', 'javascript:void(0);');
   anchorElement.textContent = Messages.get('optionsAnchor');
@@ -904,40 +904,40 @@ View._createOptionsLink = function (eventHandlers) {
  *              query.
  */
 Query = {
-  packageOrClassSearchString : '',
-  memberOrKeywordSearchString : null,
-  menuSearchString : null,
-  timeoutId : null
+  packageOrClassSearchString: '',
+  memberOrKeywordSearchString: null,
+  menuSearchString: null,
+  timeoutId: null
 };
 
 /**
- * @returns the portion of the search query that relates to the packages and
+ * @return the portion of the search query that relates to the packages and
  *          classes search
  */
-Query.getPackageOrClassSearchString = function () {
+Query.getPackageOrClassSearchString = function() {
   return this.packageOrClassSearchString;
 };
 
 /**
- * @returns the portion of the search query that relates to the class members
+ * @return the portion of the search query that relates to the class members
  *          and keywords search
  */
-Query.getMemberOrKeywordSearchString = function () {
+Query.getMemberOrKeywordSearchString = function() {
   return this.memberOrKeywordSearchString;
 };
 
 /**
- * @returns the portion of the search query that relates to the package menu or
+ * @return the portion of the search query that relates to the package menu or
  *          class menu
  */
-Query.getMenuSearchString = function () {
+Query.getMenuSearchString = function() {
   return this.menuSearchString;
 };
 
 /**
- * @returns the entire search query
+ * @return the entire search query
  */
-Query.getEntireSearchString = function () {
+Query.getEntireSearchString = function() {
   var searchString = this.packageOrClassSearchString;
   if (this.memberOrKeywordSearchString !== null) {
     searchString += '#';
@@ -954,7 +954,7 @@ Query.getEntireSearchString = function () {
  * Update this query based on the contents of the search field.
  * @param searchFieldContents
  */
-Query.update = function (searchFieldContents) {
+Query.update = function(searchFieldContents) {
   this._processInput(searchFieldContents);
 
   // Update the view on a timer. This is necessary to prevent the caret from
@@ -963,12 +963,12 @@ Query.update = function (searchFieldContents) {
     clearTimeout(this.timeoutId);
   }
   var thisObj = this;
-  this.timeoutId = setTimeout(function () {
+  this.timeoutId = setTimeout(function() {
     thisObj._updateView.apply(thisObj);
   }, 0);
 };
 
-Query._processInput = function (searchFieldContents) {
+Query._processInput = function(searchFieldContents) {
   var searchString;
   if (this.menuSearchString !== null) {
     searchString = this.packageOrClassSearchString;
@@ -986,7 +986,7 @@ Query._processInput = function (searchFieldContents) {
 
   var tokens = [];
   var splitOnPrefix;
-  ['@', '#'].forEach(function (prefix) {
+  ['@', '#'].forEach(function(prefix) {
     if (searchString.indexOf(prefix) !== -1) {
       splitOnPrefix = searchString.split(prefix, 2);
       tokens.push(splitOnPrefix[1]);
@@ -1001,9 +1001,9 @@ Query._processInput = function (searchFieldContents) {
   this.menuSearchString = tokens[0];
 };
 
-Query._updateView = function () {
+Query._updateView = function() {
   var fieldValue = this.getEntireSearchString();
-  ['#', '@'].forEach(function (prefix) {
+  ['#', '@'].forEach(function(prefix) {
     if (fieldValue.indexOf(prefix) !== -1) {
       fieldValue = prefix + fieldValue.split(prefix, 2)[1];
     }
@@ -1028,25 +1028,25 @@ RegexLibrary = {};
  * Create and return a function that will take a {@PackageLink}, {@ClassLink},
  * {@MemberLink} or {@KeywordLink} as an argument and return true if that link
  * matches the given search string and return false otherwise.
- * 
+ *
  * @param searchString
- * @returns the created function
+ * @return the created function
  */
-RegexLibrary.createCondition = function (searchString) {
+RegexLibrary.createCondition = function(searchString) {
   if (searchString.length === 0 || searchString === '*') {
-    return function (link) {
+    return function(link) {
       return true;
     };
   }
 
   var pattern = this._getRegex(searchString);
 
-  return function (link) {
+  return function(link) {
     return link.matches(pattern);
   };
 };
 
-UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function () {
+UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
   var javaAwtGeomPoint2DClass = new ClassLink(LinkType.CLASS, 'java.awt.geom', 'Point2D');
   var javaAwtGeomPoint2DDoubleClass = new ClassLink(LinkType.CLASS, 'java.awt.geom', 'Point2D.Double');
   var javaIoPackage = new PackageLink('java.io');
@@ -1060,13 +1060,13 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function () {
   var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS, 'hudson.model', 'Hudson');
   var testOuterAppleBananaClass = new ClassLink(LinkType.CLASS, 'test', 'Outer.Apple.Banana');
 
-  var allLinks = [ javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass,
+  var allLinks = [javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass,
     javaIoPackage, javaLangPackage, javaIoCloseableClass, javaLangObjectClass,
     javaxSwingBorderFactoryClass, javaxSwingBorderAbstractBorderClass,
     orgOmgCorbaObjectClass, hudsonPackage, hudsonModelHudsonClass,
-    testOuterAppleBananaClass ];
+    testOuterAppleBananaClass];
 
-  var assertThatSearchResultFor = function (searchString, searchResult) {
+  var assertThatSearchResultFor = function(searchString, searchResult) {
     assertThat(UnitTestSuite.quote(searchString),
            allLinks.filter(RegexLibrary.createCondition(searchString)),
            is(searchResult));
@@ -1161,11 +1161,11 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function () {
  * {@MemberLink} or {@KeywordLink} as an argument and return true if that link
  * is a case-sensitive exact match for the given search string and return false
  * otherwise.
- * 
+ *
  * @param searchString
- * @returns the created function
+ * @return the created function
  */
-RegexLibrary.createCaseInsensitiveExactMatchCondition = function (searchString) {
+RegexLibrary.createCaseInsensitiveExactMatchCondition = function(searchString) {
   return this._createExactMatchCondition(searchString, false);
 };
 
@@ -1174,29 +1174,29 @@ RegexLibrary.createCaseInsensitiveExactMatchCondition = function (searchString) 
  * {@MemberLink} or {@KeywordLink} as an argument and return true if that link
  * is a case-sensitive exact match for the given search string and return false
  * otherwise.
- * 
+ *
  * @param searchString
- * @returns the created function
+ * @return the created function
  */
-RegexLibrary.createCaseSensitiveExactMatchCondition = function (searchString) {
+RegexLibrary.createCaseSensitiveExactMatchCondition = function(searchString) {
   return this._createExactMatchCondition(searchString, true);
 };
 
-RegexLibrary._createExactMatchCondition = function (searchString, caseSensitive) {
+RegexLibrary._createExactMatchCondition = function(searchString, caseSensitive) {
   if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
-    return function (link) {
+    return function(link) {
       return false;
     };
   }
 
   var pattern = this._getExactMatchRegex(searchString, caseSensitive);
 
-  return function (link) {
+  return function(link) {
     return link.matches(pattern);
   };
 };
 
-RegexLibrary._getRegex = function (searchString) {
+RegexLibrary._getRegex = function(searchString) {
   var pattern = '^';
 
   var remainingSearchString = searchString.replace(/\*{2,}/g, '*');
@@ -1279,12 +1279,12 @@ RegexLibrary._getRegex = function (searchString) {
   return new RegExp(pattern);
 };
 
-UnitTestSuite.testFunctionFor('RegexLibrary._getRegex', function () {
+UnitTestSuite.testFunctionFor('RegexLibrary._getRegex', function() {
   assertThat('removal of excess asterisk characters',
          RegexLibrary._getRegex('java.**.***o**e*').pattern, is(RegexLibrary._getRegex('java.*.*o*e').pattern));
 });
 
-RegexLibrary._getExactMatchRegex = function (searchString, caseSensitive) {
+RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
   var pattern = '^';
 
   for (i = 0; i < searchString.length; i++) {
@@ -1300,8 +1300,8 @@ RegexLibrary._getExactMatchRegex = function (searchString, caseSensitive) {
   return caseSensitive ? new RegExp(pattern) : new RegExp(pattern, 'i');
 };
 
-RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
-  return ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*'].some(function (specialCharacter) {
+RegexLibrary._isSpecialRegularExpressionCharacter = function(character) {
+  return ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*'].some(function(specialCharacter) {
     return character === specialCharacter;
   });
 };
@@ -1315,10 +1315,10 @@ RegexLibrary._isSpecialRegularExpressionCharacter = function (character) {
 
 /**
  * @class A callback function in the context of a specified object.
- * @param callbackFunction the callback function
- * @param thisObject the "this" object used when calling the function
+ * @param callbackFunction the callback function.
+ * @param thisObject the "this" object used when calling the function.
  */
-Callback = function (callbackFunction, thisObject) {
+Callback = function(callbackFunction, thisObject) {
   this.callbackFunction = callbackFunction;
   this.thisObject = thisObject;
 };
@@ -1327,9 +1327,9 @@ Callback = function (callbackFunction, thisObject) {
  * Invoke this callback function with the given arguments.
  * @param argsArray {Array} (optional) an array of arguments to pass to the
  *                          callback function. If not provided, no arguments
- *                          will be passed to the callback function
+ *                          will be passed to the callback function.
  */
-Callback.prototype.invoke = function (argsArray) {
+Callback.prototype.invoke = function(argsArray) {
   return this.callbackFunction.apply(this.thisObject, argsArray);
 };
 
@@ -1344,15 +1344,15 @@ Callback.prototype.invoke = function (argsArray) {
  * @class Search The searching functionality.
  */
 Search = {
-  previousEntireSearchString : null,
-  timeoutId : null,
-  topLink : null
+  previousEntireSearchString: null,
+  timeoutId: null,
+  topLink: null
 };
 
 /**
  * Perform a search.
  */
-Search.perform = function () {
+Search.perform = function() {
   var entireSearchString = Query.getEntireSearchString();
   this._performSearch(entireSearchString);
   this.previousEntireSearchString = entireSearchString;
@@ -1361,14 +1361,14 @@ Search.perform = function () {
 /**
  * Perform a search after a short delay only if the search string has changed.
  */
-Search.performIfSearchStringHasChanged = function () {
+Search.performIfSearchStringHasChanged = function() {
   var entireSearchString = Query.getEntireSearchString();
   if (entireSearchString !== this.previousEntireSearchString) {
     if (this.timeoutId !== null) {
       clearTimeout(this.timeoutId);
     }
     var thisObj = this;
-    this.timeoutId = setTimeout(function () {
+    this.timeoutId = setTimeout(function() {
       thisObj.perform.apply(thisObj);
     }, 100);
   }
@@ -1376,19 +1376,19 @@ Search.performIfSearchStringHasChanged = function () {
 };
 
 /**
- * @returns the URL of the link currently displayed at the top of the list, or
+ * @return the URL of the link currently displayed at the top of the list, or
  *          null if no links are currently displayed
  */
-Search.getTopLinkUrl = function () {
+Search.getTopLinkUrl = function() {
   if (this.topLink) {
     return this.topLink.getUrl();
   }
   return null;
 };
 
-Search._performSearch = function (entireSearchString) {
-  Option.CLASS_MENU.getValue(function (classMenu) {
-    Option.PACKAGE_MENU.getValue(function (packageMenu) {
+Search._performSearch = function(entireSearchString) {
+  Option.CLASS_MENU.getValue(function(classMenu) {
+    Option.PACKAGE_MENU.getValue(function(packageMenu) {
       var searchContext = {};
       searchContext.classMenu = classMenu;
       searchContext.packageMenu = packageMenu;
@@ -1413,15 +1413,15 @@ Search._performSearch = function (entireSearchString) {
   }, this);
 };
 
-Search._collapseMenu = function () {
+Search._collapseMenu = function() {
   Query.update('');
   Search.perform();
 };
 
-Search._autoOpen = function () {
+Search._autoOpen = function() {
   var url = this.getTopLinkUrl();
   if (url) {
-    Option.AUTO_OPEN.getValue(function (autoOpen) {
+    Option.AUTO_OPEN.getValue(function(autoOpen) {
       if (autoOpen) {
         Frames.openLinkInSummaryFrame(url);
       }
@@ -1442,13 +1442,13 @@ Search._autoOpen = function () {
  * @private
  */
 Search._PackagesAndClasses = {
-  previousQuery : null,
-  currentLinks : null,
-  bestMatch : null,
-  topLink : null
+  previousQuery: null,
+  currentLinks: null,
+  bestMatch: null,
+  topLink: null
 };
 
-Search._PackagesAndClasses._perform = function (searchContext, searchString) {
+Search._PackagesAndClasses._perform = function(searchContext, searchString) {
   if (this.previousQuery === null || this.previousQuery !== searchString) {
 
     if (this.previousQuery !== null && searchString.indexOf(this.previousQuery) === 0) {
@@ -1471,7 +1471,7 @@ Search._PackagesAndClasses._perform = function (searchContext, searchString) {
   searchContext.getContentsHtmlCallback = new Callback(this._constructHtml, this);
 };
 
-Search._PackagesAndClasses._getTopLink = function (links, bestMatch) {
+Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
   if (bestMatch) {
     return bestMatch;
   }
@@ -1481,7 +1481,7 @@ Search._PackagesAndClasses._getTopLink = function (links, bestMatch) {
   return null;
 };
 
-UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink', function () {
+UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink', function() {
   var linkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component');
   var linkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
   var getTopLink = Search._PackagesAndClasses._getTopLink;
@@ -1497,7 +1497,7 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink', function
  * Get the best match (if any) from the given array of links.
  * @private
  */
-Search._PackagesAndClasses._getBestMatch = function (searchString, links) {
+Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
   var caseInsensitiveExactMatchCondition = RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString);
   var exactMatchLinks = links.filter(caseInsensitiveExactMatchCondition);
   // If all of the links displayed in the search list are exact matches, do
@@ -1516,7 +1516,7 @@ Search._PackagesAndClasses._getBestMatch = function (searchString, links) {
   var bestMatchPackageDepth;
   var name;
   var packageDepth;
-  exactMatchLinks.forEach(function (link) {
+  exactMatchLinks.forEach(function(link) {
     name = (link.getType() === LinkType.PACKAGE ? link.getPackageName() : link.getCanonicalName());
     packageDepth = name.split('.').length;
     if (!bestMatchPackageDepth || packageDepth < bestMatchPackageDepth) {
@@ -1530,7 +1530,7 @@ Search._PackagesAndClasses._getBestMatch = function (searchString, links) {
   return bestMatchLinks.length > 0 ? bestMatchLinks[0] : null;
 };
 
-UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch', function () {
+UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch', function() {
   var hudsonPackage = new PackageLink('hudson');
   var javaIoPackage = new PackageLink('java.io');
   var javaLangPackage = new PackageLink('java.lang');
@@ -1543,12 +1543,12 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch', functi
   var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder');
   var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS, 'org.omg.CORBA', 'Object');
 
-  var allLinks = [ hudsonPackage, javaIoPackage, javaLangPackage,
+  var allLinks = [hudsonPackage, javaIoPackage, javaLangPackage,
     javaUtilListClass, hudsonModelHudsonClass, javaAwtListClass,
     javaIoCloseableClass, javaLangObjectClass, javaxSwingBorderFactoryClass,
-    javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass ];
+    javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass];
 
-  var assertThatBestMatchFor = function (searchString, searchResult) {
+  var assertThatBestMatchFor = function(searchString, searchResult) {
     assertThat(UnitTestSuite.quote(searchString),
            Search._PackagesAndClasses._getBestMatch(searchString, allLinks),
            is(searchResult));
@@ -1572,7 +1572,7 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch', functi
   assertThatBestMatchFor('list', is(javaUtilListClass));
 });
 
-Search._PackagesAndClasses._constructHtml = function () {
+Search._PackagesAndClasses._constructHtml = function() {
   if (this.currentLinks.length === 0) {
     return 'No search results.';
   }
@@ -1586,7 +1586,7 @@ Search._PackagesAndClasses._constructHtml = function () {
   }
   var type;
   var newType;
-  this.currentLinks.forEach(function (link) {
+  this.currentLinks.forEach(function(link) {
     newType = link.getType();
     if (type !== newType) {
       html += '<br/><b>' + newType.getPluralName() + '</b><br/>';
@@ -1612,39 +1612,39 @@ Search._PackagesAndClasses._constructHtml = function () {
  * @private
  */
 Search._ClassMembersAndKeywords = {
-  httpRequest : new HttpRequest(View),
+  httpRequest: new HttpRequest(View),
 
-  keywords : {
-    'navbar_top':1,
-    'navbar_top_firstrow':1,
-    'skip-navbar_top':1,
-    'field_summary':1,
-    'nested_class_summary':1,
-    'constructor_summary':1,
-    'constructor_detail':1,
-    'method_summary':1,
-    'method_detail':1,
-    'field_detail':1,
-    'navbar_bottom':1,
-    'navbar_bottom_firstrow':1,
-    'skip-navbar_bottom':1
+  keywords: {
+    'navbar_top': 1,
+    'navbar_top_firstrow': 1,
+    'skip-navbar_top': 1,
+    'field_summary': 1,
+    'nested_class_summary': 1,
+    'constructor_summary': 1,
+    'constructor_detail': 1,
+    'method_summary': 1,
+    'method_detail': 1,
+    'field_detail': 1,
+    'navbar_bottom': 1,
+    'navbar_bottom_firstrow': 1,
+    'skip-navbar_bottom': 1
   },
 
-  keywordPrefixes : [
+  keywordPrefixes: [
     'methods_inherited_from_',
     'fields_inherited_from_',
     'nested_classes_inherited_from_'
   ]
 };
 
-Search._ClassMembersAndKeywords._perform = function (searchContext, searchString) {
+Search._ClassMembersAndKeywords._perform = function(searchContext, searchString) {
   var topPackageOrClassLink = searchContext.topPackageOrClassLink;
   if (searchString === null || !topPackageOrClassLink) {
     this.httpRequest.abort();
     return;
   }
 
-  var progressCallback = function () {
+  var progressCallback = function() {
     Search.perform.apply(Search);
   };
 
@@ -1657,31 +1657,31 @@ Search._ClassMembersAndKeywords._perform = function (searchContext, searchString
     var matchingMemberAndKeywordLinks = memberAndKeywordLinks.filter(condition);
     searchContext.topMemberOrKeywordLink = matchingMemberAndKeywordLinks.length > 0 ? matchingMemberAndKeywordLinks[0] : null;
 
-    searchContext.getContentsHtmlCallback = new Callback(function () {
+    searchContext.getContentsHtmlCallback = new Callback(function() {
       var html = '';
       if (matchingMemberAndKeywordLinks.length === 0) {
         html += 'No search results.';
       } else {
-        matchingMemberAndKeywordLinks.forEach(function (memberOrKeywordLink) {
+        matchingMemberAndKeywordLinks.forEach(function(memberOrKeywordLink) {
           html += memberOrKeywordLink.getHtml();
         });
       }
       return topPackageOrClassLink.getHtml() + '<p>' + html + '</p>';
     }, this);
   } else {
-    searchContext.getContentsHtmlCallback = new Callback(function () {
+    searchContext.getContentsHtmlCallback = new Callback(function() {
       return topPackageOrClassLink.getHtml() + '<p>' + this.httpRequest.getStatusMessage() + '</p>';
     }, this);
     searchContext.memberAndKeywordLinksLoading = true;
   }
 };
 
-Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function (baseUrl, packageOrClassPageHtml) {
+Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(baseUrl, packageOrClassPageHtml) {
   var names = this._getAnchorNames(packageOrClassPageHtml);
   return this._createMemberAndKeywordLinks(baseUrl, names);
 };
 
-Search._ClassMembersAndKeywords._getAnchorNames = function (packageOrClassPageHtml) {
+Search._ClassMembersAndKeywords._getAnchorNames = function(packageOrClassPageHtml) {
   var anchorRegex = /<a name=\"([^\"]+)\"/gi;
   var matches;
   var names = [];
@@ -1691,27 +1691,27 @@ Search._ClassMembersAndKeywords._getAnchorNames = function (packageOrClassPageHt
   return names;
 };
 
-Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function (baseUrl, names) {
+Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function(baseUrl, names) {
   var links = [];
   var keywordLinks = [];
-  names.forEach(function (name) {
+  names.forEach(function(name) {
     if (this._isKeywordName(name)) {
       keywordLinks.push(new KeywordLink(baseUrl, name));
     } else {
       links.push(new MemberLink(baseUrl, name));
     }
   }, this);
-  keywordLinks.forEach(function (keywordLink) {
+  keywordLinks.forEach(function(keywordLink) {
     links.push(keywordLink);
   });
   return links;
 };
 
-Search._ClassMembersAndKeywords._isKeywordName = function (name) {
+Search._ClassMembersAndKeywords._isKeywordName = function(name) {
   if (this.keywords[name] === 1) {
     return true;
   }
-  return this.keywordPrefixes.some(function (keywordPrefix) {
+  return this.keywordPrefixes.some(function(keywordPrefix) {
     if (name.indexOf(keywordPrefix) === 0) {
       return true;
     }
@@ -1731,10 +1731,10 @@ Search._ClassMembersAndKeywords._isKeywordName = function (name) {
  * @private
  */
 Search._Menu = {
-  menuReplacement : null
+  menuReplacement: null
 };
 
-Search._Menu._perform = function (searchContext, searchString) {
+Search._Menu._perform = function(searchContext, searchString) {
   var topPackageOrClassLink = searchContext.topPackageOrClassLink;
   var topMemberOrKeywordLink = searchContext.topMemberOrKeywordLink;
 
@@ -1747,7 +1747,7 @@ Search._Menu._perform = function (searchContext, searchString) {
   var menuReplacement = this._getMenuReplacement();
   var menu = this._constructMenu(searchContext, menuReplacement, topPackageOrClassLink, topMemberOrKeywordLink);
 
-  searchContext.getContentsHtmlCallback = new Callback(function () {
+  searchContext.getContentsHtmlCallback = new Callback(function() {
     var html = topPackageOrClassLink.getHtml();
     if (topMemberOrKeywordLink) {
       html += '<br/>' + topMemberOrKeywordLink.getHtml();
@@ -1770,12 +1770,12 @@ Search._Menu._perform = function (searchContext, searchString) {
   searchContext.menuPageOpened = true;
 };
 
-Search._Menu._constructMenu = function (searchContext, menuReplacement, classOrPackageLink, memberOrKeywordLink) {
+Search._Menu._constructMenu = function(searchContext, menuReplacement, classOrPackageLink, memberOrKeywordLink) {
   var classMemberLink;
   if (memberOrKeywordLink &&
       memberOrKeywordLink.getType() === LinkType.CLASS_MEMBER) {
     classMemberLink = memberOrKeywordLink;
-  };
+  }
 
   var menuDefinition;
   if (classOrPackageLink && classOrPackageLink.getType() === LinkType.PACKAGE) {
@@ -1785,7 +1785,7 @@ Search._Menu._constructMenu = function (searchContext, menuReplacement, classOrP
   }
 
   var menu = [];
-  menuDefinition.split('\n').forEach(function (menuAnchorDefinition) {
+  menuDefinition.split('\n').forEach(function(menuAnchorDefinition) {
     var splitOnArrow = splitOnFirst(menuAnchorDefinition, '->');
     if (splitOnArrow.length === 2) {
       var mnemonicAndLabel = splitOnFirst(splitOnArrow[0], ':');
@@ -1819,19 +1819,19 @@ Search._Menu._constructMenu = function (searchContext, menuReplacement, classOrP
  * to the current package or class.
  * @private
  */
-Search._Menu._getMenuReplacement = function () {
+Search._Menu._getMenuReplacement = function() {
   if (!this.menuReplacement) {
-    var memberNameFunction = function (classOrPackageLink, classMemberLink) {
+    var memberNameFunction = function(classOrPackageLink, classMemberLink) {
       return classMemberLink ? classMemberLink.getName() : '';
     };
     this.menuReplacement = {
-      CLASS_NAME: function (classLink) { 
+      CLASS_NAME: function(classLink) {
         return classLink ? classLink.getClassName() : '';
       },
-      PACKAGE_NAME: function (classOrPackageLink) { 
+      PACKAGE_NAME: function(classOrPackageLink) {
         return classOrPackageLink ? classOrPackageLink.getPackageName() : '';
       },
-      PACKAGE_PATH: function (classOrPackageLink) { 
+      PACKAGE_PATH: function(classOrPackageLink) {
         return classOrPackageLink ? classOrPackageLink.getPackageName().replace(/\./g, '/') : '';
       },
       MEMBER_NAME: memberNameFunction,
@@ -1843,10 +1843,10 @@ Search._Menu._getMenuReplacement = function () {
   return this.menuReplacement;
 };
 
-Search._Menu._constructMenuHtml = function (menu) {
+Search._Menu._constructMenuHtml = function(menu) {
   var menuHtml = '';
-  menu.forEach(function (menuElement) {
-    menuHtml +='<A HREF="' + menuElement.url + '">' + menuElement.mnemonic +
+  menu.forEach(function(menuElement) {
+    menuHtml += '<A HREF="' + menuElement.url + '">' + menuElement.mnemonic +
         ':' + menuElement.label + '</A><BR/>';
   });
   return menuHtml;
@@ -1862,11 +1862,11 @@ Search._Menu._constructMenuHtml = function (menu) {
 /**
  * Initialise this script.
  * @param unitTestResultsCallback function that is called with the unit test
- *                                results once the script has been initialised
+ *                                results once the script has been initialised.
  */
 function init(unitTestResultsCallback) {
 
-  Option.HIDE_PACKAGE_FRAME.getValue(function (hidePackageFrame) {
+  Option.HIDE_PACKAGE_FRAME.getValue(function(hidePackageFrame) {
 
     // Retrieve the inner HTML of the class frame.
     var classesInnerHtml = getClassesInnerHtml();
@@ -1912,16 +1912,16 @@ function init(unitTestResultsCallback) {
 
 /**
  * Parse packages from the given array of {@ClassLink} objects.
- * 
+ *
  * @param classLinks
- * @returns an array of {@PackageLink} objects
+ * @return an array of {@PackageLink} objects
  */
 function getPackageLinks(classLinks) {
   var packageLinks = [];
   var packageLinksAdded = {};
   var packageName;
 
-  classLinks.forEach(function (classLink) {
+  classLinks.forEach(function(classLink) {
     packageName = classLink.getPackageName();
     if (!packageLinksAdded[packageName]) {
       packageLinks.push(new PackageLink(packageName));
@@ -1929,7 +1929,7 @@ function getPackageLinks(classLinks) {
     }
   });
 
-  packageLinks.sort(function (packageLinkOne, packageLinkTwo) {
+  packageLinks.sort(function(packageLinkOne, packageLinkTwo) {
     var packageNameOneComponents = packageLinkOne.getPackageName().split(/\./);
     var packageNameTwoComponents = packageLinkTwo.getPackageName().split(/\./);
     var smallerLength = Math.min(packageNameOneComponents.length, packageNameTwoComponents.length);
@@ -1947,7 +1947,7 @@ function getPackageLinks(classLinks) {
   return packageLinks;
 }
 
-UnitTestSuite.testFunctionFor('getPackageLinks', function () {
+UnitTestSuite.testFunctionFor('getPackageLinks', function() {
 
   var classLinks = [
       new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder'),
@@ -1966,7 +1966,7 @@ UnitTestSuite.testFunctionFor('getPackageLinks', function () {
 });
 
 /**
- * @returns the inner HTML of the body element of the classes list frame, or
+ * @return the inner HTML of the body element of the classes list frame, or
  *          undefined if the element does not exist
  */
 function getClassesInnerHtml() {
@@ -1980,17 +1980,17 @@ function getClassesInnerHtml() {
 /**
  * Parse interfaces, classes, enumerations, and annotations from the inner HTML
  * of the body element of the classes list frame.
- * 
+ *
  * Assumptions:
  * - The use of the title attribute is consistent: either all of the anchor
  *   elements on the page have it, or all of them do not have it.
  * - Double-quotes are used to declare the href or title attributes.
  * - The italic element is the only element that can be a child of the
  *   anchor element.
- * 
+ *
  * @param classesInnerHtml the inner HTML of the body element of the classes
- *                         list frame
- * @returns an array of {@link ClassLink} objects
+ *                         list frame.
+ * @return an array of {@link ClassLink} objects
  */
 function getClassLinks(classesInnerHtml) {
   if (!classesInnerHtml) {
@@ -2003,7 +2003,7 @@ function getClassLinks(classesInnerHtml) {
       LinkType.PACKAGE, LinkType.INTERFACE, LinkType.CLASS, LinkType.ENUM,
       LinkType.EXCEPTION, LinkType.ERROR, LinkType.ANNOTATION
   ];
-  classLinkTypes.forEach(function (type) {
+  classLinkTypes.forEach(function(type) {
     classLinksMap[type] = [];
   });
 
@@ -2049,13 +2049,13 @@ function getClassLinks(classesInnerHtml) {
   }
 
   var classLinks = [];
-  classLinkTypes.forEach(function (type) {
+  classLinkTypes.forEach(function(type) {
     classLinks = classLinks.concat(classLinksMap[type]);
   });
   return classLinks;
 }
 
-UnitTestSuite.testFunctionFor('getClassLinks', function () {
+UnitTestSuite.testFunctionFor('getClassLinks', function() {
 
   function assert(args, html, description) {
     var link = new ClassLink(args.type, args.package, args.class);
@@ -2115,51 +2115,51 @@ UnitTestSuite.testFunctionFor('getClassLinks', function () {
 
   // Assert that classes are matched correctly. Classes can be matched with or
   // without a title attribute.
-  runTitleAndNoTitleTestCase( {
-      href:'javax/swing/AbstractAction.html', type:LinkType.CLASS,
-      package:'javax.swing', class:'AbstractAction', italic:false} );
+  runTitleAndNoTitleTestCase({
+      href: 'javax/swing/AbstractAction.html', type: LinkType.CLASS,
+      package: 'javax.swing', class: 'AbstractAction', italic: false});
 
   // Assert that interfaces are matched correctly. Interfaces can be matched
   // with or without a title attribute. If an anchor has no title attribute,
   // the contents of the anchor must in italics to be recognised as an
   // interface.
-  runTitleAndNoTitleTestCase( {
-      href:'javax/swing/text/AbstractDocument.AttributeContext.html', type:LinkType.INTERFACE,
-      package:'javax.swing.text', class:'AbstractDocument.AttributeContext', italic:true} );
-  runTitleTestCase( {
-      href:'javax/swing/text/AbstractDocument.AttributeContext.html', type:LinkType.INTERFACE,
-      package:'javax.swing.text', class:'AbstractDocument.AttributeContext', italic:false} );
+  runTitleAndNoTitleTestCase({
+      href: 'javax/swing/text/AbstractDocument.AttributeContext.html', type: LinkType.INTERFACE,
+      package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext', italic: true});
+  runTitleTestCase({
+      href: 'javax/swing/text/AbstractDocument.AttributeContext.html', type: LinkType.INTERFACE,
+      package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext', italic: false});
 
   // Assert that enumerations are matched correctly. Anchors must have a title
   // attribute to be recognised as an enumeration.
-  runTitleTestCase( {
-      href:'java/net/Authenticator.RequestorType.html', type:LinkType.ENUM,
-      package:'java.net', class:'Authenticator.RequestorType', italic:false} );
+  runTitleTestCase({
+      href: 'java/net/Authenticator.RequestorType.html', type: LinkType.ENUM,
+      package: 'java.net', class: 'Authenticator.RequestorType', italic: false});
 
   // Assert that exceptions are matched correctly. Exceptions can be matched
   // with or without a title attribute.
-  runTitleAndNoTitleTestCase( {
-      href:'java/security/AccessControlException.html', type:LinkType.EXCEPTION,
-      typeInTitle:'class', package:'java.security', class:'AccessControlException', italic:false} );
+  runTitleAndNoTitleTestCase({
+      href: 'java/security/AccessControlException.html', type: LinkType.EXCEPTION,
+      typeInTitle: 'class', package: 'java.security', class: 'AccessControlException', italic: false});
 
   // Assert that errors are matched correctly. Errors can be matched with or
   // without a title attribute.
-  runTitleAndNoTitleTestCase( {
-      href:'java/lang/AbstractMethodError.html', type:LinkType.ERROR,
-      typeInTitle:'class', package:'java.lang', class:'AbstractMethodError', italic:false} );
+  runTitleAndNoTitleTestCase({
+      href: 'java/lang/AbstractMethodError.html', type: LinkType.ERROR,
+      typeInTitle: 'class', package: 'java.lang', class: 'AbstractMethodError', italic: false});
 
   // Assert that annotations are matched correctly. Anchors must have a title
   // attribute to be recognised as an annotation.
-  runTitleTestCase( {
-      href:'javax/xml/ws/Action.html', type:LinkType.ANNOTATION,
-      package:'javax.xml.ws', class:'Action', italic:false} );
+  runTitleTestCase({
+      href: 'javax/xml/ws/Action.html', type: LinkType.ANNOTATION,
+      package: 'javax.xml.ws', class: 'Action', italic: false});
 });
 
 /**
  * Determine whether stringOne ends with stringTwo.
  * @param {String} stringOne
  * @param {String} stringTwo
- * @returns true if stringOne ends with stringTwo, false otherwise
+ * @return true if stringOne ends with stringTwo, false otherwise
  */
 function endsWith(stringOne, stringTwo) {
   if (!stringOne) {
@@ -2169,11 +2169,11 @@ function endsWith(stringOne, stringTwo) {
   return strIndex >= 0 && stringOne.substring(strIndex) === stringTwo;
 }
 
-UnitTestSuite.testFunctionFor('endsWith', function () {
+UnitTestSuite.testFunctionFor('endsWith', function() {
 
-  var assertThatEndsWith = function (stringOne, stringTwo, expectedResult) {
+  var assertThatEndsWith = function(stringOne, stringTwo, expectedResult) {
     assertThat(
-        UnitTestSuite.quote(stringOne) + ' ends with ' + UnitTestSuite.quote(stringTwo)+ ':',
+        UnitTestSuite.quote(stringOne) + ' ends with ' + UnitTestSuite.quote(stringTwo) + ':',
         endsWith(stringOne, stringTwo),
         expectedResult);
   };
@@ -2188,16 +2188,16 @@ UnitTestSuite.testFunctionFor('endsWith', function () {
 
 /**
  * Trim whitespace from the start of the given string.
- * @param {String} stringToTrim the string to trim
- * @returns {String} the trimmed string
+ * @param {String} stringToTrim the string to trim.
+ * @return {String} the trimmed string
  */
 function trimFromStart(stringToTrim) {
   return stringToTrim.replace(/^\s+/, '');
 }
 
-UnitTestSuite.testFunctionFor('trimFromStart', function () {
+UnitTestSuite.testFunctionFor('trimFromStart', function() {
 
-  var assertThatTrimFromStart = function (stringToTrim, expectedResult) {
+  var assertThatTrimFromStart = function(stringToTrim, expectedResult) {
     assertThat(UnitTestSuite.quote(stringToTrim), trimFromStart(stringToTrim), expectedResult);
   };
 
@@ -2209,16 +2209,16 @@ UnitTestSuite.testFunctionFor('trimFromStart', function () {
 
 /**
  * Trim whitespace from the end of the given string.
- * @param {String} stringToTrim the string to trim
- * @returns {String} the trimmed string
+ * @param {String} stringToTrim the string to trim.
+ * @return {String} the trimmed string
  */
 function trimFromEnd(stringToTrim) {
   return stringToTrim.replace(/\s+$/, '');
 }
 
-UnitTestSuite.testFunctionFor('trimFromEnd', function () {
+UnitTestSuite.testFunctionFor('trimFromEnd', function() {
 
-  var assertThatTrimFromEnd = function (stringToTrim, expectedResult) {
+  var assertThatTrimFromEnd = function(stringToTrim, expectedResult) {
     assertThat(UnitTestSuite.quote(stringToTrim), trimFromEnd(stringToTrim), expectedResult);
   };
 
@@ -2232,9 +2232,9 @@ UnitTestSuite.testFunctionFor('trimFromEnd', function () {
  * Split the given string on the first occurence of the given separator string.
  * Any whitespace surrounding the first occurence of the separator will be
  * removed.
- * @param {String} stringToSplit the string to split
- * @param {String} separator the separator string
- * @returns {Array} an array containing two elements: the portion of the string
+ * @param {String} stringToSplit the string to split.
+ * @param {String} separator the separator string.
+ * @return {Array} an array containing two elements: the portion of the string
  *                  found before the first occurence of the separator, and the
  *                  portion of the string found after the first occurence of
  *                  the separator
@@ -2248,11 +2248,11 @@ function splitOnFirst(stringToSplit, separator) {
       trimFromEnd(stringToSplit.substring(0, firstOccurrence)),
       trimFromStart(stringToSplit.substring(firstOccurrence + separator.length, stringToSplit.length))
   ];
-};
+}
 
-UnitTestSuite.testFunctionFor('splitOnFirst', function () {
+UnitTestSuite.testFunctionFor('splitOnFirst', function() {
 
-  var assertThatSplitOnFirst = function (stringToSplit, separator, expectedResult) {
+  var assertThatSplitOnFirst = function(stringToSplit, separator, expectedResult) {
     assertThat(
         'split ' + UnitTestSuite.quote(stringToSplit) + ' on first ' + UnitTestSuite.quote(separator),
         splitOnFirst(stringToSplit, separator),
@@ -2282,7 +2282,7 @@ EventHandlers = {};
  * Called when a key has been pressed while the search field has focus.
  * @param evt
  */
-EventHandlers.searchFieldKeyup = function (evt) {
+EventHandlers.searchFieldKeyup = function(evt) {
   var code = evt.keyCode;
   if (code === 13) {
     EventHandlers._returnKeyPressed(evt.ctrlKey);
@@ -2294,7 +2294,7 @@ EventHandlers.searchFieldKeyup = function (evt) {
 /**
  * Called when the contents of the search field has changed.
  */
-EventHandlers.searchFieldChanged = function () {
+EventHandlers.searchFieldChanged = function() {
   var searchFieldContents = View.getSearchFieldValue();
   Query.update(searchFieldContents);
   Search.performIfSearchStringHasChanged();
@@ -2303,14 +2303,14 @@ EventHandlers.searchFieldChanged = function () {
 /**
  * Called when the search field has gained focus.
  */
-EventHandlers.searchFieldFocus = function () {
+EventHandlers.searchFieldFocus = function() {
   document.body.scrollLeft = 0;
 };
 
 /**
  * Caled when the erase button has been clicked.
  */
-EventHandlers.eraseButtonClick = function () {
+EventHandlers.eraseButtonClick = function() {
   Query.update('');
   View.focusOnSearchField();
   Search.performIfSearchStringHasChanged();
@@ -2320,7 +2320,7 @@ EventHandlers.eraseButtonClick = function () {
  * Called when the Options link has been clicked.
  * @param evt
  */
-EventHandlers.optionsLinkClicked = function (evt) {
+EventHandlers.optionsLinkClicked = function(evt) {
   OptionsPage.open();
   evt.preventDefault();
 };
@@ -2329,10 +2329,10 @@ EventHandlers.optionsLinkClicked = function (evt) {
  * Called when the return key has been pressed while the search field has
  * focus.
  * @param ctrlModifier true if the CTRL key was held down when the return key
- *                     was pressed, false otherwise
+ *                     was pressed, false otherwise.
  * @private
  */
-EventHandlers._returnKeyPressed = function (ctrlModifier) {
+EventHandlers._returnKeyPressed = function(ctrlModifier) {
   var searchFieldValue = View.getSearchFieldValue();
   Query.update(searchFieldValue);
   Search.performIfSearchStringHasChanged();
@@ -2352,7 +2352,7 @@ EventHandlers._returnKeyPressed = function (ctrlModifier) {
  * focus.
  * @private
  */
-EventHandlers._escapeKeyPressed = function () {
+EventHandlers._escapeKeyPressed = function() {
   var searchFieldValue = View.getSearchFieldValue();
   if (searchFieldValue) {
     Query.update('');

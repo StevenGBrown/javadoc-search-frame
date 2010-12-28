@@ -1,9 +1,9 @@
 /**
  * The MIT License
- * 
+ *
  * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -36,7 +36,7 @@
 /**
  * @class HttpRequest Asynchronously loads resources from external URLs.
  */
-HttpRequest = function (view) {
+HttpRequest = function(view) {
   this.view = view;
   this.port = null;
   this.url = null;
@@ -47,12 +47,12 @@ HttpRequest = function (view) {
 /**
  * Loads the resource at the given URL. If the resource at the given URL is
  * already being loaded, calling this function will have no effect.
- * 
- * @param url the URL
+ *
+ * @param url the URL.
  * @param progressCallback function that is called when whenever some progress
- *                         has been made towards loading the resource
+ *                         has been made towards loading the resource.
  */
-HttpRequest.prototype.load = function (url, progressCallback) {
+HttpRequest.prototype.load = function(url, progressCallback) {
   if (this.url === url) {
     // Already loading the resource at this URL.
     return;
@@ -65,10 +65,10 @@ HttpRequest.prototype.load = function (url, progressCallback) {
   if (url.indexOf('file://') === 0) {
     chrome.extension.sendRequest(
         {
-          operation:'requestContent',
-          contentUrl:url
+          operation: 'requestContent',
+          contentUrl: url
         },
-        function (response) {
+        function(response) {
           thisObj.view.removeInnerFrame(url);
           thisObj.loadedResource = response;
           progressCallback();
@@ -81,7 +81,7 @@ HttpRequest.prototype.load = function (url, progressCallback) {
   var connectionInfo = {name: 'httpRequest', httpRequestUrl: url};
   this.port = chrome.extension.connect(connectionInfo);
 
-  this.port.onMessage.addListener(function (msg) {
+  this.port.onMessage.addListener(function(msg) {
     if (msg.type === 'status') {
       thisObj.statusMessage = msg.status;
       progressCallback();
@@ -98,14 +98,14 @@ HttpRequest.prototype.load = function (url, progressCallback) {
 /**
  * @retuns true if the loading is complete, false otherwise
  */
-HttpRequest.prototype.isComplete = function () {
+HttpRequest.prototype.isComplete = function() {
   return this.loadedResource !== null;
 };
 
 /**
- * @returns a status message on the progress made towards loading the resource
+ * @return a status message on the progress made towards loading the resource
  */
-HttpRequest.prototype.getStatusMessage = function () {
+HttpRequest.prototype.getStatusMessage = function() {
   if (this.statusMessage) {
     return this.statusMessage;
   }
@@ -113,16 +113,16 @@ HttpRequest.prototype.getStatusMessage = function () {
 };
 
 /**
- * @returns the loaded resource, or null if the loading is not complete
+ * @return the loaded resource, or null if the loading is not complete
  */
-HttpRequest.prototype.getResource = function () {
+HttpRequest.prototype.getResource = function() {
   return this.loadedResource;
 };
 
 /**
  * Abort the current anchor load operation.
  */
-HttpRequest.prototype.abort = function () {
+HttpRequest.prototype.abort = function() {
   if (this.port) {
     this.port.disconnect();
   }
