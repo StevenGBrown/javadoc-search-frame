@@ -39,7 +39,7 @@
 Storage = {};
 
 /**
- * @return {Boolean} true if retrieval of stored data is supported, false otherwise
+ * @return {Boolean} true if retrieval of stored data is supported, false otherwise.
  */
 Storage.canGet = function() {
   return this._localStorageDefined();
@@ -55,7 +55,7 @@ Storage.get = function(key, callback) {
 };
 
 /**
- * @return {Boolean} true if modification of stored data is supported, false otherwise
+ * @return {Boolean} true if modification of stored data is supported, false otherwise.
  */
 Storage.canSet = function() {
   return this._localStorageDefined();
@@ -71,7 +71,7 @@ Storage.set = function(key, value) {
 };
 
 /**
- * @return true if the localStorage object is defined, false otherwise
+ * @return true if the localStorage object is defined, false otherwise.
  * @private
  */
 Storage._localStorageDefined = function() {

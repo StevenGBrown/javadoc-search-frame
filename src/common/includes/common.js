@@ -63,7 +63,7 @@ UnitTestSuite.testFunctionFor = function(functionUnderTest, unitTestFunction) {
 
 /**
  * Run all of the test functions that have been added to this suite.
- * @return {UnitTestResult} the result of running this suite
+ * @return {UnitTestResult} the result of running this suite.
  */
 UnitTestSuite.run = function() {
   this.assertionsCount = 0;
@@ -100,7 +100,7 @@ UnitTestSuite.assertThat = function(description, actual, expected) {
 /**
  * Has no effect; intended to make calls to the {@link UnitTestSuite.assertThat}
  * and {@link UnitTestSuite.assertThatEval} functions more readable.
- * @return the value paramter (unchanged)
+ * @return the value paramter (unchanged).
  * @example assertThat(theSky, is(blue));
  */
 UnitTestSuite.is = function(value) {
@@ -109,7 +109,7 @@ UnitTestSuite.is = function(value) {
 
 /**
  * Quotes the given string value in the same way as the Console or Error Log.
- * @return the quoted string
+ * @return the quoted string.
  */
 UnitTestSuite.quote = function(stringValue) {
   if (stringValue || stringValue === '') {
@@ -121,7 +121,7 @@ UnitTestSuite.quote = function(stringValue) {
 /**
  * Used by the {@link UnitTestSuite} assertion functions to determine if two
  * objects are equal.
- * @return {Boolean} true if the two objects are equal, false otherwise
+ * @return {Boolean} true if the two objects are equal, false otherwise.
  * @private
  */
 UnitTestSuite._equals = function(one, two) {
@@ -186,7 +186,7 @@ UnitTestResult = function(numberOfAssertions, failures) {
 };
 
 /**
- * @return a description of this unit test result
+ * @return a description of this unit test result.
  */
 UnitTestResult.prototype.toString = function() {
   var result = '';
@@ -223,7 +223,7 @@ UnitTestAssertionFailure = function(functionUnderTestName, description, actual, 
 };
 
 /**
- * @return a description of this unit test failure
+ * @return a description of this unit test failure.
  */
 UnitTestAssertionFailure.prototype.toString = function() {
   var failureString = this.functionUnderTestName + '\n';
@@ -251,7 +251,7 @@ UnitTestExceptionThrownFailure = function(functionUnderTestName, exception) {
 };
 
 /**
- * @return a description of this unit test failure
+ * @return a description of this unit test failure.
  */
 UnitTestExceptionThrownFailure.prototype.toString = function() {
   return this.functionUnderTestName + '\n' + this.exception;
@@ -273,21 +273,21 @@ LinkType = function(singularName, pluralName) {
 };
 
 /**
- * @return {String} the singular name of this type
+ * @return {String} the singular name of this type.
  */
 LinkType.prototype.getSingularName = function() {
   return this.singularName;
 };
 
 /**
- * @return {String} the plural name of this type
+ * @return {String} the plural name of this type.
  */
 LinkType.prototype.getPluralName = function() {
   return this.pluralName;
 };
 
 /**
- * @return {String} a string representation of this type
+ * @return {String} a string representation of this type.
  */
 LinkType.prototype.toString = function() {
   return this.singularName;
@@ -342,7 +342,7 @@ LinkType.KEYWORD = new LinkType('Keyword', 'Keywords');
  * Get the link type with the given singular name.
  *
  * @param {String} singluarName
- * @return {LinkType} the link type
+ * @return {LinkType} the link type.
  */
 LinkType.getByName = function(singularName) {
   return LinkType[singularName.toUpperCase()];
@@ -358,7 +358,7 @@ LinkType.getByName = function(singularName) {
 /**
  * Extract a URL from the given link.
  * @param link the link.
- * @return the URL
+ * @return the URL.
  */
 function extractUrl(link) {
   var html = link.getHtml();
@@ -381,7 +381,7 @@ UnitTestSuite.testFunctionFor('extractUrl', function() {
  * @param relativeUrl the relative URL.
  * @param documentUrl (optional) the document's current URL, given by
  *                    location.href.
- * @return the absolute URL
+ * @return the absolute URL.
  */
 function toAbsoluteUrl(relativeUrl, documentUrl) {
   if (!documentUrl) {
@@ -421,14 +421,14 @@ PackageLink = function(packageName) {
  * Determine whether this link matches the given regular expression.
  *
  * @param regex the regular expression.
- * @return true if this link is a match, false otherwise
+ * @return true if this link is a match, false otherwise.
  */
 PackageLink.prototype.matches = function(regex) {
   return regex.test(this.packageName);
 };
 
 /**
- * @return this link in HTML format
+ * @return this link in HTML format.
  */
 PackageLink.prototype.getHtml = function() {
   return this.html;
@@ -440,21 +440,21 @@ UnitTestSuite.testFunctionFor('PackageLink.getHtml', function() {
 });
 
 /**
- * @return {@LinkType} the type of this link
+ * @return {@LinkType} the type of this link.
  */
 PackageLink.prototype.getType = function() {
   return LinkType.PACKAGE;
 };
 
 /**
- * @return the name of this package
+ * @return the name of this package.
  */
 PackageLink.prototype.getPackageName = function() {
   return this.packageName;
 };
 
 /**
- * @return the URL of this link
+ * @return the URL of this link.
  */
 PackageLink.prototype.getUrl = function() {
   return toAbsoluteUrl(extractUrl(this));
@@ -469,7 +469,7 @@ UnitTestSuite.testFunctionFor('PackageLink.getUrl', function() {
  * Equals function.
  *
  * @param obj
- * @return true if this link is equal to the given object, false otherwise
+ * @return true if this link is equal to the given object, false otherwise.
  */
 PackageLink.prototype.equals = function(obj) {
   return obj instanceof PackageLink &&
@@ -477,7 +477,7 @@ PackageLink.prototype.equals = function(obj) {
 };
 
 /**
- * @return a string representation of this link
+ * @return a string representation of this link.
  */
 PackageLink.prototype.toString = function() {
   return this.packageName;
@@ -526,7 +526,7 @@ ClassLink = function(type, packageName, className) {
  * Determine whether this link matches the given regular expression.
  *
  * @param regex the regular expression.
- * @return true if this link is a match, false otherwise
+ * @return true if this link is a match, false otherwise.
  */
 ClassLink.prototype.matches = function(regex) {
   return regex.test(this.className) || regex.test(this.canonicalName) ||
@@ -536,7 +536,7 @@ ClassLink.prototype.matches = function(regex) {
 };
 
 /**
- * @return this link in HTML format
+ * @return this link in HTML format.
  */
 ClassLink.prototype.getHtml = function() {
   return this.html;
@@ -558,35 +558,35 @@ UnitTestSuite.testFunctionFor('ClassLink.getHtml', function() {
 });
 
 /**
- * @return {@LinkType} the type of this link
+ * @return {@LinkType} the type of this link.
  */
 ClassLink.prototype.getType = function() {
   return this.type;
 };
 
 /**
- * @return the simple name of this class
+ * @return the simple name of this class.
  */
 ClassLink.prototype.getClassName = function() {
   return this.className;
 };
 
 /**
- * @return the name of the package that contains this class
+ * @return the name of the package that contains this class.
  */
 ClassLink.prototype.getPackageName = function() {
   return this.canonicalName.substring(0, this.canonicalName.length - this.className.length - 1);
 };
 
 /**
- * @return the canonical name of this class
+ * @return the canonical name of this class.
  */
 ClassLink.prototype.getCanonicalName = function() {
   return this.canonicalName;
 };
 
 /**
- * @return the URL of this link
+ * @return the URL of this link.
  */
 ClassLink.prototype.getUrl = function() {
   return toAbsoluteUrl(extractUrl(this));
@@ -611,7 +611,7 @@ UnitTestSuite.testFunctionFor('ClassLink.getUrl', function() {
  * Equals function.
  *
  * @param obj
- * @return true if this link is equal to the given object, false otherwise
+ * @return true if this link is equal to the given object, false otherwise.
  */
 ClassLink.prototype.equals = function(obj) {
   return obj instanceof ClassLink &&
@@ -621,7 +621,7 @@ ClassLink.prototype.equals = function(obj) {
 };
 
 /**
- * @return a string representation of this link
+ * @return a string representation of this link.
  */
 ClassLink.prototype.toString = function() {
   return this.canonicalName;
@@ -642,35 +642,35 @@ MemberLink = function(baseUrl, name) {
  * Determine whether this link matches the given regular expression.
  *
  * @param regex the regular expression.
- * @return true if this link is a match, false otherwise
+ * @return true if this link is a match, false otherwise.
  */
 MemberLink.prototype.matches = function(regex) {
   return regex.test(this.name);
 };
 
 /**
- * @return this link in HTML format
+ * @return this link in HTML format.
  */
 MemberLink.prototype.getHtml = function() {
   return this.html;
 };
 
 /**
- * @return {@LinkType} the type of this link
+ * @return {@LinkType} the type of this link.
  */
 MemberLink.prototype.getType = function() {
   return LinkType.CLASS_MEMBER;
 };
 
 /**
- * @return the URL of this link
+ * @return the URL of this link.
  */
 MemberLink.prototype.getUrl = function() {
   return extractUrl(this);
 };
 
 /**
- * @return the name of this class member
+ * @return the name of this class member.
  */
 MemberLink.prototype.getName = function() {
   if (this.name.indexOf('(') !== -1) {
@@ -695,28 +695,28 @@ KeywordLink = function(baseUrl, name) {
  * Determine whether this link matches the given regular expression.
  *
  * @param regex the regular expression.
- * @return true if this link is a match, false otherwise
+ * @return true if this link is a match, false otherwise.
  */
 KeywordLink.prototype.matches = function(regex) {
   return regex.test(this.name);
 };
 
 /**
- * @return this link in HTML format
+ * @return this link in HTML format.
  */
 KeywordLink.prototype.getHtml = function() {
   return this.html;
 };
 
 /**
- * @return {@LinkType} the type of this link
+ * @return {@LinkType} the type of this link.
  */
 KeywordLink.prototype.getType = function() {
   return LinkType.KEYWORD;
 };
 
 /**
- * @return the URL of this link
+ * @return the URL of this link.
  */
 KeywordLink.prototype.getUrl = function() {
   return extractUrl(this);
@@ -912,7 +912,7 @@ Query = {
 
 /**
  * @return the portion of the search query that relates to the packages and
- *          classes search
+ *          classes search.
  */
 Query.getPackageOrClassSearchString = function() {
   return this.packageOrClassSearchString;
@@ -920,7 +920,7 @@ Query.getPackageOrClassSearchString = function() {
 
 /**
  * @return the portion of the search query that relates to the class members
- *          and keywords search
+ *          and keywords search.
  */
 Query.getMemberOrKeywordSearchString = function() {
   return this.memberOrKeywordSearchString;
@@ -928,14 +928,14 @@ Query.getMemberOrKeywordSearchString = function() {
 
 /**
  * @return the portion of the search query that relates to the package menu or
- *          class menu
+ *          class menu.
  */
 Query.getMenuSearchString = function() {
   return this.menuSearchString;
 };
 
 /**
- * @return the entire search query
+ * @return the entire search query.
  */
 Query.getEntireSearchString = function() {
   var searchString = this.packageOrClassSearchString;
@@ -1030,7 +1030,7 @@ RegexLibrary = {};
  * matches the given search string and return false otherwise.
  *
  * @param searchString
- * @return the created function
+ * @return the created function.
  */
 RegexLibrary.createCondition = function(searchString) {
   if (searchString.length === 0 || searchString === '*') {
@@ -1163,7 +1163,7 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
  * otherwise.
  *
  * @param searchString
- * @return the created function
+ * @return the created function.
  */
 RegexLibrary.createCaseInsensitiveExactMatchCondition = function(searchString) {
   return this._createExactMatchCondition(searchString, false);
@@ -1176,7 +1176,7 @@ RegexLibrary.createCaseInsensitiveExactMatchCondition = function(searchString) {
  * otherwise.
  *
  * @param searchString
- * @return the created function
+ * @return the created function.
  */
 RegexLibrary.createCaseSensitiveExactMatchCondition = function(searchString) {
   return this._createExactMatchCondition(searchString, true);
@@ -1377,7 +1377,7 @@ Search.performIfSearchStringHasChanged = function() {
 
 /**
  * @return the URL of the link currently displayed at the top of the list, or
- *          null if no links are currently displayed
+ *          null if no links are currently displayed.
  */
 Search.getTopLinkUrl = function() {
   if (this.topLink) {
@@ -1914,7 +1914,7 @@ function init(unitTestResultsCallback) {
  * Parse packages from the given array of {@ClassLink} objects.
  *
  * @param classLinks
- * @return an array of {@PackageLink} objects
+ * @return an array of {@PackageLink} objects.
  */
 function getPackageLinks(classLinks) {
   var packageLinks = [];
@@ -1967,7 +1967,7 @@ UnitTestSuite.testFunctionFor('getPackageLinks', function() {
 
 /**
  * @return the inner HTML of the body element of the classes list frame, or
- *          undefined if the element does not exist
+ *          undefined if the element does not exist.
  */
 function getClassesInnerHtml() {
   var classesInnerHtml;
@@ -1990,7 +1990,7 @@ function getClassesInnerHtml() {
  *
  * @param classesInnerHtml the inner HTML of the body element of the classes
  *                         list frame.
- * @return an array of {@link ClassLink} objects
+ * @return an array of {@link ClassLink} objects.
  */
 function getClassLinks(classesInnerHtml) {
   if (!classesInnerHtml) {
@@ -2159,7 +2159,7 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
  * Determine whether stringOne ends with stringTwo.
  * @param {String} stringOne
  * @param {String} stringTwo
- * @return true if stringOne ends with stringTwo, false otherwise
+ * @return true if stringOne ends with stringTwo, false otherwise.
  */
 function endsWith(stringOne, stringTwo) {
   if (!stringOne) {
@@ -2189,7 +2189,7 @@ UnitTestSuite.testFunctionFor('endsWith', function() {
 /**
  * Trim whitespace from the start of the given string.
  * @param {String} stringToTrim the string to trim.
- * @return {String} the trimmed string
+ * @return {String} the trimmed string.
  */
 function trimFromStart(stringToTrim) {
   return stringToTrim.replace(/^\s+/, '');
@@ -2210,7 +2210,7 @@ UnitTestSuite.testFunctionFor('trimFromStart', function() {
 /**
  * Trim whitespace from the end of the given string.
  * @param {String} stringToTrim the string to trim.
- * @return {String} the trimmed string
+ * @return {String} the trimmed string.
  */
 function trimFromEnd(stringToTrim) {
   return stringToTrim.replace(/\s+$/, '');
@@ -2237,7 +2237,7 @@ UnitTestSuite.testFunctionFor('trimFromEnd', function() {
  * @return {Array} an array containing two elements: the portion of the string
  *                  found before the first occurence of the separator, and the
  *                  portion of the string found after the first occurence of
- *                  the separator
+ *                  the separator.
  */
 function splitOnFirst(stringToSplit, separator) {
   var firstOccurrence = stringToSplit.indexOf(separator);
