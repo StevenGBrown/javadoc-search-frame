@@ -43,7 +43,6 @@ def analyse(filePath):
       fileContents = file.read()
     log = createLogger(filePath)
     checkForTabCharacters(fileContents, log)
-    checkForReturnJsdocTag(fileContents, log)
     checkForMissingPrivateJsdocTag(fileContents, log)
     checkForMissingFunctionDocumentation(fileContents, log)
 
@@ -102,18 +101,6 @@ def checkForTabCharacters(fileContents, log):
   for lineNumber, line in zip(range(1, len(lines) + 1), lines):
     if line.find('\t') != -1:
       log(lineNumber, 'tab character found')
-
-
-def checkForReturnJsdocTag(fileContents, log):
-  """
-  Log a warning message if the '@return' tag is found in the given file
-  contents. This is not a valid Jsdoc tag: it should be '@returns'.
-  """
-
-  lines = fileContents.splitlines();
-  for lineNumber, line in zip(range(1, len(lines) + 1), lines):
-    if line.find('@return ') != -1:
-      log(lineNumber, 'found @return tag, should be @returns')
 
 
 def checkForMissingPrivateJsdocTag(fileContents, log):
