@@ -8,4 +8,4 @@
 #INCLUDE OptionsPage.js;
 #INCLUDE HttpRequest.js;
 #INCLUDE common.js;
-#INCLUDE main.js
+#INCLUDE main.js;
