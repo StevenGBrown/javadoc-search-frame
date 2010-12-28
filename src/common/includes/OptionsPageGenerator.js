@@ -59,7 +59,8 @@ OptionsPageGenerator._createContents = function(pageDocument) {
   contents.push(this._createHeader(pageDocument));
   contents.push(pageDocument.createElement('p'));
   if (!Option.canGetAndSet()) {
-    contents.push(this._createOptionsCannotBeConfiguredErrorMessage(pageDocument));
+    contents.push(
+        this._createOptionsCannotBeConfiguredErrorMessage(pageDocument));
     contents.push(pageDocument.createElement('p'));
   }
   contents.push(this._booleanOption(
@@ -92,27 +93,34 @@ OptionsPageGenerator._createHeader = function(pageDocument) {
   return headerElement;
 };
 
-OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function(pageDocument) {
+OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function(
+    pageDocument) {
   var errorMessageElement = pageDocument.createElement('p');
   errorMessageElement.innerHTML = Messages.get('optionsReadOnly');
   errorMessageElement.style.color = 'red';
   return errorMessageElement;
 };
 
-OptionsPageGenerator._booleanOption = function(pageDocument, option, title, trueText, falseText) {
-  var trueRadioButtonElement = this._radioButton(pageDocument, option, title, true);
-  var falseRadioButtonElement = this._radioButton(pageDocument, option, title, false);
+OptionsPageGenerator._booleanOption = function(
+    pageDocument, option, title, trueText, falseText) {
+  var trueRadioButtonElement = this._radioButton(
+      pageDocument, option, title, true);
+  var falseRadioButtonElement = this._radioButton(
+      pageDocument, option, title, false);
 
   option.getValue(function(value) {
-    var radioButtonToCheck = value ? trueRadioButtonElement : falseRadioButtonElement;
+    var radioButtonToCheck =
+        value ? trueRadioButtonElement : falseRadioButtonElement;
     radioButtonToCheck.setAttribute('checked', true);
 
     var clickEventListener = function() {
       option.setValue(trueRadioButtonElement.checked);
     };
 
-    trueRadioButtonElement.addEventListener('click', clickEventListener, false);
-    falseRadioButtonElement.addEventListener('click', clickEventListener, false);
+    trueRadioButtonElement.addEventListener(
+        'click', clickEventListener, false);
+    falseRadioButtonElement.addEventListener(
+        'click', clickEventListener, false);
   });
 
   if (option.getDefaultValue()) {
@@ -122,12 +130,15 @@ OptionsPageGenerator._booleanOption = function(pageDocument, option, title, true
   }
 
   return this._createTable(pageDocument, title, '', [
-      this._tableContentElementForRadioButton(pageDocument, trueRadioButtonElement, trueText),
-      this._tableContentElementForRadioButton(pageDocument, falseRadioButtonElement, falseText)
+      this._tableContentElementForRadioButton(
+          pageDocument, trueRadioButtonElement, trueText),
+      this._tableContentElementForRadioButton(
+          pageDocument, falseRadioButtonElement, falseText)
   ]);
 };
 
-OptionsPageGenerator._radioButton = function(pageDocument, option, name, value) {
+OptionsPageGenerator._radioButton = function(
+    pageDocument, option, name, value) {
   var radioButtonElement = pageDocument.createElement('input');
   radioButtonElement.setAttribute('type', 'radio');
   radioButtonElement.setAttribute('name', name);
@@ -138,7 +149,8 @@ OptionsPageGenerator._radioButton = function(pageDocument, option, name, value) 
   return radioButtonElement;
 };
 
-OptionsPageGenerator._tableContentElementForRadioButton = function(pageDocument, radioButtonElement, text) {
+OptionsPageGenerator._tableContentElementForRadioButton = function(
+    pageDocument, radioButtonElement, text) {
   var spanElement = pageDocument.createElement('span');
   spanElement.innerHTML = text;
 
@@ -149,7 +161,8 @@ OptionsPageGenerator._tableContentElementForRadioButton = function(pageDocument,
   return labelElement;
 };
 
-OptionsPageGenerator._menuOption = function(pageDocument, option, title, subTitle) {
+OptionsPageGenerator._menuOption = function(
+    pageDocument, option, title, subTitle) {
   var textAreaElement = pageDocument.createElement('textarea');
   textAreaElement.setAttribute('rows', 5);
   textAreaElement.setAttribute('cols', 100);
@@ -179,10 +192,12 @@ OptionsPageGenerator._menuOption = function(pageDocument, option, title, subTitl
     }, false);
   });
 
-  return this._createTable(pageDocument, title, subTitle, [textAreaElement, restoreDefaultButtonElement]);
+  return this._createTable(pageDocument, title, subTitle,
+      [textAreaElement, restoreDefaultButtonElement]);
 };
 
-OptionsPageGenerator._createTable = function(pageDocument, title, subTitle, contentElements) {
+OptionsPageGenerator._createTable = function(
+    pageDocument, title, subTitle, contentElements) {
   var tableElement = pageDocument.createElement('table');
   tableElement.style.borderStyle = 'groove';
   tableElement.style.borderColor = 'blue';
