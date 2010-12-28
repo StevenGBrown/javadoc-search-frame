@@ -42,9 +42,7 @@ def analyse(filePath):
     with io.open(filePath) as file:
       fileContents = file.read()
     log = createLogger(filePath)
-    checkForTabCharacters(fileContents, log)
     checkForMissingPrivateJsdocTag(fileContents, log)
-    checkForMissingFunctionDocumentation(fileContents, log)
 
 
 def isText(filePath):
@@ -91,18 +89,6 @@ def getLineNumber(inputString, position):
   return inputString.count('\n', 0, position) + 1;
 
 
-def checkForTabCharacters(fileContents, log):
-  """
-  Log a warning message if any tab characters are found in the given file
-  contents.
-  """
-
-  lines = fileContents.splitlines()
-  for lineNumber, line in zip(range(1, len(lines) + 1), lines):
-    if line.find('\t') != -1:
-      log(lineNumber, 'tab character found')
-
-
 def checkForMissingPrivateJsdocTag(fileContents, log):
   """
   Log a warning message if a '@private' tag is missing from the given file
@@ -117,21 +103,3 @@ def checkForMissingPrivateJsdocTag(fileContents, log):
     if functionDoc.find('@private') == -1 and functionName.find('._') != -1:
       lineNumber = getLineNumber(fileContents, match.end())
       log(lineNumber, 'missing @private tag for ' + functionName)
-
-
-def checkForMissingFunctionDocumentation(fileContents, log):
-  """
-  Log a warning message if an undocumented public function is found in the
-  given file contents. A function is considered to be public if the name does
-  not start with an underscore.
-  """
-
-  lines = fileContents.splitlines();
-  for lineNumber, line in zip(range(1, len(lines) + 1), lines):
-    isFunctionDeclaration = line.startswith('function') or re.match(r'[^ ].*=.*function.*', line)
-    isPublicFunctionDeclaration = isFunctionDeclaration and line.find('._') == -1
-    hasPreceedingDocumentation = lineNumber > 1 and previousLine.find('*/') != -1
-    if isPublicFunctionDeclaration and not hasPreceedingDocumentation:
-      functionName = re.sub(r'\(.*\)', '', line.replace('function', '')).strip(' ={')
-      log(lineNumber, 'missing documentation for ' + functionName)
-    previousLine = line
