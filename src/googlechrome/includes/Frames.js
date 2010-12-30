@@ -33,10 +33,12 @@
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Provides functions to interact with other frames.
  */
 Frames = {};
+
 
 /**
  * Hide the packages frame. If the packages frame does not exist, calling this
@@ -45,6 +47,7 @@ Frames = {};
 Frames.hideAllPackagesFrame = function() {
   // Nothing to do. The packages frame is hidden by a different content script.
 };
+
 
 /**
  * Open the given URL in the summary frame. If the summary frame is not
@@ -56,6 +59,7 @@ Frames.openLinkInSummaryFrame = function(url) {
     window.open(url, 'classFrame');
   }
 };
+
 
 /**
  * Open the given URL in the summary frame. If the summary frame is not
@@ -69,6 +73,7 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
     Frames.openLinkInNewTab(url);
   }
 };
+
 
 /**
  * Open the given URL in a new tab.

@@ -33,12 +33,14 @@
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Provides functions to interact with other frames.
  */
 Frames = {
   siblingFramesByName: {}
 };
+
 
 /**
  * Hide the packages frame. If the packages frame does not exist, calling this
@@ -60,6 +62,7 @@ Frames.hideAllPackagesFrame = function() {
   }
 };
 
+
 /**
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will not be opened.
@@ -71,6 +74,7 @@ Frames.openLinkInSummaryFrame = function(url) {
     window.open(url, 'classFrame');
   }
 };
+
 
 /**
  * Open the given URL in the summary frame. If the summary frame is not
@@ -86,6 +90,7 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
   }
 };
 
+
 /**
  * Open the given URL in a new tab.
  * @param {string} url the URL to open.
@@ -93,6 +98,7 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
 Frames.openLinkInNewTab = function(url) {
   window.open(url);
 };
+
 
 /**
  * Get the frame with the given name. This frame will share a parent with the

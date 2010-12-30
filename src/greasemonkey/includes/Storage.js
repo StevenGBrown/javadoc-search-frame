@@ -33,10 +33,12 @@
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Provides local storage functionality.
  */
 Storage = {};
+
 
 /**
  * @return {boolean} true if retrieval of stored data is supported, false
@@ -51,6 +53,7 @@ Storage.canGet = function() {
   }
 };
 
+
 /**
  * Retrieve a value based on a key.
  * @param {string} key the key.
@@ -60,6 +63,7 @@ Storage.canGet = function() {
 Storage.get = function(key, callback) {
   callback(GM_getValue(key));
 };
+
 
 /**
  * @return {boolean} true if modification of stored data is supported, false
@@ -72,6 +76,7 @@ Storage.canSet = function() {
     return false;
   }
 };
+
 
 /**
  * Store a value based on a key.

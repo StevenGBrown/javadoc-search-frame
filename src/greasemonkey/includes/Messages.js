@@ -32,10 +32,12 @@
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Provides localised strings.
  */
 Messages = {};
+
 
 /**
  * Retrieve a localised string.

@@ -33,10 +33,12 @@
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Provides local storage functionality.
  */
 Storage = {};
+
 
 /**
  * @return {boolean} true if retrieval of stored data is supported, false
@@ -45,6 +47,7 @@ Storage = {};
 Storage.canGet = function() {
   return Storage._localStorageDefined();
 };
+
 
 /**
  * Retrieve a value based on a key.
@@ -56,6 +59,7 @@ Storage.get = function(key, callback) {
   chrome.extension.sendRequest({operation: 'get', key: key}, callback);
 };
 
+
 /**
  * @return {boolean} true if modification of stored data is supported, false
  *                   otherwise.
@@ -63,6 +67,7 @@ Storage.get = function(key, callback) {
 Storage.canSet = function() {
   return Storage._localStorageDefined();
 };
+
 
 /**
  * Store a value based on a key.
@@ -72,6 +77,7 @@ Storage.canSet = function() {
 Storage.set = function(key, value) {
   chrome.extension.sendRequest({operation: 'set', key: key, value: value});
 };
+
 
 /**
  * @return {boolean} true if the localStorage object is defined, false

@@ -28,9 +28,9 @@
 
 
 chrome.extension.sendRequest(
-  {
-    operation: 'provideContent',
-    contentUrl: document.location.href,
-    content: document.body.innerHTML
-  }
+    {
+      operation: 'provideContent',
+      contentUrl: document.location.href,
+      content: document.body.innerHTML
+    }
 );

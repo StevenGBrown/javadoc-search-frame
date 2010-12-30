@@ -33,6 +33,8 @@
  * ----------------------------------------------------------------------------
  */
 
+
+
 /**
  * Asynchronously loads resources from external URLs.
  * @param {View} view the object responsible for updating the UI.
@@ -45,6 +47,7 @@ HttpRequest = function(view) {
   this.loadedResource = null;
   this.statusMessage = null;
 };
+
 
 /**
  * Loads the resource at the given URL. If the resource at the given URL is
@@ -98,12 +101,14 @@ HttpRequest.prototype.load = function(url, progressCallback) {
   this.port.postMessage({httpRequestUrl: url});
 };
 
+
 /**
  * @return {boolean} true if the loading is complete, false otherwise.
  */
 HttpRequest.prototype.isComplete = function() {
   return this.loadedResource !== null;
 };
+
 
 /**
  * @return {string} a status message on the progress made towards loading the
@@ -116,6 +121,7 @@ HttpRequest.prototype.getStatusMessage = function() {
   return 'loading...';
 };
 
+
 /**
  * @return {string} the loaded resource, or null if the loading is not
  *                  complete.
@@ -123,6 +129,7 @@ HttpRequest.prototype.getStatusMessage = function() {
 HttpRequest.prototype.getResource = function() {
   return this.loadedResource;
 };
+
 
 /**
  * Abort the current anchor load operation.
