@@ -103,7 +103,7 @@ HttpRequest.prototype.load = function(url, progressCallback) {
 
 
 /**
- * @return {boolean} true if the loading is complete, false otherwise.
+ * @return {boolean} Whether the loading is complete.
  */
 HttpRequest.prototype.isComplete = function() {
   return this.loadedResource !== null;
