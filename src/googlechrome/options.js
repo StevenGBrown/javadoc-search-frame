@@ -1,7 +1,7 @@
-#INCLUDE license.txt
+#INCLUDE license.txt;
 
 
-#INCLUDE Messages.js
-#INCLUDE Storage.js
-#INCLUDE Option.js
-#INCLUDE OptionsPageGenerator.js
+#INCLUDE Messages.js;
+#INCLUDE Storage.js;
+#INCLUDE Option.js;
+#INCLUDE OptionsPageGenerator.js;

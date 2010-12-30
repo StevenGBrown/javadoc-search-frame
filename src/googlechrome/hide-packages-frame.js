@@ -1,9 +1,9 @@
 /**
  * The MIT License
- * 
- * Copyright (c) 2009 Steven G. Brown
+ *
+ * Copyright (c) 2010 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -12,10 +12,10 @@
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,28 +28,28 @@
 
 
 chrome.extension.sendRequest(
-  {
-    operation:'get',
-    key:'hide_package_frame'
-  },
-  function (hidePackageFrame) {
-    if (hidePackageFrame !== 'false') {
-      var framesets = document.getElementsByTagName('frameset');
-      if (framesets) {
-        for (var i = 0; i < framesets.length; i++) {
-          var frameset = framesets[i];
-          var framesetChildren = frameset.children;
-          if (framesetChildren &&
-              framesetChildren.length === 2 &&
-              framesetChildren[0].name === 'packageListFrame' &&
-              framesetChildren[1].name === 'packageFrame') {
-            frameset.setAttribute('rows', '0,*');
-            frameset.setAttribute('border', 0);
-            frameset.setAttribute('frameborder', 0);
-            frameset.setAttribute('framespacing', 0);
+    {
+      operation: 'get',
+      key: 'hide_package_frame'
+    },
+    function(hidePackageFrame) {
+      if (hidePackageFrame !== 'false') {
+        var framesets = document.getElementsByTagName('frameset');
+        if (framesets) {
+          for (var i = 0; i < framesets.length; i++) {
+            var frameset = framesets[i];
+            var framesetChildren = frameset.children;
+            if (framesetChildren &&
+                framesetChildren.length === 2 &&
+                framesetChildren[0].name === 'packageListFrame' &&
+                framesetChildren[1].name === 'packageFrame') {
+              frameset.setAttribute('rows', '0,*');
+              frameset.setAttribute('border', 0);
+              frameset.setAttribute('frameborder', 0);
+              frameset.setAttribute('framespacing', 0);
+            }
           }
         }
       }
     }
-  }
 );

@@ -31,6 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 import io, json, sys
 from buildlib.build_date import *
 from buildlib.file_copy import *
+from buildlib.linter import *
 from buildlib.transformations import *
 
 
@@ -39,6 +40,8 @@ def buildGoogleChromeExtension():
   Build the Javadoc Search Frame extension for Google Chrome.
   This extension will be created in the current working directory.
   """
+
+  linter()
 
   copyFile(name='allclasses-frame.js', fromDir='googlechrome', toDir='.',
     transformations=(
