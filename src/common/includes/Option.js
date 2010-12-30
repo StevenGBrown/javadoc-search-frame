@@ -33,6 +33,8 @@
  * ----------------------------------------------------------------------------
  */
 
+
+
 /**
  * Provides persistent configuration of the script options.
  * @param {{key: string, defaultValue: string, type}} properties
@@ -44,6 +46,7 @@ Option = function(properties) {
   this.type = properties.type;
 };
 
+
 /**
  * @return {boolean} true if options can be both retrieved and set, false
  *                    otherwise.
@@ -51,6 +54,7 @@ Option = function(properties) {
 Option.canGetAndSet = function() {
   return Storage.canGet() && Storage.canSet();
 };
+
 
 /**
  * Retrieve the current value of this option.
@@ -87,12 +91,14 @@ Option.prototype.getValue = function(callback, thisObject) {
   }
 };
 
+
 /**
  * @return {*} the default value of this option.
  */
 Option.prototype.getDefaultValue = function() {
   return this.defaultValue;
 };
+
 
 /**
  * Set this option to a new value.
@@ -109,6 +115,7 @@ Option.prototype.setValue = function(newValue) {
  * Option recognised by this script.
  */
 
+
 /**
  * @type {Option}
  */
@@ -117,6 +124,7 @@ Option.AUTO_OPEN = new Option({
   defaultValue: false,
   type: Boolean
 });
+
 
 /**
  * @type {Option}
@@ -127,16 +135,18 @@ Option.HIDE_PACKAGE_FRAME = new Option({
   type: Boolean
 });
 
+
 /**
  * @type {Option}
  */
 Option.PACKAGE_MENU = new Option({
   key: 'package_menu',
   defaultValue:
-    '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##\n' +
-    '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##',
+      '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##',
   type: String
 });
+
 
 /**
  * @type {Option}
@@ -144,11 +154,11 @@ Option.PACKAGE_MENU = new Option({
 Option.CLASS_MENU = new Option({
   key: 'class_menu',
   defaultValue:
-    '@1:search(koders) -> http://www.koders.com/' +
-        '?s=##PACKAGE_NAME##+##CLASS_NAME##+##MEMBER_NAME##\n' +
-    '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
-    '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
-        '##PACKAGE_PATH##/##CLASS_NAME##.java.html',
+      '@1:search(koders) -> http://www.koders.com/' +
+      '?s=##PACKAGE_NAME##+##CLASS_NAME##+##MEMBER_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
+      '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
+      '##PACKAGE_PATH##/##CLASS_NAME##.java.html',
   type: String
 });
 

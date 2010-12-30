@@ -33,6 +33,8 @@
  * ----------------------------------------------------------------------------
  */
 
+
+
 /**
  * Asynchronously loads resources from external URLs.
  * @param {View} view the object responsible for updating the UI.
@@ -46,6 +48,7 @@ HttpRequest = function(view) {
   this.errorMessage = null;
   this.progressCallback = null;
 };
+
 
 /**
  * Loads the resource at the given URL. If the resource at the given URL is
@@ -85,12 +88,14 @@ HttpRequest.prototype.load = function(url, progressCallback) {
   this.xmlHttpRequest = xmlHttpRequest;
 };
 
+
 /**
  * @return {boolean} true if the loading is complete, false otherwise.
  */
 HttpRequest.prototype.isComplete = function() {
   return this.loadedResource !== null;
 };
+
 
 /**
  * @return {string} a status message on the progress made towards loading the
@@ -112,6 +117,7 @@ HttpRequest.prototype.getStatusMessage = function() {
   return 'loading...';
 };
 
+
 /**
  * @return {string} the loaded resource, or null if the loading is not
  *                  complete.
@@ -119,6 +125,7 @@ HttpRequest.prototype.getStatusMessage = function() {
 HttpRequest.prototype.getResource = function() {
   return this.loadedResource;
 };
+
 
 /**
  * Abort the current anchor load operation.
@@ -135,6 +142,7 @@ HttpRequest.prototype.abort = function() {
   this.progressCallback = null;
 };
 
+
 /**
  * @param {Event} e the progress event.
  */
@@ -144,6 +152,7 @@ HttpRequest.prototype._onprogress = function(e) {
   this.progressCallback();
 };
 
+
 /**
  * @param {Event} e the load event.
  */
@@ -151,6 +160,7 @@ HttpRequest.prototype._onload = function(e) {
   this.loadedResource = this.xmlHttpRequest.responseText;
   this.progressCallback();
 };
+
 
 /**
  * @param {Event} e the error event.
@@ -160,6 +170,7 @@ HttpRequest.prototype._onerror = function(e) {
   this.errorMessage = 'ERROR';
   this.progressCallback();
 };
+
 
 /**
  * @param {*} ex the exception.

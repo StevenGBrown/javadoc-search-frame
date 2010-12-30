@@ -33,10 +33,12 @@
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Options page generator.
  */
 OptionsPageGenerator = {};
+
 
 /**
  * Generate the options page by replacing the current document.
@@ -53,6 +55,7 @@ OptionsPageGenerator.generate = function() {
     document.body.appendChild(pageElement);
   });
 };
+
 
 /**
  * Create the contents of the options page.
@@ -93,6 +96,7 @@ OptionsPageGenerator._createContents = function(pageDocument) {
   return contents;
 };
 
+
 /**
  * @param {Document} pageDocument the options page document.
  * @return {Element} a header element.
@@ -102,6 +106,7 @@ OptionsPageGenerator._createHeader = function(pageDocument) {
   headerElement.textContent = Messages.get('optionsTitle');
   return headerElement;
 };
+
 
 /**
  * @param {Document} pageDocument the options page document.
@@ -114,6 +119,7 @@ OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function(
   errorMessageElement.style.color = 'red';
   return errorMessageElement;
 };
+
 
 /**
  * @param {Document} pageDocument the options page document.
@@ -152,12 +158,13 @@ OptionsPageGenerator._booleanOption = function(
   }
 
   return OptionsPageGenerator._createTable(pageDocument, title, '', [
-      OptionsPageGenerator._tableContentElementForRadioButton(
-          pageDocument, trueRadioButtonElement, trueText),
-      OptionsPageGenerator._tableContentElementForRadioButton(
-          pageDocument, falseRadioButtonElement, falseText)
+    OptionsPageGenerator._tableContentElementForRadioButton(
+        pageDocument, trueRadioButtonElement, trueText),
+    OptionsPageGenerator._tableContentElementForRadioButton(
+        pageDocument, falseRadioButtonElement, falseText)
   ]);
 };
+
 
 /**
  * @param {Document} pageDocument the options page document.
@@ -178,6 +185,7 @@ OptionsPageGenerator._radioButton = function(
   return radioButtonElement;
 };
 
+
 /**
  * @param {Document} pageDocument the options page document.
  * @param {Element} radioButtonElement a radio button element.
@@ -195,6 +203,7 @@ OptionsPageGenerator._tableContentElementForRadioButton = function(
 
   return labelElement;
 };
+
 
 /**
  * @param {Document} pageDocument the options page document.
@@ -237,6 +246,7 @@ OptionsPageGenerator._menuOption = function(
   return OptionsPageGenerator._createTable(pageDocument, title, subTitle,
       [textAreaElement, restoreDefaultButtonElement]);
 };
+
 
 /**
  * @param {Document} pageDocument the options page document.

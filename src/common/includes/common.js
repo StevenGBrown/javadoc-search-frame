@@ -33,6 +33,7 @@
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * Array of all package and class links.
  */
@@ -45,12 +46,14 @@ var ALL_PACKAGE_AND_CLASS_LINKS = [];
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Unit test suite used by this script.
  */
 UnitTestSuite = {
   unitTestFunctions: []
 };
+
 
 /**
  * Add a test function to this suite.
@@ -61,6 +64,7 @@ UnitTestSuite.testFunctionFor = function(functionUnderTest, unitTestFunction) {
   UnitTestSuite.unitTestFunctions.push(
       {name: functionUnderTest, run: unitTestFunction});
 };
+
 
 /**
  * Run all of the test functions that have been added to this suite.
@@ -86,6 +90,7 @@ UnitTestSuite.run = function() {
       UnitTestSuite.assertionsCount, UnitTestSuite.failures);
 };
 
+
 /**
  * Assert that the actual value equals the expected value.
  *
@@ -102,6 +107,7 @@ UnitTestSuite.assertThat = function(description, actual, expected) {
   UnitTestSuite.assertionsCount++;
 };
 
+
 /**
  * Has no effect; intended to make calls to the {@link UnitTestSuite.assertThat}
  * and {@link UnitTestSuite.assertThatEval} functions more readable.
@@ -114,6 +120,7 @@ UnitTestSuite.is = function(value) {
   return value;
 };
 
+
 /**
  * Quotes the given string value in the same way as the Console or Error Log.
  * @param {string} stringValue the string value.
@@ -125,6 +132,7 @@ UnitTestSuite.quote = function(stringValue) {
   }
   return stringValue;
 };
+
 
 /**
  * Used by the {@link UnitTestSuite} assertion functions to determine if two
@@ -160,13 +168,16 @@ UnitTestSuite._equals = function(one, two) {
  * {@link UnitTestSuite} object.
  */
 
+
 /**
  */
 var assertThat = UnitTestSuite.assertThat;
 
+
 /**
  */
 var assertThatEval = UnitTestSuite.assertThatEval;
+
 
 /**
  */
@@ -182,6 +193,8 @@ var is = UnitTestSuite.is;
  * ----------------------------------------------------------------------------
  */
 
+
+
 /**
  * Unit test result returned by {@link UnitTestSuite#run}.
  * @param {number} numberOfAssertions the total number of unit test assertions.
@@ -193,6 +206,7 @@ UnitTestResult = function(numberOfAssertions, failures) {
   this.numberOfAssertions = numberOfAssertions;
   this.failures = failures;
 };
+
 
 /**
  * @return {string} a description of this unit test result.
@@ -220,6 +234,8 @@ UnitTestResult.prototype.toString = function() {
  * ----------------------------------------------------------------------------
  */
 
+
+
 /**
  * A unit test failure due to a failed assertion.
  * @param {string} functionUnderTestName the name of the function under test.
@@ -235,6 +251,7 @@ UnitTestAssertionFailure = function(
   this.actual = actual;
   this.expected = expected;
 };
+
 
 /**
  * @return {string} a description of this unit test failure.
@@ -256,6 +273,8 @@ UnitTestAssertionFailure.prototype.toString = function() {
  * ----------------------------------------------------------------------------
  */
 
+
+
 /**
  * A unit test failure due to a thrown exception.
  * @param {string} functionUnderTestName the name of the function under test.
@@ -266,6 +285,7 @@ UnitTestExceptionThrownFailure = function(functionUnderTestName, exception) {
   this.functionUnderTestName = functionUnderTestName;
   this.exception = exception;
 };
+
 
 /**
  * @return {string} a description of this unit test failure.
@@ -281,6 +301,8 @@ UnitTestExceptionThrownFailure.prototype.toString = function() {
  * ----------------------------------------------------------------------------
  */
 
+
+
 /**
  * Package, class, class member and keyword link types.
  * @param {string} singularName the singular name of the link type.
@@ -292,12 +314,14 @@ LinkType = function(singularName, pluralName) {
   this.pluralName = pluralName;
 };
 
+
 /**
  * @return {string} the singular name of this type.
  */
 LinkType.prototype.getSingularName = function() {
   return this.singularName;
 };
+
 
 /**
  * @return {string} the plural name of this type.
@@ -306,6 +330,7 @@ LinkType.prototype.getPluralName = function() {
   return this.pluralName;
 };
 
+
 /**
  * @return {string} a string representation of this type.
  */
@@ -313,50 +338,60 @@ LinkType.prototype.toString = function() {
   return this.singularName;
 };
 
+
 /**
  * Package link type.
  */
 LinkType.PACKAGE = new LinkType('Package', 'Packages');
+
 
 /**
  * Interface link type.
  */
 LinkType.INTERFACE = new LinkType('Interface', 'Interfaces');
 
+
 /**
  * Class link type.
  */
 LinkType.CLASS = new LinkType('Class', 'Classes');
+
 
 /**
  * Enum link type.
  */
 LinkType.ENUM = new LinkType('Enum', 'Enums');
 
+
 /**
  * Exception link type.
  */
 LinkType.EXCEPTION = new LinkType('Exception', 'Exceptions');
+
 
 /**
  * Error link type.
  */
 LinkType.ERROR = new LinkType('Error', 'Errors');
 
+
 /**
  * Annotation link type.
  */
 LinkType.ANNOTATION = new LinkType('Annotation', 'Annotation Types');
+
 
 /**
  * Class member link type.
  */
 LinkType.CLASS_MEMBER = new LinkType('Method or Field', 'Methods and Fields');
 
+
 /**
  * Keyword link type.
  */
 LinkType.KEYWORD = new LinkType('Keyword', 'Keywords');
+
 
 /**
  * Get the link type with the given singular name.
@@ -374,6 +409,7 @@ LinkType.getByName = function(singularName) {
  * PackageLink, ClassLink, MemberLink and KeywordLink
  * ----------------------------------------------------------------------------
  */
+
 
 /**
  * Extract a URL from the given link.
@@ -395,6 +431,7 @@ UnitTestSuite.testFunctionFor('extractUrl', function() {
   };
   assertThat('', extractUrl(mockLink), is('urlOfLink'));
 });
+
 
 /**
  * Convert the given relative URL to an absolute URL.
@@ -431,6 +468,7 @@ UnitTestSuite.testFunctionFor('toAbsoluteUrl', function() {
 });
 
 
+
 /**
  * Link to a package. These links are of type {LinkType.PACKAGE}.
  * @param {string} packageName the package name.
@@ -442,6 +480,7 @@ PackageLink = function(packageName) {
       '/package-summary.html" target="classFrame">' + packageName + '</A>';
 };
 
+
 /**
  * Determine whether this link matches the given regular expression.
  *
@@ -451,6 +490,7 @@ PackageLink = function(packageName) {
 PackageLink.prototype.matches = function(regex) {
   return regex.test(this.packageName);
 };
+
 
 /**
  * @return {string} this link in HTML format.
@@ -465,6 +505,7 @@ UnitTestSuite.testFunctionFor('PackageLink.getHtml', function() {
       'java.applet</A>'));
 });
 
+
 /**
  * @return {LinkType} the type of this link.
  */
@@ -472,12 +513,14 @@ PackageLink.prototype.getType = function() {
   return LinkType.PACKAGE;
 };
 
+
 /**
  * @return {string} the name of this package.
  */
 PackageLink.prototype.getPackageName = function() {
   return this.packageName;
 };
+
 
 /**
  * @return {string} the URL of this link.
@@ -491,6 +534,7 @@ UnitTestSuite.testFunctionFor('PackageLink.getUrl', function() {
       is(toAbsoluteUrl('java/applet/package-summary.html')));
 });
 
+
 /**
  * Equals function.
  *
@@ -500,8 +544,9 @@ UnitTestSuite.testFunctionFor('PackageLink.getUrl', function() {
  */
 PackageLink.prototype.equals = function(obj) {
   return obj instanceof PackageLink &&
-       this.packageName === obj.packageName;
+      this.packageName === obj.packageName;
 };
+
 
 /**
  * @return {string} a string representation of this link.
@@ -509,6 +554,7 @@ PackageLink.prototype.equals = function(obj) {
 PackageLink.prototype.toString = function() {
   return this.packageName;
 };
+
 
 
 /**
@@ -552,6 +598,7 @@ ClassLink = function(type, packageName, className) {
       closingTag + '</A>&nbsp;[&nbsp;' + packageName + '&nbsp;]';
 };
 
+
 /**
  * Determine whether this link matches the given regular expression.
  *
@@ -564,6 +611,7 @@ ClassLink.prototype.matches = function(regex) {
         return regex.test(innerClassName);
       });
 };
+
 
 /**
  * @return {string} this link in HTML format.
@@ -605,6 +653,7 @@ UnitTestSuite.testFunctionFor('ClassLink.getHtml', function() {
       'target="classFrame">Deprecated</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
 });
 
+
 /**
  * @return {LinkType} the type of this link.
  */
@@ -612,12 +661,14 @@ ClassLink.prototype.getType = function() {
   return this.type;
 };
 
+
 /**
  * @return {string} the simple name of this class.
  */
 ClassLink.prototype.getClassName = function() {
   return this.className;
 };
+
 
 /**
  * @return {string} the name of the package that contains this class.
@@ -627,12 +678,14 @@ ClassLink.prototype.getPackageName = function() {
       0, this.canonicalName.length - this.className.length - 1);
 };
 
+
 /**
  * @return {string} the canonical name of this class.
  */
 ClassLink.prototype.getCanonicalName = function() {
   return this.canonicalName;
 };
+
 
 /**
  * @return {string} the URL of this link.
@@ -661,6 +714,7 @@ UnitTestSuite.testFunctionFor('ClassLink.getUrl', function() {
       'Deprecated').getUrl(), is(toAbsoluteUrl('java/lang/Deprecated.html')));
 });
 
+
 /**
  * Equals function.
  *
@@ -670,10 +724,11 @@ UnitTestSuite.testFunctionFor('ClassLink.getUrl', function() {
  */
 ClassLink.prototype.equals = function(obj) {
   return obj instanceof ClassLink &&
-       this.type === obj.type &&
-       this.className === obj.className &&
-       this.canonicalName === obj.canonicalName;
+      this.type === obj.type &&
+      this.className === obj.className &&
+      this.canonicalName === obj.canonicalName;
 };
+
 
 /**
  * @return {string} a string representation of this link.
@@ -681,6 +736,7 @@ ClassLink.prototype.equals = function(obj) {
 ClassLink.prototype.toString = function() {
   return this.canonicalName;
 };
+
 
 
 /**
@@ -696,6 +752,7 @@ MemberLink = function(baseUrl, name) {
       name.replace(/ /g, '&nbsp;') + '</A><BR/>';
 };
 
+
 /**
  * Determine whether this link matches the given regular expression.
  *
@@ -706,12 +763,14 @@ MemberLink.prototype.matches = function(regex) {
   return regex.test(this.name);
 };
 
+
 /**
  * @return {string} this link in HTML format.
  */
 MemberLink.prototype.getHtml = function() {
   return this.html;
 };
+
 
 /**
  * @return {LinkType} the type of this link.
@@ -720,12 +779,14 @@ MemberLink.prototype.getType = function() {
   return LinkType.CLASS_MEMBER;
 };
 
+
 /**
  * @return {string} the URL of this link.
  */
 MemberLink.prototype.getUrl = function() {
   return extractUrl(this);
 };
+
 
 /**
  * @return {string} the name of this class member.
@@ -737,6 +798,7 @@ MemberLink.prototype.getName = function() {
     return this.name;
   }
 };
+
 
 
 /**
@@ -752,6 +814,7 @@ KeywordLink = function(baseUrl, name) {
       name.replace(/ /g, '&nbsp;') + '</A><BR/>';
 };
 
+
 /**
  * Determine whether this link matches the given regular expression.
  *
@@ -762,6 +825,7 @@ KeywordLink.prototype.matches = function(regex) {
   return regex.test(this.name);
 };
 
+
 /**
  * @return {string} this link in HTML format.
  */
@@ -769,12 +833,14 @@ KeywordLink.prototype.getHtml = function() {
   return this.html;
 };
 
+
 /**
  * @return {LinkType} the type of this link.
  */
 KeywordLink.prototype.getType = function() {
   return LinkType.KEYWORD;
 };
+
 
 /**
  * @return {string} the URL of this link.
@@ -790,6 +856,7 @@ KeywordLink.prototype.getUrl = function() {
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class View Provides access to the UI elements of the frame containing the
  *             search field.
@@ -801,12 +868,14 @@ View = {
   innerFrame: null
 };
 
+
 /**
  * Access key that will focus on the search field when activated ('s').
  * This access key can be activated by pressing either Alt+s or Alt+Shift+s,
  * depending on the internet browser.
  */
 View.searchAccessKey = 's';
+
 
 /**
  * Access key that will clear the search field when activated ('a').
@@ -815,6 +884,7 @@ View.searchAccessKey = 's';
  */
 View.eraseAccessKey = 'a';
 
+
 /**
  * Initialise the search field frame.
  * @param {EventHandlers} eventHandlers the event handlers.
@@ -822,6 +892,7 @@ View.eraseAccessKey = 'a';
 View.initialise = function(eventHandlers) {
   View._create(eventHandlers);
 };
+
 
 /**
  * Set the HTML contents of the area below the search field.
@@ -834,6 +905,7 @@ View.setContentsHtml = function(contents) {
   View.contentNode = newNode;
 };
 
+
 /**
  * Set the value displayed in the search field.
  * @param {string} value the value to display.
@@ -844,6 +916,7 @@ View.setSearchFieldValue = function(value) {
   }
 };
 
+
 /**
  * @return {string} the current value displayed in the search field.
  */
@@ -851,12 +924,14 @@ View.getSearchFieldValue = function() {
   return View.searchField.value;
 };
 
+
 /**
  * Give focus to the search field.
  */
 View.focusOnSearchField = function() {
   View.searchField.focus();
 };
+
 
 /**
  * Add an inner frame with the given URL.
@@ -868,6 +943,7 @@ View.addInnerFrame = function(url) {
   View.innerFrame.src = url;
 };
 
+
 /**
  * Remove the previously added inner frame.
  */
@@ -877,6 +953,7 @@ View.removeInnerFrame = function() {
   }
   View.innerFrame = null;
 };
+
 
 /**
  * Create the view elements and add them to the current document.
@@ -909,7 +986,7 @@ View._create = function(eventHandlers) {
   tableRowElementTwo.appendChild(tableDataCellElementTwo);
 
   [tableElement, tableRowElementOne, tableDataCellElementOne,
-      tableRowElementTwo, tableDataCellElementTwo].forEach(function(element) {
+   tableRowElementTwo, tableDataCellElementTwo].forEach(function(element) {
     element.style.border = '0';
     element.style.width = '100%';
   });
@@ -919,6 +996,7 @@ View._create = function(eventHandlers) {
   }
   document.body.appendChild(tableElement);
 };
+
 
 /**
  * @param {EventHandlers} eventHandlers the event handlers.
@@ -939,6 +1017,7 @@ View._createSearchField = function(eventHandlers) {
   return searchField;
 };
 
+
 /**
  * @param {EventHandlers} eventHandlers the event handlers.
  * @return {Element} the erase button element.
@@ -957,6 +1036,7 @@ View._createEraseButton = function(eventHandlers) {
   }
   return eraseButton;
 };
+
 
 /**
  * @param {EventHandlers} eventHandlers the event handlers.
@@ -981,6 +1061,7 @@ View._createOptionsLink = function(eventHandlers) {
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Query Constructs the text entered into the search field into a search
  *              query.
@@ -992,6 +1073,7 @@ Query = {
   timeoutId: null
 };
 
+
 /**
  * @return {string} the portion of the search query that relates to the
  *                  packages and classes search.
@@ -999,6 +1081,7 @@ Query = {
 Query.getPackageOrClassSearchString = function() {
   return Query.packageOrClassSearchString;
 };
+
 
 /**
  * @return {string} the portion of the search query that relates to the class
@@ -1008,6 +1091,7 @@ Query.getMemberOrKeywordSearchString = function() {
   return Query.memberOrKeywordSearchString;
 };
 
+
 /**
  * @return {string} the portion of the search query that relates to the
  *                  package menu or class menu.
@@ -1015,6 +1099,7 @@ Query.getMemberOrKeywordSearchString = function() {
 Query.getMenuSearchString = function() {
   return Query.menuSearchString;
 };
+
 
 /**
  * @return {string} the entire search query.
@@ -1032,6 +1117,7 @@ Query.getEntireSearchString = function() {
   return searchString;
 };
 
+
 /**
  * Update this query based on the contents of the search field.
  * @param {string} searchFieldContents the contents of the search field.
@@ -1048,6 +1134,7 @@ Query.update = function(searchFieldContents) {
     Query._updateView.apply(Query);
   }, 0);
 };
+
 
 /**
  * Process the search field input.
@@ -1086,6 +1173,7 @@ Query._processInput = function(searchFieldContents) {
   Query.menuSearchString = tokens[0];
 };
 
+
 /**
  * Update the view.
  */
@@ -1107,10 +1195,12 @@ Query._updateView = function() {
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class RegexLibrary Library of regular expressions used by this script.
  */
 RegexLibrary = {};
+
 
 /**
  * Create and return a function that will take a {PackageLink}, {ClassLink},
@@ -1159,10 +1249,10 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
       'test', 'Outer.Apple.Banana');
 
   var allLinks = [javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass,
-      javaIoPackage, javaLangPackage, javaIoCloseableClass,
-      javaLangObjectClass, javaxSwingBorderFactoryClass,
-      javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass,
-      hudsonPackage, hudsonModelHudsonClass, testOuterAppleBananaClass];
+    javaIoPackage, javaLangPackage, javaIoCloseableClass,
+    javaLangObjectClass, javaxSwingBorderFactoryClass,
+    javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass,
+    hudsonPackage, hudsonModelHudsonClass, testOuterAppleBananaClass];
 
   var assertThatSearchResultFor = function(searchString, searchResult) {
     assertThat(UnitTestSuite.quote(searchString),
@@ -1259,6 +1349,7 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
 });
 
+
 /**
  * Create and return a function that will take a {PackageLink}, {ClassLink},
  * {MemberLink} or {KeywordLink} as an argument and return true if that link
@@ -1273,6 +1364,7 @@ RegexLibrary.createCaseInsensitiveExactMatchCondition = function(searchString) {
   return RegexLibrary._createExactMatchCondition(searchString, false);
 };
 
+
 /**
  * Create and return a function that will take a {PackageLink}, {ClassLink},
  * {MemberLink} or {KeywordLink} as an argument and return true if that link
@@ -1286,6 +1378,7 @@ RegexLibrary.createCaseInsensitiveExactMatchCondition = function(searchString) {
 RegexLibrary.createCaseSensitiveExactMatchCondition = function(searchString) {
   return RegexLibrary._createExactMatchCondition(searchString, true);
 };
+
 
 /**
  * @param {string} searchString the search string.
@@ -1308,6 +1401,7 @@ RegexLibrary._createExactMatchCondition = function(
     return link.matches(pattern);
   };
 };
+
 
 /**
  * @param {string} searchString the search string.
@@ -1381,10 +1475,10 @@ RegexLibrary._getRegex = function(searchString) {
 
         pattern += '.*';
       } else if (RegexLibrary._isSpecialRegularExpressionCharacter(token)) {
-         // A special regular expression character, but not an asterisk.
-         // Escape this character.
+        // A special regular expression character, but not an asterisk.
+        // Escape this character.
 
-         pattern += '\\' + token;
+        pattern += '\\' + token;
       } else {
         // Otherwise, add the character directly to the regular expression.
 
@@ -1407,6 +1501,7 @@ UnitTestSuite.testFunctionFor('RegexLibrary._getRegex', function() {
       RegexLibrary._getRegex('java.*.*o*e').pattern));
 });
 
+
 /**
  * @param {string} searchString the search string.
  * @param {boolean} caseSensitive true for a case-sensitive match, false for
@@ -1419,7 +1514,7 @@ RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
   for (i = 0; i < searchString.length; i++) {
     var character = searchString.charAt(i);
     if (RegexLibrary._isSpecialRegularExpressionCharacter(character)) {
-       pattern += '\\' + character;
+      pattern += '\\' + character;
     } else {
       pattern += character;
     }
@@ -1428,6 +1523,7 @@ RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
   pattern += '$';
   return caseSensitive ? new RegExp(pattern) : new RegExp(pattern, 'i');
 };
+
 
 /**
  * @param {string} character the character to inspect.
@@ -1449,6 +1545,8 @@ RegexLibrary._isSpecialRegularExpressionCharacter = function(character) {
  * ----------------------------------------------------------------------------
  */
 
+
+
 /**
  * A callback function in the context of a specified object.
  * @param {function(*): *} callbackFunction the callback function.
@@ -1459,6 +1557,7 @@ Callback = function(callbackFunction, thisObject) {
   this.callbackFunction = callbackFunction;
   this.thisObject = thisObject;
 };
+
 
 /**
  * Invoke this callback function with the given arguments.
@@ -1478,6 +1577,7 @@ Callback.prototype.invoke = function(argsArray) {
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Search The searching functionality.
  */
@@ -1487,6 +1587,7 @@ Search = {
   topLink: null
 };
 
+
 /**
  * Perform a search.
  */
@@ -1495,6 +1596,7 @@ Search.perform = function() {
   Search._performSearch(entireSearchString);
   Search.previousEntireSearchString = entireSearchString;
 };
+
 
 /**
  * Perform a search after a short delay only if the search string has changed.
@@ -1512,6 +1614,7 @@ Search.performIfSearchStringHasChanged = function() {
   Search.previousEntireSearchString = entireSearchString;
 };
 
+
 /**
  * @return {string} the URL of the link currently displayed at the top of the
  *                  list, or null if no links are currently displayed.
@@ -1522,6 +1625,7 @@ Search.getTopLinkUrl = function() {
   }
   return null;
 };
+
 
 /**
  * @param {string} entireSearchString the search string.
@@ -1556,6 +1660,7 @@ Search._performSearch = function(entireSearchString) {
   }, Search);
 };
 
+
 /**
  * Collapse the menu after an external page has been opened.
  */
@@ -1563,6 +1668,7 @@ Search._collapseMenu = function() {
   Query.update('');
   Search.perform();
 };
+
 
 /**
  * If the option is configured, automatically open the top link.
@@ -1585,6 +1691,7 @@ Search._autoOpen = function() {
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Search._PackagesAndClasses Component of the search functionality that
  *                                   deals with package and class links.
@@ -1595,6 +1702,7 @@ Search._PackagesAndClasses = {
   bestMatch: null,
   topLink: null
 };
+
 
 /**
  * Perform this portion of the search.
@@ -1631,6 +1739,7 @@ Search._PackagesAndClasses._perform = function(searchContext, searchString) {
       module._constructHtml, module);
 };
 
+
 /**
  * @param {Array<PackageLink|ClassLink>} links the package and class links
  *                                       matched by the current search.
@@ -1649,20 +1758,21 @@ Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
 
 UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink',
     function() {
-  var linkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component');
-  var linkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
-  var getTopLink = Search._PackagesAndClasses._getTopLink;
+      var linkOne = new ClassLink(LinkType.CLASS, 'java.awt', 'Component');
+      var linkTwo = new ClassLink(LinkType.CLASS, 'java.lang', 'Object');
+      var getTopLink = Search._PackagesAndClasses._getTopLink;
 
-  assertThat('no links, best match undefined', getTopLink([]), is(null));
-  assertThat('one link, best match undefined',
-      getTopLink([linkOne]), is(linkOne));
-  assertThat('two links, best match undefined',
-      getTopLink([linkOne, linkTwo]), is(linkOne));
-  assertThat('no links, best match defined',
-      getTopLink([], linkOne), is(linkOne));
-  assertThat('one link, best match defined',
-      getTopLink([linkOne], linkTwo), is(linkTwo));
-});
+      assertThat('no links, best match undefined', getTopLink([]), is(null));
+      assertThat('one link, best match undefined',
+          getTopLink([linkOne]), is(linkOne));
+      assertThat('two links, best match undefined',
+          getTopLink([linkOne, linkTwo]), is(linkOne));
+      assertThat('no links, best match defined',
+          getTopLink([], linkOne), is(linkOne));
+      assertThat('one link, best match defined',
+          getTopLink([linkOne], linkTwo), is(linkTwo));
+    });
+
 
 /**
  * Get the best match (if any) from the given array of links.
@@ -1711,54 +1821,56 @@ Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
 
 UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch',
     function() {
-  var hudsonPackage = new PackageLink('hudson');
-  var javaIoPackage = new PackageLink('java.io');
-  var javaLangPackage = new PackageLink('java.lang');
-  var javaUtilListClass = new ClassLink(LinkType.INTERFACE,
-      'java.util', 'List');
-  var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS,
-      'hudson.model', 'Hudson');
-  var javaAwtListClass = new ClassLink(LinkType.CLASS,
-      'java.awt', 'List');
-  var javaIoCloseableClass = new ClassLink(LinkType.CLASS,
-      'java.io', 'Closeable');
-  var javaLangObjectClass = new ClassLink(LinkType.CLASS,
-      'java.lang', 'Object');
-  var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS,
-      'javax.swing', 'BorderFactory');
-  var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS,
-      'javax.swing.border', 'AbstractBorder');
-  var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS,
-      'org.omg.CORBA', 'Object');
+      var hudsonPackage = new PackageLink('hudson');
+      var javaIoPackage = new PackageLink('java.io');
+      var javaLangPackage = new PackageLink('java.lang');
+      var javaUtilListClass = new ClassLink(LinkType.INTERFACE,
+          'java.util', 'List');
+      var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS,
+          'hudson.model', 'Hudson');
+      var javaAwtListClass = new ClassLink(LinkType.CLASS,
+          'java.awt', 'List');
+      var javaIoCloseableClass = new ClassLink(LinkType.CLASS,
+          'java.io', 'Closeable');
+      var javaLangObjectClass = new ClassLink(LinkType.CLASS,
+          'java.lang', 'Object');
+      var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS,
+          'javax.swing', 'BorderFactory');
+      var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS,
+          'javax.swing.border', 'AbstractBorder');
+      var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS,
+          'org.omg.CORBA', 'Object');
 
-  var allLinks = [hudsonPackage, javaIoPackage, javaLangPackage,
-      javaUtilListClass, hudsonModelHudsonClass, javaAwtListClass,
-      javaIoCloseableClass, javaLangObjectClass, javaxSwingBorderFactoryClass,
-      javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass];
+      var allLinks = [hudsonPackage, javaIoPackage, javaLangPackage,
+        javaUtilListClass, hudsonModelHudsonClass, javaAwtListClass,
+        javaIoCloseableClass, javaLangObjectClass, javaxSwingBorderFactoryClass,
+        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass];
 
-  var assertThatBestMatchFor = function(searchString, searchResult) {
-    assertThat(UnitTestSuite.quote(searchString),
-        Search._PackagesAndClasses._getBestMatch(searchString, allLinks),
-        is(searchResult));
-  };
+      var assertThatBestMatchFor = function(searchString, searchResult) {
+        assertThat(UnitTestSuite.quote(searchString),
+            Search._PackagesAndClasses._getBestMatch(searchString, allLinks),
+            is(searchResult));
+      };
 
-  assertThatBestMatchFor('java.io', is(javaIoPackage));
-  assertThatBestMatchFor('j', is(null));
-  assertThatBestMatchFor('J', is(null));
-  assertThatBestMatchFor('Object', is(javaLangObjectClass));
-  assertThatBestMatchFor('O', is(null));
-  assertThatBestMatchFor('java.lang.Object', is(javaLangObjectClass));
-  assertThatBestMatchFor('JAVA.LANG.OBJECT', is(javaLangObjectClass));
-  assertThatBestMatchFor('org.omg.CORBA.Object', is(orgOmgCorbaObjectClass));
-  assertThatBestMatchFor('java.lang', is(javaLangPackage));
-  assertThatBestMatchFor('java.lang.', is(null));
-  assertThatBestMatchFor('java.*.o*e', is(null));
-  assertThatBestMatchFor('java.*.*o*e', is(null));
-  assertThatBestMatchFor('javax.swing.border.A', is(null));
-  assertThatBestMatchFor('hudson', is(hudsonPackage));
-  assertThatBestMatchFor('Hudson', is(hudsonModelHudsonClass));
-  assertThatBestMatchFor('list', is(javaUtilListClass));
-});
+      assertThatBestMatchFor('java.io', is(javaIoPackage));
+      assertThatBestMatchFor('j', is(null));
+      assertThatBestMatchFor('J', is(null));
+      assertThatBestMatchFor('Object', is(javaLangObjectClass));
+      assertThatBestMatchFor('O', is(null));
+      assertThatBestMatchFor('java.lang.Object', is(javaLangObjectClass));
+      assertThatBestMatchFor('JAVA.LANG.OBJECT', is(javaLangObjectClass));
+      assertThatBestMatchFor('org.omg.CORBA.Object', is(
+          orgOmgCorbaObjectClass));
+      assertThatBestMatchFor('java.lang', is(javaLangPackage));
+      assertThatBestMatchFor('java.lang.', is(null));
+      assertThatBestMatchFor('java.*.o*e', is(null));
+      assertThatBestMatchFor('java.*.*o*e', is(null));
+      assertThatBestMatchFor('javax.swing.border.A', is(null));
+      assertThatBestMatchFor('hudson', is(hudsonPackage));
+      assertThatBestMatchFor('Hudson', is(hudsonModelHudsonClass));
+      assertThatBestMatchFor('list', is(javaUtilListClass));
+    });
+
 
 /**
  * @return {string} the HTML to display the search results.
@@ -1797,6 +1909,7 @@ Search._PackagesAndClasses._constructHtml = function() {
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Search._ClassMembersAndKeywords Component of the search functionality
  *                                        that deals with class members and
@@ -1827,6 +1940,7 @@ Search._ClassMembersAndKeywords = {
     'nested_classes_inherited_from_'
   ]
 };
+
 
 /**
  * Perform this portion of the search.
@@ -1880,6 +1994,7 @@ Search._ClassMembersAndKeywords._perform = function(
   }
 };
 
+
 /**
  * Retrieve the member and keyword links from the given package or class page.
  * @param {string} baseUrl the URL of the page.
@@ -1893,6 +2008,7 @@ Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
   return Search._ClassMembersAndKeywords._createMemberAndKeywordLinks(
       baseUrl, names);
 };
+
 
 /**
  * Retrieve the anchor names from the given package or class page.
@@ -1909,6 +2025,7 @@ Search._ClassMembersAndKeywords._getAnchorNames = function(
   }
   return names;
 };
+
 
 /**
  * Create member and keyword links from the given anchor names.
@@ -1933,6 +2050,7 @@ Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function(
   return links;
 };
 
+
 /**
  * @param {string} name the anchor name.
  * @return {boolean} true if the anchor is a keyword, false otherwise.
@@ -1956,6 +2074,7 @@ Search._ClassMembersAndKeywords._isKeywordName = function(name) {
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class Search._Menu Component of the search functionality that deals with
  *                     the package menu and class menu.
@@ -1963,6 +2082,7 @@ Search._ClassMembersAndKeywords._isKeywordName = function(name) {
 Search._Menu = {
   menuReplacement: null
 };
+
 
 /**
  * Perform this portion of the search.
@@ -2009,6 +2129,7 @@ Search._Menu._perform = function(searchContext, searchString) {
 
   searchContext.menuPageOpened = true;
 };
+
 
 /**
  * Construct the menu.
@@ -2068,6 +2189,7 @@ Search._Menu._constructMenu = function(searchContext, menuReplacement,
   return menu;
 };
 
+
 /**
  * Placeholder values that can be entered into the class_menu or package_menu
  * options and will, when the menu is opened, be replaced with data relevant
@@ -2101,6 +2223,7 @@ Search._Menu._getMenuReplacement = function() {
   return Search._Menu.menuReplacement;
 };
 
+
 /**
  * @param {{Array<{mnemonic: string, label: string, url: string}>}} the menu
  *     items.
@@ -2121,6 +2244,7 @@ Search._Menu._constructMenuHtml = function(menu) {
  * Main script
  * ----------------------------------------------------------------------------
  */
+
 
 /**
  * Initialise this script.
@@ -2173,6 +2297,7 @@ function init(unitTestResultCallback) {
   });
 }
 
+
 /**
  * Parse packages from the given array of {ClassLink} objects.
  *
@@ -2214,19 +2339,20 @@ function getPackageLinks(classLinks) {
 UnitTestSuite.testFunctionFor('getPackageLinks', function() {
 
   var classLinks = [
-      new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder'),
-      new ClassLink(LinkType.CLASS, 'java.awt', 'Button'),
-      new ClassLink(LinkType.CLASS, 'javax.swing', 'SwingWorker')
+    new ClassLink(LinkType.CLASS, 'javax.swing.border', 'AbstractBorder'),
+    new ClassLink(LinkType.CLASS, 'java.awt', 'Button'),
+    new ClassLink(LinkType.CLASS, 'javax.swing', 'SwingWorker')
   ];
 
   var expectedPackageLinks = [
-      new PackageLink('java.awt'),
-      new PackageLink('javax.swing'),
-      new PackageLink('javax.swing.border')
+    new PackageLink('java.awt'),
+    new PackageLink('javax.swing'),
+    new PackageLink('javax.swing.border')
   ];
 
   assertThat('', getPackageLinks(classLinks), is(expectedPackageLinks));
 });
+
 
 /**
  * @return {string} the inner HTML of the body element of the classes list
@@ -2239,6 +2365,7 @@ function getClassesInnerHtml() {
   }
   return classesInnerHtml;
 }
+
 
 /**
  * Parse interfaces, classes, enumerations, and annotations from the inner HTML
@@ -2263,8 +2390,8 @@ function getClassLinks(classesInnerHtml) {
   var matches;
   var classLinksMap = {};
   var classLinkTypes = [
-      LinkType.PACKAGE, LinkType.INTERFACE, LinkType.CLASS, LinkType.ENUM,
-      LinkType.EXCEPTION, LinkType.ERROR, LinkType.ANNOTATION
+    LinkType.PACKAGE, LinkType.INTERFACE, LinkType.CLASS, LinkType.ENUM,
+    LinkType.EXCEPTION, LinkType.ERROR, LinkType.ANNOTATION
   ];
   classLinkTypes.forEach(function(type) {
     classLinksMap[type] = [];
@@ -2386,52 +2513,53 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
   // Assert that classes are matched correctly. Classes can be matched with or
   // without a title attribute.
   runTitleAndNoTitleTestCase({
-      href: 'javax/swing/AbstractAction.html', type: LinkType.CLASS,
-      package: 'javax.swing', class: 'AbstractAction', italic: false});
+    href: 'javax/swing/AbstractAction.html', type: LinkType.CLASS,
+    package: 'javax.swing', class: 'AbstractAction', italic: false});
 
   // Assert that interfaces are matched correctly. Interfaces can be matched
   // with or without a title attribute. If an anchor has no title attribute,
   // the contents of the anchor must in italics to be recognised as an
   // interface.
   runTitleAndNoTitleTestCase({
-      href: 'javax/swing/text/AbstractDocument.AttributeContext.html',
-      type: LinkType.INTERFACE,
-      package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext',
-      italic: true});
+    href: 'javax/swing/text/AbstractDocument.AttributeContext.html',
+    type: LinkType.INTERFACE,
+    package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext',
+    italic: true});
   runTitleTestCase({
-      href: 'javax/swing/text/AbstractDocument.AttributeContext.html',
-      type: LinkType.INTERFACE,
-      package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext',
-      italic: false});
+    href: 'javax/swing/text/AbstractDocument.AttributeContext.html',
+    type: LinkType.INTERFACE,
+    package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext',
+    italic: false});
 
   // Assert that enumerations are matched correctly. Anchors must have a title
   // attribute to be recognised as an enumeration.
   runTitleTestCase({
-      href: 'java/net/Authenticator.RequestorType.html', type: LinkType.ENUM,
-      package: 'java.net', class: 'Authenticator.RequestorType',
-      italic: false});
+    href: 'java/net/Authenticator.RequestorType.html', type: LinkType.ENUM,
+    package: 'java.net', class: 'Authenticator.RequestorType',
+    italic: false});
 
   // Assert that exceptions are matched correctly. Exceptions can be matched
   // with or without a title attribute.
   runTitleAndNoTitleTestCase({
-      href: 'java/security/AccessControlException.html',
-      type: LinkType.EXCEPTION, typeInTitle: 'class',
-      package: 'java.security', class: 'AccessControlException',
-      italic: false});
+    href: 'java/security/AccessControlException.html',
+    type: LinkType.EXCEPTION, typeInTitle: 'class',
+    package: 'java.security', class: 'AccessControlException',
+    italic: false});
 
   // Assert that errors are matched correctly. Errors can be matched with or
   // without a title attribute.
   runTitleAndNoTitleTestCase({
-      href: 'java/lang/AbstractMethodError.html',
-      type: LinkType.ERROR, typeInTitle: 'class',
-      package: 'java.lang', class: 'AbstractMethodError', italic: false});
+    href: 'java/lang/AbstractMethodError.html',
+    type: LinkType.ERROR, typeInTitle: 'class',
+    package: 'java.lang', class: 'AbstractMethodError', italic: false});
 
   // Assert that annotations are matched correctly. Anchors must have a title
   // attribute to be recognised as an annotation.
   runTitleTestCase({
-      href: 'javax/xml/ws/Action.html', type: LinkType.ANNOTATION,
-      package: 'javax.xml.ws', class: 'Action', italic: false});
+    href: 'javax/xml/ws/Action.html', type: LinkType.ANNOTATION,
+    package: 'javax.xml.ws', class: 'Action', italic: false});
 });
+
 
 /**
  * Determine whether stringOne ends with stringTwo.
@@ -2465,6 +2593,7 @@ UnitTestSuite.testFunctionFor('endsWith', function() {
   assertThatEndsWith('', 'two', is(false));
 });
 
+
 /**
  * Trim whitespace from the start of the given string.
  * @param {string} stringToTrim the string to trim.
@@ -2486,6 +2615,7 @@ UnitTestSuite.testFunctionFor('trimFromStart', function() {
   assertThatTrimFromStart('   string', is('string'));
   assertThatTrimFromStart('   string   ', is('string   '));
 });
+
 
 /**
  * Trim whitespace from the end of the given string.
@@ -2509,6 +2639,7 @@ UnitTestSuite.testFunctionFor('trimFromEnd', function() {
   assertThatTrimFromEnd('   string   ', is('   string'));
 });
 
+
 /**
  * Split the given string on the first occurence of the given separator string.
  * Any whitespace surrounding the first occurence of the separator will be
@@ -2526,8 +2657,8 @@ function splitOnFirst(stringToSplit, separator) {
     return [stringToSplit, ''];
   }
   return [
-      trimFromEnd(stringToSplit.substring(0, firstOccurrence)),
-      trimFromStart(stringToSplit.substring(
+    trimFromEnd(stringToSplit.substring(0, firstOccurrence)),
+    trimFromStart(stringToSplit.substring(
           firstOccurrence + separator.length, stringToSplit.length))
   ];
 }
@@ -2559,10 +2690,12 @@ UnitTestSuite.testFunctionFor('splitOnFirst', function() {
  * ----------------------------------------------------------------------------
  */
 
+
 /**
  * @class EventHandlers Called by the view to handle UI events.
  */
 EventHandlers = {};
+
 
 /**
  * Called when a key has been pressed while the search field has focus.
@@ -2577,6 +2710,7 @@ EventHandlers.searchFieldKeyup = function(evt) {
   }
 };
 
+
 /**
  * Called when the contents of the search field has changed.
  */
@@ -2586,12 +2720,14 @@ EventHandlers.searchFieldChanged = function() {
   Search.performIfSearchStringHasChanged();
 };
 
+
 /**
  * Called when the search field has gained focus.
  */
 EventHandlers.searchFieldFocus = function() {
   document.body.scrollLeft = 0;
 };
+
 
 /**
  * Caled when the erase button has been clicked.
@@ -2602,6 +2738,7 @@ EventHandlers.eraseButtonClick = function() {
   Search.performIfSearchStringHasChanged();
 };
 
+
 /**
  * Called when the Options link has been clicked.
  * @param {Event} evt the event.
@@ -2610,6 +2747,7 @@ EventHandlers.optionsLinkClicked = function(evt) {
   OptionsPage.open();
   evt.preventDefault();
 };
+
 
 /**
  * Called when the return key has been pressed while the search field has
@@ -2631,6 +2769,7 @@ EventHandlers._returnKeyPressed = function(ctrlModifier) {
     }
   }
 };
+
 
 /**
  * Called when the escape key has been pressed while the search field has
