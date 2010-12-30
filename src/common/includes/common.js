@@ -139,7 +139,7 @@ UnitTestSuite.quote = function(stringValue) {
  * objects are equal.
  * @param {*} one the first object.
  * @param {*} two the second object.
- * @return {boolean} true if the two objects are equal, false otherwise.
+ * @return {boolean} Whether the two objects are equal.
  */
 UnitTestSuite._equals = function(one, two) {
   if (one instanceof Array && two instanceof Array) {
@@ -485,7 +485,7 @@ PackageLink = function(packageName) {
  * Determine whether this link matches the given regular expression.
  *
  * @param {RegExp} regex the regular expression.
- * @return {boolean} true if this link is a match, false otherwise.
+ * @return {boolean} Whether this link is a match.
  */
 PackageLink.prototype.matches = function(regex) {
   return regex.test(this.packageName);
@@ -539,8 +539,7 @@ UnitTestSuite.testFunctionFor('PackageLink.getUrl', function() {
  * Equals function.
  *
  * @param {*} obj the object with which to compare.
- * @return {boolean} true if this link is equal to the given object, false
- *                   otherwise.
+ * @return {boolean} Whether this link is equal to the given object.
  */
 PackageLink.prototype.equals = function(obj) {
   return obj instanceof PackageLink &&
@@ -603,7 +602,7 @@ ClassLink = function(type, packageName, className) {
  * Determine whether this link matches the given regular expression.
  *
  * @param {RegExp} regex the regular expression.
- * @return {boolean} true if this link is a match, false otherwise.
+ * @return {boolean} Whether this link is a match.
  */
 ClassLink.prototype.matches = function(regex) {
   return regex.test(this.className) || regex.test(this.canonicalName) ||
@@ -719,8 +718,7 @@ UnitTestSuite.testFunctionFor('ClassLink.getUrl', function() {
  * Equals function.
  *
  * @param {*} obj the object with which to compare.
- * @return {boolean} true if this link is equal to the given object, false
- *                   otherwise.
+ * @return {boolean} Whether this link is equal to the given object.
  */
 ClassLink.prototype.equals = function(obj) {
   return obj instanceof ClassLink &&
@@ -757,7 +755,7 @@ MemberLink = function(baseUrl, name) {
  * Determine whether this link matches the given regular expression.
  *
  * @param {RegExp} regex the regular expression.
- * @return {boolean} true if this link is a match, false otherwise.
+ * @return {boolean} Whether this link is a match.
  */
 MemberLink.prototype.matches = function(regex) {
   return regex.test(this.name);
@@ -819,7 +817,7 @@ KeywordLink = function(baseUrl, name) {
  * Determine whether this link matches the given regular expression.
  *
  * @param {RegExp} regex the regular expression.
- * @return {boolean} true if this link is a match, false otherwise.
+ * @return {boolean} Whether this link is a match.
  */
 KeywordLink.prototype.matches = function(regex) {
   return regex.test(this.name);
@@ -1527,8 +1525,8 @@ RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
 
 /**
  * @param {string} character the character to inspect.
- * @return {boolean} true if the character has a special meaning within regular
- *                   expressions, false otherwise.
+ * @return {boolean} Whether the character has a special meaning within regular
+ *                   expressions.
  */
 RegexLibrary._isSpecialRegularExpressionCharacter = function(character) {
   var special =
@@ -2053,7 +2051,7 @@ Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function(
 
 /**
  * @param {string} name the anchor name.
- * @return {boolean} true if the anchor is a keyword, false otherwise.
+ * @return {boolean} Whether the anchor is a keyword.
  */
 Search._ClassMembersAndKeywords._isKeywordName = function(name) {
   if (Search._ClassMembersAndKeywords.keywords[name] === 1) {
@@ -2565,7 +2563,7 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
  * Determine whether stringOne ends with stringTwo.
  * @param {string} stringOne the first string.
  * @param {string} stringTwo the second string.
- * @return {boolean} true if stringOne ends with stringTwo, false otherwise.
+ * @return {boolean} Whether stringOne ends with stringTwo.
  */
 function endsWith(stringOne, stringTwo) {
   if (!stringOne) {

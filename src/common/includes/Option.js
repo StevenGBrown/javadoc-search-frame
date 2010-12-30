@@ -48,8 +48,7 @@ Option = function(properties) {
 
 
 /**
- * @return {boolean} true if options can be both retrieved and set, false
- *                    otherwise.
+ * @return {boolean} Whether options can be both retrieved and set.
  */
 Option.canGetAndSet = function() {
   return Storage.canGet() && Storage.canSet();
