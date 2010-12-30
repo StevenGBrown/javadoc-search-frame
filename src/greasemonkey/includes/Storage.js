@@ -39,7 +39,7 @@
 Storage = {};
 
 /**
- * @return {Boolean} true if retrieval of stored data is supported, false
+ * @return {boolean} true if retrieval of stored data is supported, false
  *                   otherwise.
  */
 Storage.canGet = function() {
@@ -53,15 +53,16 @@ Storage.canGet = function() {
 
 /**
  * Retrieve a value based on a key.
- * @param key the key.
- * @param callback callback function that is provided with the retrieved value.
+ * @param {string} key the key.
+ * @param {function(*)} callback callback function that is provided with the
+ *                      retrieved value.
  */
 Storage.get = function(key, callback) {
   callback(GM_getValue(key));
 };
 
 /**
- * @return {Boolean} true if modification of stored data is supported, false
+ * @return {boolean} true if modification of stored data is supported, false
  *                   otherwise.
  */
 Storage.canSet = function() {
@@ -74,8 +75,8 @@ Storage.canSet = function() {
 
 /**
  * Store a value based on a key.
- * @param key the key.
- * @param value the value.
+ * @param {string} key the key.
+ * @param {*} value the value.
  */
 Storage.set = function(key, value) {
   GM_setValue(key, value);

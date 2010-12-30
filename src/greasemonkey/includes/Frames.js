@@ -45,7 +45,7 @@ Frames = {
  * function will have no effect.
  */
 Frames.hideAllPackagesFrame = function() {
-  if (this._getFrame('packageListFrame')) {
+  if (Frames._getFrame('packageListFrame')) {
     var framesets = parent.document.getElementsByTagName('frameset');
     if (framesets) {
       var frameset = framesets[1];
@@ -63,10 +63,10 @@ Frames.hideAllPackagesFrame = function() {
 /**
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will not be opened.
- * @param url
+ * @param {string} url the URL to open.
  */
 Frames.openLinkInSummaryFrame = function(url) {
-  var summaryFrame = this._getFrame('classFrame');
+  var summaryFrame = Frames._getFrame('classFrame');
   if (summaryFrame) {
     window.open(url, 'classFrame');
   }
@@ -75,10 +75,10 @@ Frames.openLinkInSummaryFrame = function(url) {
 /**
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will be opened in a new tab or window.
- * @param url
+ * @param {string} url the URL to open.
  */
 Frames.openLinkInSummaryFrameOrNewTab = function(url) {
-  var summaryFrame = this._getFrame('classFrame');
+  var summaryFrame = Frames._getFrame('classFrame');
   if (summaryFrame) {
     window.open(url, 'classFrame');
   } else {
@@ -88,7 +88,7 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
 
 /**
  * Open the given URL in a new tab.
- * @param url
+ * @param {string} url the URL to open.
  */
 Frames.openLinkInNewTab = function(url) {
   window.open(url);
@@ -97,13 +97,12 @@ Frames.openLinkInNewTab = function(url) {
 /**
  * Get the frame with the given name. This frame will share a parent with the
  * current frame.
- * @param name
- * @return the frame, or null if it could not be found.
- * @private
+ * @param {string} name the name.
+ * @return {DOMWindow} the frame, or null if it could not be found.
  */
 Frames._getFrame = function(name) {
-  if (this.siblingFramesByName[name]) {
-    return this.siblingFramesByName[name];
+  if (Frames.siblingFramesByName[name]) {
+    return Frames.siblingFramesByName[name];
   }
   var frame;
   var i;
@@ -111,7 +110,7 @@ Frames._getFrame = function(name) {
     for (i = 0; i < parent.frames.length; i++) {
       frame = parent.frames[i];
       if (frame && frame.name === name && frame.document) {
-        this.siblingFramesByName[name] = frame;
+        Frames.siblingFramesByName[name] = frame;
         return frame;
       }
     }

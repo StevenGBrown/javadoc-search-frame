@@ -48,51 +48,65 @@ OptionsPageGenerator.generate = function() {
     document.body.removeChild(document.body.firstChild);
   }
 
-  var contents = this._createContents(document);
+  var contents = OptionsPageGenerator._createContents(document);
   contents.forEach(function(pageElement) {
     document.body.appendChild(pageElement);
   });
 };
 
+/**
+ * Create the contents of the options page.
+ * @param {Document} pageDocument the options page document.
+ * @return {Array<Element>} the contents of the options page.
+ */
 OptionsPageGenerator._createContents = function(pageDocument) {
   var contents = [];
-  contents.push(this._createHeader(pageDocument));
+  contents.push(OptionsPageGenerator._createHeader(pageDocument));
   contents.push(pageDocument.createElement('p'));
   if (!Option.canGetAndSet()) {
     contents.push(
-        this._createOptionsCannotBeConfiguredErrorMessage(pageDocument));
+        OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage(
+            pageDocument));
     contents.push(pageDocument.createElement('p'));
   }
-  contents.push(this._booleanOption(
+  contents.push(OptionsPageGenerator._booleanOption(
       pageDocument, Option.AUTO_OPEN,
       Messages.get('autoOpenOptionTitle'),
       Messages.get('autoOpenOptionOn'),
       Messages.get('autoOpenOptionOff')));
   contents.push(pageDocument.createElement('p'));
-  contents.push(this._booleanOption(
+  contents.push(OptionsPageGenerator._booleanOption(
       pageDocument, Option.HIDE_PACKAGE_FRAME,
       Messages.get('mergeFramesOptionTitle'),
       Messages.get('mergeFramesOptionOn'),
       Messages.get('mergeFramesOptionOff')));
   contents.push(pageDocument.createElement('p'));
-  contents.push(this._menuOption(
+  contents.push(OptionsPageGenerator._menuOption(
       pageDocument, Option.CLASS_MENU,
       Messages.get('classOrMethodMenuTitle'),
       Messages.get('classOrMethodMenuDescription')));
   contents.push(pageDocument.createElement('p'));
-  contents.push(this._menuOption(
+  contents.push(OptionsPageGenerator._menuOption(
       pageDocument, Option.PACKAGE_MENU,
       Messages.get('packageMenuTitle'),
       Messages.get('packageMenuDescription')));
   return contents;
 };
 
+/**
+ * @param {Document} pageDocument the options page document.
+ * @return {Element} a header element.
+ */
 OptionsPageGenerator._createHeader = function(pageDocument) {
   var headerElement = pageDocument.createElement('h2');
   headerElement.textContent = Messages.get('optionsTitle');
   return headerElement;
 };
 
+/**
+ * @param {Document} pageDocument the options page document.
+ * @return {Element} an error message element.
+ */
 OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function(
     pageDocument) {
   var errorMessageElement = pageDocument.createElement('p');
@@ -101,11 +115,19 @@ OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function(
   return errorMessageElement;
 };
 
+/**
+ * @param {Document} pageDocument the options page document.
+ * @param {Option} option a boolean option.
+ * @param {string} title the title to display.
+ * @param {string} trueText the message to display when the option is true.
+ * @param {string} falseText the message to display when the option is false.
+ * @return {Element} an element that allows the option to be configured.
+ */
 OptionsPageGenerator._booleanOption = function(
     pageDocument, option, title, trueText, falseText) {
-  var trueRadioButtonElement = this._radioButton(
+  var trueRadioButtonElement = OptionsPageGenerator._radioButton(
       pageDocument, option, title, true);
-  var falseRadioButtonElement = this._radioButton(
+  var falseRadioButtonElement = OptionsPageGenerator._radioButton(
       pageDocument, option, title, false);
 
   option.getValue(function(value) {
@@ -129,30 +151,43 @@ OptionsPageGenerator._booleanOption = function(
     falseText += ' ' + Messages.get('default');
   }
 
-  return this._createTable(pageDocument, title, '', [
-      this._tableContentElementForRadioButton(
+  return OptionsPageGenerator._createTable(pageDocument, title, '', [
+      OptionsPageGenerator._tableContentElementForRadioButton(
           pageDocument, trueRadioButtonElement, trueText),
-      this._tableContentElementForRadioButton(
+      OptionsPageGenerator._tableContentElementForRadioButton(
           pageDocument, falseRadioButtonElement, falseText)
   ]);
 };
 
+/**
+ * @param {Document} pageDocument the options page document.
+ * @param {Option} option a boolean option.
+ * @param {string} name the name to display on the radio button.
+ * @param {boolean} checked true to check the radio button, false otherwise.
+ * @return {Element} a radio button element used to display the boolean option.
+ */
 OptionsPageGenerator._radioButton = function(
-    pageDocument, option, name, value) {
+    pageDocument, option, name, checked) {
   var radioButtonElement = pageDocument.createElement('input');
   radioButtonElement.setAttribute('type', 'radio');
   radioButtonElement.setAttribute('name', name);
-  radioButtonElement.setAttribute('value', value);
+  radioButtonElement.setAttribute('value', checked);
   if (!Option.canGetAndSet()) {
     radioButtonElement.setAttribute('disabled', true);
   }
   return radioButtonElement;
 };
 
+/**
+ * @param {Document} pageDocument the options page document.
+ * @param {Element} radioButtonElement a radio button element.
+ * @param {string} label a label for the radio button.
+ * @return {Element} an element containing the radio button.
+ */
 OptionsPageGenerator._tableContentElementForRadioButton = function(
-    pageDocument, radioButtonElement, text) {
+    pageDocument, radioButtonElement, label) {
   var spanElement = pageDocument.createElement('span');
-  spanElement.innerHTML = text;
+  spanElement.innerHTML = label;
 
   var labelElement = pageDocument.createElement('label');
   labelElement.appendChild(radioButtonElement);
@@ -161,6 +196,13 @@ OptionsPageGenerator._tableContentElementForRadioButton = function(
   return labelElement;
 };
 
+/**
+ * @param {Document} pageDocument the options page document.
+ * @param {Option} option a menu option.
+ * @param {string} title the title to display for this option.
+ * @param {string} subTitle the sub-title to display for this option.
+ * @return {Element} an element that allows the option to be configured.
+ */
 OptionsPageGenerator._menuOption = function(
     pageDocument, option, title, subTitle) {
   var textAreaElement = pageDocument.createElement('textarea');
@@ -192,10 +234,17 @@ OptionsPageGenerator._menuOption = function(
     }, false);
   });
 
-  return this._createTable(pageDocument, title, subTitle,
+  return OptionsPageGenerator._createTable(pageDocument, title, subTitle,
       [textAreaElement, restoreDefaultButtonElement]);
 };
 
+/**
+ * @param {Document} pageDocument the options page document.
+ * @param {string} title the options page title.
+ * @param {string} subTitle the option page sub-title.
+ * @param {Array<Element>} contentElements the contents of the options page.
+ * @return {Element} a table element.
+ */
 OptionsPageGenerator._createTable = function(
     pageDocument, title, subTitle, contentElements) {
   var tableElement = pageDocument.createElement('table');

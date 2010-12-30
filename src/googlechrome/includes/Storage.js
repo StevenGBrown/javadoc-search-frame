@@ -39,42 +39,43 @@
 Storage = {};
 
 /**
- * @return {Boolean} true if retrieval of stored data is supported, false
+ * @return {boolean} true if retrieval of stored data is supported, false
  *                   otherwise.
  */
 Storage.canGet = function() {
-  return this._localStorageDefined();
+  return Storage._localStorageDefined();
 };
 
 /**
  * Retrieve a value based on a key.
- * @param key the key.
- * @param callback callback function that is provided with the retrieved value.
+ * @param {string} key the key.
+ * @param {function(*)} callback callback function that is provided with the
+ *                      retrieved value.
  */
 Storage.get = function(key, callback) {
   chrome.extension.sendRequest({operation: 'get', key: key}, callback);
 };
 
 /**
- * @return {Boolean} true if modification of stored data is supported, false
+ * @return {boolean} true if modification of stored data is supported, false
  *                   otherwise.
  */
 Storage.canSet = function() {
-  return this._localStorageDefined();
+  return Storage._localStorageDefined();
 };
 
 /**
  * Store a value based on a key.
- * @param key the key.
- * @param value the value.
+ * @param {string} key the key.
+ * @param {*} value the value.
  */
 Storage.set = function(key, value) {
   chrome.extension.sendRequest({operation: 'set', key: key, value: value});
 };
 
 /**
- * @return true if the localStorage object is defined, false otherwise.
- * @private
+ * @return {boolean} true if the localStorage object is defined, false
+ *                   otherwise.
  */
 Storage._localStorageDefined = function() {
   try {

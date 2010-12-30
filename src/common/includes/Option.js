@@ -34,14 +34,9 @@
  */
 
 /**
- * Create a new Option.
- * @class Provides persistent configuration of the script options.
- * @param properties               the properties for this option.
- * @param properties.key           the key associated with this option.
- * @param properties.defaultValue  the default used when the value cannot be
- *                                 retrieved or has not yet been configured.
- * @param properties.type          the type of values accepted for this option.
- * @private
+ * Provides persistent configuration of the script options.
+ * @param {{key: string, defaultValue: string, type}} properties
+ * @constructor
  */
 Option = function(properties) {
   this.key = properties.key;
@@ -50,7 +45,7 @@ Option = function(properties) {
 };
 
 /**
- * @return {Boolean} true if options can be both retrieved and set, false
+ * @return {boolean} true if options can be both retrieved and set, false
  *                    otherwise.
  */
 Option.canGetAndSet = function() {
@@ -59,13 +54,14 @@ Option.canGetAndSet = function() {
 
 /**
  * Retrieve the current value of this option.
- * @param callback callback function that is provided with the value of this
- *                 option. If the option cannot be retrieved, has not yet been
- *                 configured, or is invalid, the default value will be
- *                 returned.
- * @param thisObject (optional) Used as the "this" for each invocation of the
- *                   callback. If it is not provided, or is null, the global
- *                   object associated with callback is used instead.
+ * @param {function(*)} callback callback function that is provided with the
+ *                               value of this option. If the option cannot be
+ *                               retrieved, has not yet been configured, or is
+ *                               invalid, the default value will be returned.
+ * @param {Object=} thisObject Used as the "this" for each invocation of the
+ *                             callback. If it is not provided, or is null, the
+ *                             global object associated with callback is used
+ *                             instead.
  * @see Option.canGetAndSet
  */
 Option.prototype.getValue = function(callback, thisObject) {
@@ -92,7 +88,7 @@ Option.prototype.getValue = function(callback, thisObject) {
 };
 
 /**
- * @return the default value of this option.
+ * @return {*} the default value of this option.
  */
 Option.prototype.getDefaultValue = function() {
   return this.defaultValue;
@@ -100,6 +96,7 @@ Option.prototype.getDefaultValue = function() {
 
 /**
  * Set this option to a new value.
+ * @param {*} newValue the new value.
  * @throws an exception if this option cannot be set
  * @see Option.canGetAndSet
  */
@@ -113,7 +110,7 @@ Option.prototype.setValue = function(newValue) {
  */
 
 /**
- * @field
+ * @type {Option}
  */
 Option.AUTO_OPEN = new Option({
   key: 'auto_open',
@@ -122,7 +119,7 @@ Option.AUTO_OPEN = new Option({
 });
 
 /**
- * @field
+ * @type {Option}
  */
 Option.HIDE_PACKAGE_FRAME = new Option({
   key: 'hide_package_frame',
@@ -131,7 +128,7 @@ Option.HIDE_PACKAGE_FRAME = new Option({
 });
 
 /**
- * @field
+ * @type {Option}
  */
 Option.PACKAGE_MENU = new Option({
   key: 'package_menu',
@@ -142,7 +139,7 @@ Option.PACKAGE_MENU = new Option({
 });
 
 /**
- * @field
+ * @type {Option}
  */
 Option.CLASS_MENU = new Option({
   key: 'class_menu',

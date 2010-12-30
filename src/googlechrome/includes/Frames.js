@@ -49,7 +49,7 @@ Frames.hideAllPackagesFrame = function() {
 /**
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will not be opened.
- * @param url
+ * @param {string} url the URL to open.
  */
 Frames.openLinkInSummaryFrame = function(url) {
   if (window.top !== window) {
@@ -60,19 +60,19 @@ Frames.openLinkInSummaryFrame = function(url) {
 /**
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will be opened in a new tab or window.
- * @param url
+ * @param {string} url the URL to open.
  */
 Frames.openLinkInSummaryFrameOrNewTab = function(url) {
   if (window.top !== window) {
     window.open(url, 'classFrame');
   } else {
-    this.openLinkInNewTab(url);
+    Frames.openLinkInNewTab(url);
   }
 };
 
 /**
  * Open the given URL in a new tab.
- * @param url
+ * @param {string} url the URL to open.
  */
 Frames.openLinkInNewTab = function(url) {
   chrome.extension.sendRequest(

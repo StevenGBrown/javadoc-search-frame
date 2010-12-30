@@ -39,8 +39,8 @@ Messages = {};
 
 /**
  * Retrieve a localised string.
- * @param key the key used to lookup the localised string.
- * @return {String} the localised string.
+ * @param {string} key the key used to lookup the localised string.
+ * @return {string} the localised string.
  */
 Messages.get = function(key) {
   return chrome.i18n.getMessage(key);

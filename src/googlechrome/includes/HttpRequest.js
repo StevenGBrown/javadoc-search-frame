@@ -34,7 +34,9 @@
  */
 
 /**
- * @class HttpRequest Asynchronously loads resources from external URLs.
+ * Asynchronously loads resources from external URLs.
+ * @param {View} view the object responsible for updating the UI.
+ * @constructor
  */
 HttpRequest = function(view) {
   this.view = view;
@@ -48,9 +50,10 @@ HttpRequest = function(view) {
  * Loads the resource at the given URL. If the resource at the given URL is
  * already being loaded, calling this function will have no effect.
  *
- * @param url the URL.
- * @param progressCallback function that is called when whenever some progress
- *                         has been made towards loading the resource.
+ * @param {string} url the URL.
+ * @param {function()} progressCallback function that is called when whenever
+ *                                      progress has been made towards loading
+ *                                      the resource.
  */
 HttpRequest.prototype.load = function(url, progressCallback) {
   if (this.url === url) {
@@ -96,14 +99,15 @@ HttpRequest.prototype.load = function(url, progressCallback) {
 };
 
 /**
- * @retuns true if the loading is complete, false otherwise
+ * @return {boolean} true if the loading is complete, false otherwise.
  */
 HttpRequest.prototype.isComplete = function() {
   return this.loadedResource !== null;
 };
 
 /**
- * @return a status message on the progress made towards loading the resource.
+ * @return {string} a status message on the progress made towards loading the
+ *                  resource.
  */
 HttpRequest.prototype.getStatusMessage = function() {
   if (this.statusMessage) {
@@ -113,7 +117,8 @@ HttpRequest.prototype.getStatusMessage = function() {
 };
 
 /**
- * @return the loaded resource, or null if the loading is not complete.
+ * @return {string} the loaded resource, or null if the loading is not
+ *                  complete.
  */
 HttpRequest.prototype.getResource = function() {
   return this.loadedResource;
