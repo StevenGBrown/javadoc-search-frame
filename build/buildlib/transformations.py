@@ -50,7 +50,7 @@ def insertExternalFiles(includesDirectories):
   """
   Return a function that will transform the script contents by including the
   contents of external files. For example, if the script contains the line:
-  '#INCLUDE Frames.js', then the file 'Frames.js' will be found in one of the
+  '#INCLUDE Frames.js;', then the file 'Frames.js' will be found in one of the
   includes directories and inserted in this location. If the inserted file has
   a license header, it will be removed. If the file to be inserted cannot be
   found, a ValueError will be thrown.
@@ -61,7 +61,7 @@ def insertExternalFiles(includesDirectories):
       for directory in includesDirectories
   ]
 
-  includesRegex = re.compile(r'^#INCLUDE (.*)$', re.MULTILINE)
+  includesRegex = re.compile(r'^#INCLUDE ([^;]*);$', re.MULTILINE)
 
   def insertExternalFilesTransformation(fileContents):
     while True:
