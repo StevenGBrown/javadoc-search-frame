@@ -2467,8 +2467,8 @@ UnitTestSuite.testFunctionFor('endsWith', function() {
 
 /**
  * Trim whitespace from the start of the given string.
- * @param {String} stringToTrim the string to trim.
- * @return {String} the trimmed string.
+ * @param {string} stringToTrim the string to trim.
+ * @return {string} the trimmed string.
  */
 function trimFromStart(stringToTrim) {
   return stringToTrim.replace(/^\s+/, '');
@@ -2489,8 +2489,8 @@ UnitTestSuite.testFunctionFor('trimFromStart', function() {
 
 /**
  * Trim whitespace from the end of the given string.
- * @param {String} stringToTrim the string to trim.
- * @return {String} the trimmed string.
+ * @param {string} stringToTrim the string to trim.
+ * @return {string} the trimmed string.
  */
 function trimFromEnd(stringToTrim) {
   return stringToTrim.replace(/\s+$/, '');
@@ -2513,8 +2513,8 @@ UnitTestSuite.testFunctionFor('trimFromEnd', function() {
  * Split the given string on the first occurence of the given separator string.
  * Any whitespace surrounding the first occurence of the separator will be
  * removed.
- * @param {String} stringToSplit the string to split.
- * @param {String} separator the separator string.
+ * @param {string} stringToSplit the string to split.
+ * @param {string} separator the separator string.
  * @return {Array} an array containing two elements: the portion of the string
  *                  found before the first occurence of the separator, and the
  *                  portion of the string found after the first occurence of
