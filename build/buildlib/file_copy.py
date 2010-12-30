@@ -29,7 +29,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 # Developed with Python v3.0.1
 
 import distutils.dir_util, fnmatch, io, os, shutil, sys
-from . import static_analysis
 
 
 def copyFile(name, fromDir, toDir, transformations=()):
@@ -84,7 +83,6 @@ def copyAndRenameFile(fromPath, toPath, transformations=()):
       fileContents = transformation(fileContents)
     with io.open(absToPath, 'w', newline='\n') as toFile:
       toFile.write(fileContents)
-  static_analysis.analyse(absToPath)
 
 
 def copyDir(fromDir, toDir):
@@ -100,7 +98,6 @@ def copyDir(fromDir, toDir):
   for root, dirs, files in os.walk(absFromDir):
     for file in [f for f in files if not _junkFile(f)]:
       sourceFile = os.path.join(root, file)
-      static_analysis.analyse(sourceFile)
       targetFile = os.path.join(absToDir,
           os.path.relpath(sourceFile, absFromDir))
       targetFileDir = os.path.dirname(targetFile)
