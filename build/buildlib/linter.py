@@ -28,34 +28,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import io, sys
-from buildlib.build_date import *
-from buildlib.file_copy import *
-from buildlib.linter import *
-from buildlib.transformations import *
+import os, sys
+from subprocess import *
 
 
-def buildGreasemonkeyUserScript():
+def linter():
   """
-  Build the Javadoc Search Frame user script for Greasemonkey.
-  This script will be created in the current working directory.
+  Inspect the source code with Closure Linter and log any warnings to the
+  console. http://code.google.com/p/closure-linter/
   """
 
-  linter()
-
-  copyAndRenameFile(
-    fromPath='greasemonkey/allclasses-frame.js',
-    toPath='javadoc_search_frame_' + formattedBuildDateISO() + '.user.js',
-    transformations=(
-      prepend('greasemonkey/metadata_block.txt'),
-      insertValue('unquotedBuildDate', formattedBuildDate()),
-      insertExternalFiles(
-          ['common/_locales/en', 'common/includes', 'greasemonkey/includes']),
-      insertValue('buildDate', '\'' + formattedBuildDate() + '\''),
-      insertValue('buildYear', buildYear())
-    )
-  )
-
-
-if __name__ == "__main__":
-  buildGreasemonkeyUserScript()
+  srcPath = os.path.abspath(os.path.join(sys.path[0], '..', 'src'))
+  proc = Popen(['gjslint', '-r', srcPath], stdout=PIPE, stderr=STDOUT)
+  output = proc.communicate()[0]
+  if proc.returncode != 0:
+    print(output.decode())
