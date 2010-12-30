@@ -39,7 +39,7 @@ def linter():
   """
 
   srcPath = os.path.abspath(os.path.join(sys.path[0], '..', 'src'))
-  args = ['gjslint', '-r', srcPath, '--strict']
+  args = ['gjslint', '-r', srcPath, '--strict', '--check_html']
   proc = Popen(args, stdout=PIPE, stderr=STDOUT)
   output = proc.communicate()[0]
   if proc.returncode != 0:
