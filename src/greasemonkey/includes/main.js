@@ -30,7 +30,7 @@
 /**
  * If the given menu option does not match the new format, set it to the
  * default.
- * @param option the menu option.
+ * @param {Option} option the menu option.
  */
 function updateMenuOption(option) {
   option.getValue(function(value) {
