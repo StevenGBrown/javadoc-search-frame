@@ -36,6 +36,7 @@
 
 /**
  * Array of all package and class links.
+ * @type {Array.<PackageLink|ClassLink>}
  */
 var ALL_PACKAGE_AND_CLASS_LINKS = [];
 
@@ -57,8 +58,8 @@ UnitTestSuite = {
 
 /**
  * Add a test function to this suite.
- * @param {string} functionUnderTest the name of the function under test.
- * @param {function()} unitTestFunction the test function.
+ * @param {string} functionUnderTest The name of the function under test.
+ * @param {function()} unitTestFunction The test function.
  */
 UnitTestSuite.testFunctionFor = function(functionUnderTest, unitTestFunction) {
   UnitTestSuite.unitTestFunctions.push(
@@ -68,7 +69,7 @@ UnitTestSuite.testFunctionFor = function(functionUnderTest, unitTestFunction) {
 
 /**
  * Run all of the test functions that have been added to this suite.
- * @return {UnitTestResult} the result of running this suite.
+ * @return {UnitTestResult} The result of running this suite.
  */
 UnitTestSuite.run = function() {
   UnitTestSuite.assertionsCount = 0;
@@ -93,10 +94,9 @@ UnitTestSuite.run = function() {
 
 /**
  * Assert that the actual value equals the expected value.
- *
- * @param {string} description a description of the assertion.
- * @param {*} actual the actual value.
- * @param {*} expected the expected value.
+ * @param {string} description A description of the assertion.
+ * @param {*} actual The actual value.
+ * @param {*} expected The expected value.
  */
 UnitTestSuite.assertThat = function(description, actual, expected) {
   if (!UnitTestSuite._equals(expected, actual)) {
@@ -113,8 +113,8 @@ UnitTestSuite.assertThat = function(description, actual, expected) {
  * and {@link UnitTestSuite.assertThatEval} functions more readable.
  * <p>
  * Example: assertThat(theSky, is(blue));
- * @param {*} value any value.
- * @return {*} the value paramter (unchanged).
+ * @param {*} value Any value.
+ * @return {*} The value paramter (unchanged).
  */
 UnitTestSuite.is = function(value) {
   return value;
@@ -123,8 +123,8 @@ UnitTestSuite.is = function(value) {
 
 /**
  * Quotes the given string value in the same way as the Console or Error Log.
- * @param {string} stringValue the string value.
- * @return {string} the quoted string.
+ * @param {string} stringValue The string value.
+ * @return {string} The quoted string.
  */
 UnitTestSuite.quote = function(stringValue) {
   if (stringValue || stringValue === '') {
@@ -137,8 +137,8 @@ UnitTestSuite.quote = function(stringValue) {
 /**
  * Used by the {@link UnitTestSuite} assertion functions to determine if two
  * objects are equal.
- * @param {*} one the first object.
- * @param {*} two the second object.
+ * @param {*} one The first object.
+ * @param {*} two The second object.
  * @return {boolean} Whether the two objects are equal.
  */
 UnitTestSuite._equals = function(one, two) {
@@ -164,8 +164,8 @@ UnitTestSuite._equals = function(one, two) {
 
 /**#@+
  * Function declared in the global scope as a convenience for test functions;
- * calls through to a function of the same name declared on the
- * {@link UnitTestSuite} object.
+ * calls through to a function of the same name declared on the {UnitTestSuite}
+ * object.
  */
 
 
@@ -197,9 +197,9 @@ var is = UnitTestSuite.is;
 
 /**
  * Unit test result returned by {@link UnitTestSuite#run}.
- * @param {number} numberOfAssertions the total number of unit test assertions.
+ * @param {number} numberOfAssertions The total number of unit test assertions.
  * @param {Array.<UnitTestAssertionFailure|UnitTestExceptionThrownFailure>}
- *     failures the assertion failures.
+ *     failures The assertion failures.
  * @constructor
  */
 UnitTestResult = function(numberOfAssertions, failures) {
@@ -209,7 +209,7 @@ UnitTestResult = function(numberOfAssertions, failures) {
 
 
 /**
- * @return {string} a description of this unit test result.
+ * @return {string} A description of this unit test result.
  */
 UnitTestResult.prototype.toString = function() {
   var result = '';
@@ -238,10 +238,10 @@ UnitTestResult.prototype.toString = function() {
 
 /**
  * A unit test failure due to a failed assertion.
- * @param {string} functionUnderTestName the name of the function under test.
- * @param {string} description the description of the test case.
- * @param {*} actual the actual value.
- * @param {*} expected the expected value.
+ * @param {string} functionUnderTestName The name of the function under test.
+ * @param {string} description The description of the test case.
+ * @param {*} actual The actual value.
+ * @param {*} expected The expected value.
  * @constructor
  */
 UnitTestAssertionFailure = function(
@@ -254,7 +254,7 @@ UnitTestAssertionFailure = function(
 
 
 /**
- * @return {string} a description of this unit test failure.
+ * @return {string} A description of this unit test failure.
  */
 UnitTestAssertionFailure.prototype.toString = function() {
   var failureString = this.functionUnderTestName + '\n';
@@ -277,8 +277,8 @@ UnitTestAssertionFailure.prototype.toString = function() {
 
 /**
  * A unit test failure due to a thrown exception.
- * @param {string} functionUnderTestName the name of the function under test.
- * @param {*} exception the exception that was thrown.
+ * @param {string} functionUnderTestName The name of the function under test.
+ * @param {*} exception The exception that was thrown.
  * @constructor
  */
 UnitTestExceptionThrownFailure = function(functionUnderTestName, exception) {
@@ -288,7 +288,7 @@ UnitTestExceptionThrownFailure = function(functionUnderTestName, exception) {
 
 
 /**
- * @return {string} a description of this unit test failure.
+ * @return {string} A description of this unit test failure.
  */
 UnitTestExceptionThrownFailure.prototype.toString = function() {
   return this.functionUnderTestName + '\n' + this.exception;
@@ -305,8 +305,8 @@ UnitTestExceptionThrownFailure.prototype.toString = function() {
 
 /**
  * Package, class, class member and keyword link types.
- * @param {string} singularName the singular name of the link type.
- * @param {string} pluralName the plural name of the link type.
+ * @param {string} singularName The singular name of the link type.
+ * @param {string} pluralName The plural name of the link type.
  * @constructor
  */
 LinkType = function(singularName, pluralName) {
@@ -316,7 +316,7 @@ LinkType = function(singularName, pluralName) {
 
 
 /**
- * @return {string} the singular name of this type.
+ * @return {string} The singular name of this type.
  */
 LinkType.prototype.getSingularName = function() {
   return this.singularName;
@@ -324,7 +324,7 @@ LinkType.prototype.getSingularName = function() {
 
 
 /**
- * @return {string} the plural name of this type.
+ * @return {string} The plural name of this type.
  */
 LinkType.prototype.getPluralName = function() {
   return this.pluralName;
@@ -332,7 +332,7 @@ LinkType.prototype.getPluralName = function() {
 
 
 /**
- * @return {string} a string representation of this type.
+ * @return {string} A string representation of this type.
  */
 LinkType.prototype.toString = function() {
   return this.singularName;
@@ -395,9 +395,8 @@ LinkType.KEYWORD = new LinkType('Keyword', 'Keywords');
 
 /**
  * Get the link type with the given singular name.
- *
- * @param {string} singularName the singular name.
- * @return {LinkType} the link type.
+ * @param {string} singularName The singular name.
+ * @return {LinkType} The link type.
  */
 LinkType.getByName = function(singularName) {
   return LinkType[singularName.toUpperCase()];
@@ -413,8 +412,8 @@ LinkType.getByName = function(singularName) {
 
 /**
  * Extract a URL from the given link.
- * @param {PackageLink|ClassLink|MemberLink|KeywordLink} link the link.
- * @return {string} the URL.
+ * @param {PackageLink|ClassLink|MemberLink|KeywordLink} link The link.
+ * @return {string} The URL.
  */
 function extractUrl(link) {
   var html = link.getHtml();
@@ -435,10 +434,10 @@ UnitTestSuite.testFunctionFor('extractUrl', function() {
 
 /**
  * Convert the given relative URL to an absolute URL.
- * @param {string} relativeUrl the relative URL.
- * @param {string=} documentUrl the document's current URL, given by
- *                              location.href (optional).
- * @return {string} the absolute URL.
+ * @param {string} relativeUrl The relative URL.
+ * @param {string=} documentUrl The document's current URL, given by
+ *     location.href (optional).
+ * @return {string} The absolute URL.
  */
 function toAbsoluteUrl(relativeUrl, documentUrl) {
   if (!documentUrl) {
@@ -471,7 +470,7 @@ UnitTestSuite.testFunctionFor('toAbsoluteUrl', function() {
 
 /**
  * Link to a package. These links are of type {LinkType.PACKAGE}.
- * @param {string} packageName the package name.
+ * @param {string} packageName The package name.
  * @constructor
  */
 PackageLink = function(packageName) {
@@ -483,8 +482,7 @@ PackageLink = function(packageName) {
 
 /**
  * Determine whether this link matches the given regular expression.
- *
- * @param {RegExp} regex the regular expression.
+ * @param {RegExp} regex The regular expression.
  * @return {boolean} Whether this link is a match.
  */
 PackageLink.prototype.matches = function(regex) {
@@ -493,7 +491,7 @@ PackageLink.prototype.matches = function(regex) {
 
 
 /**
- * @return {string} this link in HTML format.
+ * @return {string} This link in HTML format.
  */
 PackageLink.prototype.getHtml = function() {
   return this.html;
@@ -507,7 +505,7 @@ UnitTestSuite.testFunctionFor('PackageLink.getHtml', function() {
 
 
 /**
- * @return {LinkType} the type of this link.
+ * @return {LinkType} The type of this link.
  */
 PackageLink.prototype.getType = function() {
   return LinkType.PACKAGE;
@@ -515,7 +513,7 @@ PackageLink.prototype.getType = function() {
 
 
 /**
- * @return {string} the name of this package.
+ * @return {string} The name of this package.
  */
 PackageLink.prototype.getPackageName = function() {
   return this.packageName;
@@ -523,7 +521,7 @@ PackageLink.prototype.getPackageName = function() {
 
 
 /**
- * @return {string} the URL of this link.
+ * @return {string} The URL of this link.
  */
 PackageLink.prototype.getUrl = function() {
   return toAbsoluteUrl(extractUrl(this));
@@ -537,8 +535,7 @@ UnitTestSuite.testFunctionFor('PackageLink.getUrl', function() {
 
 /**
  * Equals function.
- *
- * @param {*} obj the object with which to compare.
+ * @param {*} obj The object with which to compare.
  * @return {boolean} Whether this link is equal to the given object.
  */
 PackageLink.prototype.equals = function(obj) {
@@ -548,7 +545,7 @@ PackageLink.prototype.equals = function(obj) {
 
 
 /**
- * @return {string} a string representation of this link.
+ * @return {string} A string representation of this link.
  */
 PackageLink.prototype.toString = function() {
   return this.packageName;
@@ -560,9 +557,9 @@ PackageLink.prototype.toString = function() {
  * Link to a class. These links are of type {LinkType.INTERFACE},
  * {LinkType.CLASS}, {LinkType.ENUM}, {LinkType.EXCEPTION}, {LinkType.ERROR} or
  * {LinkType.ANNOTATION}.
- * @param {LinkType} type the type of this link.
- * @param {string} packageName the package name.
- * @param {string} className the class name.
+ * @param {LinkType} type The type of this link.
+ * @param {string} packageName The package name.
+ * @param {string} className The class name.
  * @constructor
  */
 ClassLink = function(type, packageName, className) {
@@ -600,8 +597,7 @@ ClassLink = function(type, packageName, className) {
 
 /**
  * Determine whether this link matches the given regular expression.
- *
- * @param {RegExp} regex the regular expression.
+ * @param {RegExp} regex The regular expression.
  * @return {boolean} Whether this link is a match.
  */
 ClassLink.prototype.matches = function(regex) {
@@ -613,7 +609,7 @@ ClassLink.prototype.matches = function(regex) {
 
 
 /**
- * @return {string} this link in HTML format.
+ * @return {string} This link in HTML format.
  */
 ClassLink.prototype.getHtml = function() {
   return this.html;
@@ -654,7 +650,7 @@ UnitTestSuite.testFunctionFor('ClassLink.getHtml', function() {
 
 
 /**
- * @return {LinkType} the type of this link.
+ * @return {LinkType} The type of this link.
  */
 ClassLink.prototype.getType = function() {
   return this.type;
@@ -662,7 +658,7 @@ ClassLink.prototype.getType = function() {
 
 
 /**
- * @return {string} the simple name of this class.
+ * @return {string} The simple name of this class.
  */
 ClassLink.prototype.getClassName = function() {
   return this.className;
@@ -670,7 +666,7 @@ ClassLink.prototype.getClassName = function() {
 
 
 /**
- * @return {string} the name of the package that contains this class.
+ * @return {string} The name of the package that contains this class.
  */
 ClassLink.prototype.getPackageName = function() {
   return this.canonicalName.substring(
@@ -679,7 +675,7 @@ ClassLink.prototype.getPackageName = function() {
 
 
 /**
- * @return {string} the canonical name of this class.
+ * @return {string} The canonical name of this class.
  */
 ClassLink.prototype.getCanonicalName = function() {
   return this.canonicalName;
@@ -687,7 +683,7 @@ ClassLink.prototype.getCanonicalName = function() {
 
 
 /**
- * @return {string} the URL of this link.
+ * @return {string} The URL of this link.
  */
 ClassLink.prototype.getUrl = function() {
   return toAbsoluteUrl(extractUrl(this));
@@ -716,8 +712,7 @@ UnitTestSuite.testFunctionFor('ClassLink.getUrl', function() {
 
 /**
  * Equals function.
- *
- * @param {*} obj the object with which to compare.
+ * @param {*} obj The object with which to compare.
  * @return {boolean} Whether this link is equal to the given object.
  */
 ClassLink.prototype.equals = function(obj) {
@@ -729,7 +724,7 @@ ClassLink.prototype.equals = function(obj) {
 
 
 /**
- * @return {string} a string representation of this link.
+ * @return {string} A string representation of this link.
  */
 ClassLink.prototype.toString = function() {
   return this.canonicalName;
@@ -739,8 +734,8 @@ ClassLink.prototype.toString = function() {
 
 /**
  * Link to a method or field of a class.
- * @param {string} baseUrl the base URL of this link.
- * @param {string} name the method or field name.
+ * @param {string} baseUrl The base URL of this link.
+ * @param {string} name The method or field name.
  * @constructor
  */
 MemberLink = function(baseUrl, name) {
@@ -753,8 +748,7 @@ MemberLink = function(baseUrl, name) {
 
 /**
  * Determine whether this link matches the given regular expression.
- *
- * @param {RegExp} regex the regular expression.
+ * @param {RegExp} regex The regular expression.
  * @return {boolean} Whether this link is a match.
  */
 MemberLink.prototype.matches = function(regex) {
@@ -763,7 +757,7 @@ MemberLink.prototype.matches = function(regex) {
 
 
 /**
- * @return {string} this link in HTML format.
+ * @return {string} This link in HTML format.
  */
 MemberLink.prototype.getHtml = function() {
   return this.html;
@@ -771,7 +765,7 @@ MemberLink.prototype.getHtml = function() {
 
 
 /**
- * @return {LinkType} the type of this link.
+ * @return {LinkType} The type of this link.
  */
 MemberLink.prototype.getType = function() {
   return LinkType.CLASS_MEMBER;
@@ -779,7 +773,7 @@ MemberLink.prototype.getType = function() {
 
 
 /**
- * @return {string} the URL of this link.
+ * @return {string} The URL of this link.
  */
 MemberLink.prototype.getUrl = function() {
   return extractUrl(this);
@@ -787,7 +781,7 @@ MemberLink.prototype.getUrl = function() {
 
 
 /**
- * @return {string} the name of this class member.
+ * @return {string} The name of this class member.
  */
 MemberLink.prototype.getName = function() {
   if (this.name.indexOf('(') !== -1) {
@@ -801,8 +795,8 @@ MemberLink.prototype.getName = function() {
 
 /**
  * Keyword link found on a package or class page.
- * @param {string} baseUrl the base URL of this link.
- * @param {string} name the keyword name.
+ * @param {string} baseUrl The base URL of this link.
+ * @param {string} name The keyword name.
  * @constructor
  */
 KeywordLink = function(baseUrl, name) {
@@ -815,8 +809,7 @@ KeywordLink = function(baseUrl, name) {
 
 /**
  * Determine whether this link matches the given regular expression.
- *
- * @param {RegExp} regex the regular expression.
+ * @param {RegExp} regex The regular expression.
  * @return {boolean} Whether this link is a match.
  */
 KeywordLink.prototype.matches = function(regex) {
@@ -825,7 +818,7 @@ KeywordLink.prototype.matches = function(regex) {
 
 
 /**
- * @return {string} this link in HTML format.
+ * @return {string} This link in HTML format.
  */
 KeywordLink.prototype.getHtml = function() {
   return this.html;
@@ -833,7 +826,7 @@ KeywordLink.prototype.getHtml = function() {
 
 
 /**
- * @return {LinkType} the type of this link.
+ * @return {LinkType} The type of this link.
  */
 KeywordLink.prototype.getType = function() {
   return LinkType.KEYWORD;
@@ -841,7 +834,7 @@ KeywordLink.prototype.getType = function() {
 
 
 /**
- * @return {string} the URL of this link.
+ * @return {string} The URL of this link.
  */
 KeywordLink.prototype.getUrl = function() {
   return extractUrl(this);
@@ -857,7 +850,7 @@ KeywordLink.prototype.getUrl = function() {
 
 /**
  * @class View Provides access to the UI elements of the frame containing the
- *             search field.
+ *     search field.
  */
 View = {
   searchField: null,
@@ -871,6 +864,7 @@ View = {
  * Access key that will focus on the search field when activated ('s').
  * This access key can be activated by pressing either Alt+s or Alt+Shift+s,
  * depending on the internet browser.
+ * @type {string}
  */
 View.searchAccessKey = 's';
 
@@ -879,13 +873,14 @@ View.searchAccessKey = 's';
  * Access key that will clear the search field when activated ('a').
  * This access key can be activated by pressing either Alt+a or Alt+Shift+a,
  * depending on the internet browser.
+ * @type {string}
  */
 View.eraseAccessKey = 'a';
 
 
 /**
  * Initialise the search field frame.
- * @param {EventHandlers} eventHandlers the event handlers.
+ * @param {EventHandlers} eventHandlers The event handlers.
  */
 View.initialise = function(eventHandlers) {
   View._create(eventHandlers);
@@ -894,7 +889,7 @@ View.initialise = function(eventHandlers) {
 
 /**
  * Set the HTML contents of the area below the search field.
- * @param {string} contents the HTML contents.
+ * @param {string} contents The HTML contents.
  */
 View.setContentsHtml = function(contents) {
   var newNode = View.contentNode.cloneNode(false);
@@ -906,7 +901,7 @@ View.setContentsHtml = function(contents) {
 
 /**
  * Set the value displayed in the search field.
- * @param {string} value the value to display.
+ * @param {string} value The value to display.
  */
 View.setSearchFieldValue = function(value) {
   if (View.searchField.value !== value) {
@@ -916,7 +911,7 @@ View.setSearchFieldValue = function(value) {
 
 
 /**
- * @return {string} the current value displayed in the search field.
+ * @return {string} The current value displayed in the search field.
  */
 View.getSearchFieldValue = function() {
   return View.searchField.value;
@@ -933,7 +928,7 @@ View.focusOnSearchField = function() {
 
 /**
  * Add an inner frame with the given URL.
- * @param {string} url the URL.
+ * @param {string} url The URL.
  */
 View.addInnerFrame = function(url) {
   View.innerFrame = document.createElement('iframe');
@@ -955,7 +950,7 @@ View.removeInnerFrame = function() {
 
 /**
  * Create the view elements and add them to the current document.
- * @param {EventHandlers} eventHandlers the event handlers.
+ * @param {EventHandlers} eventHandlers The event handlers.
  */
 View._create = function(eventHandlers) {
   var tableElement = document.createElement('table');
@@ -997,8 +992,8 @@ View._create = function(eventHandlers) {
 
 
 /**
- * @param {EventHandlers} eventHandlers the event handlers.
- * @return {Element} the search field element.
+ * @param {EventHandlers} eventHandlers The event handlers.
+ * @return {Element} The search field element.
  */
 View._createSearchField = function(eventHandlers) {
   var searchField = document.createElement('input');
@@ -1017,8 +1012,8 @@ View._createSearchField = function(eventHandlers) {
 
 
 /**
- * @param {EventHandlers} eventHandlers the event handlers.
- * @return {Element} the erase button element.
+ * @param {EventHandlers} eventHandlers The event handlers.
+ * @return {Element} The erase button element.
  */
 View._createEraseButton = function(eventHandlers) {
   var eraseButton = document.createElement('input');
@@ -1037,8 +1032,8 @@ View._createEraseButton = function(eventHandlers) {
 
 
 /**
- * @param {EventHandlers} eventHandlers the event handlers.
- * @return {Element} the options page link element.
+ * @param {EventHandlers} eventHandlers The event handlers.
+ * @return {Element} The options page link element.
  */
 View._createOptionsLink = function(eventHandlers) {
   var anchorElement = document.createElement('a');
@@ -1062,7 +1057,7 @@ View._createOptionsLink = function(eventHandlers) {
 
 /**
  * @class Query Constructs the text entered into the search field into a search
- *              query.
+ *     query.
  */
 Query = {
   packageOrClassSearchString: '',
@@ -1073,8 +1068,8 @@ Query = {
 
 
 /**
- * @return {string} the portion of the search query that relates to the
- *                  packages and classes search.
+ * @return {string} The portion of the search query that relates to the
+ *     packages and classes search.
  */
 Query.getPackageOrClassSearchString = function() {
   return Query.packageOrClassSearchString;
@@ -1082,8 +1077,8 @@ Query.getPackageOrClassSearchString = function() {
 
 
 /**
- * @return {string} the portion of the search query that relates to the class
- *                  members and keywords search.
+ * @return {string} The portion of the search query that relates to the class
+ *     members and keywords search.
  */
 Query.getMemberOrKeywordSearchString = function() {
   return Query.memberOrKeywordSearchString;
@@ -1091,8 +1086,8 @@ Query.getMemberOrKeywordSearchString = function() {
 
 
 /**
- * @return {string} the portion of the search query that relates to the
- *                  package menu or class menu.
+ * @return {string} The portion of the search query that relates to the
+ *     package menu or class menu.
  */
 Query.getMenuSearchString = function() {
   return Query.menuSearchString;
@@ -1100,7 +1095,7 @@ Query.getMenuSearchString = function() {
 
 
 /**
- * @return {string} the entire search query.
+ * @return {string} The entire search query.
  */
 Query.getEntireSearchString = function() {
   var searchString = Query.packageOrClassSearchString;
@@ -1118,7 +1113,7 @@ Query.getEntireSearchString = function() {
 
 /**
  * Update this query based on the contents of the search field.
- * @param {string} searchFieldContents the contents of the search field.
+ * @param {string} searchFieldContents The contents of the search field.
  */
 Query.update = function(searchFieldContents) {
   Query._processInput(searchFieldContents);
@@ -1136,7 +1131,7 @@ Query.update = function(searchFieldContents) {
 
 /**
  * Process the search field input.
- * @param {string} searchFieldContents the contents of the search field.
+ * @param {string} searchFieldContents The contents of the search field.
  */
 Query._processInput = function(searchFieldContents) {
   var searchString;
@@ -1202,12 +1197,11 @@ RegexLibrary = {};
 
 /**
  * Create and return a function that will take a {PackageLink}, {ClassLink},
- * {MemberLink} or {KeywordLink} as an argument and return true if that link
- * matches the given search string and return false otherwise.
- *
- * @param {string} searchString the search string.
+ * {MemberLink} or {KeywordLink} as an argument and return whether that link
+ * matches the given search string.
+ * @param {string} searchString The search string.
  * @return {function(PackageLink|ClassLink|MemberLink|KeywordLink): boolean}
- *     the condition function.
+ *     The condition function.
  */
 RegexLibrary.createCondition = function(searchString) {
   if (searchString.length === 0 || searchString === '*') {
@@ -1350,13 +1344,11 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
 
 /**
  * Create and return a function that will take a {PackageLink}, {ClassLink},
- * {MemberLink} or {KeywordLink} as an argument and return true if that link
- * is a case-sensitive exact match for the given search string and return false
- * otherwise.
- *
- * @param {string} searchString the search string.
+ * {MemberLink} or {KeywordLink} as an argument and return whether that link
+ * is a case-sensitive exact match for the given search string.
+ * @param {string} searchString The search string.
  * @return {function(PackageLink|ClassLink|MemberLink|KeywordLink): boolean}
- *     the condition function.
+ *     The condition function.
  */
 RegexLibrary.createCaseInsensitiveExactMatchCondition = function(searchString) {
   return RegexLibrary._createExactMatchCondition(searchString, false);
@@ -1365,13 +1357,11 @@ RegexLibrary.createCaseInsensitiveExactMatchCondition = function(searchString) {
 
 /**
  * Create and return a function that will take a {PackageLink}, {ClassLink},
- * {MemberLink} or {KeywordLink} as an argument and return true if that link
- * is a case-sensitive exact match for the given search string and return false
- * otherwise.
- *
- * @param {string} searchString the search string.
+ * {MemberLink} or {KeywordLink} as an argument and return whether that link
+ * is a case-sensitive exact match for the given search string.
+ * @param {string} searchString The search string.
  * @return {function(PackageLink|ClassLink|MemberLink|KeywordLink): boolean}
- *     the condition function.
+ *     The condition function.
  */
 RegexLibrary.createCaseSensitiveExactMatchCondition = function(searchString) {
   return RegexLibrary._createExactMatchCondition(searchString, true);
@@ -1379,11 +1369,11 @@ RegexLibrary.createCaseSensitiveExactMatchCondition = function(searchString) {
 
 
 /**
- * @param {string} searchString the search string.
- * @param {boolean} caseSensitive true for a case-sensitive match, false for
+ * @param {string} searchString The search string.
+ * @param {boolean} caseSensitive True for a case-sensitive match, false for
  *                  case-insensitive.
  * @return {function(PackageLink|ClassLink|MemberLink|KeywordLink): boolean}
- *     the condition function.
+ *     The condition function.
  */
 RegexLibrary._createExactMatchCondition = function(
     searchString, caseSensitive) {
@@ -1402,8 +1392,8 @@ RegexLibrary._createExactMatchCondition = function(
 
 
 /**
- * @param {string} searchString the search string.
- * @return {RegExp} the regular expression for the search string.
+ * @param {string} searchString The search string.
+ * @return {RegExp} The regular expression for the search string.
  */
 RegexLibrary._getRegex = function(searchString) {
   var pattern = '^';
@@ -1501,10 +1491,10 @@ UnitTestSuite.testFunctionFor('RegexLibrary._getRegex', function() {
 
 
 /**
- * @param {string} searchString the search string.
- * @param {boolean} caseSensitive true for a case-sensitive match, false for
+ * @param {string} searchString The search string.
+ * @param {boolean} caseSensitive True for a case-sensitive match, false for
  *                  case-insensitive.
- * @return {RegExp} the exact match regular expression for the search string.
+ * @return {RegExp} The exact match regular expression for the search string.
  */
 RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
   var pattern = '^';
@@ -1524,7 +1514,7 @@ RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
 
 
 /**
- * @param {string} character the character to inspect.
+ * @param {string} character The character to inspect.
  * @return {boolean} Whether the character has a special meaning within regular
  *                   expressions.
  */
@@ -1547,8 +1537,8 @@ RegexLibrary._isSpecialRegularExpressionCharacter = function(character) {
 
 /**
  * A callback function in the context of a specified object.
- * @param {function(*): *} callbackFunction the callback function.
- * @param {*} thisObject the "this" object used when calling the function.
+ * @param {function(*): *} callbackFunction The callback function.
+ * @param {*} thisObject The "this" object used when calling the function.
  * @constructor
  */
 Callback = function(callbackFunction, thisObject) {
@@ -1559,10 +1549,10 @@ Callback = function(callbackFunction, thisObject) {
 
 /**
  * Invoke this callback function with the given arguments.
- * @param {Array.<*>=} argsArray an array of arguments to pass to the callback
- *                               function. If not provided, no arguments will
- *                               be passed to the callback function.
- * @return {*} the function result.
+ * @param {Array.<*>=} argsArray An array of arguments to pass to the callback
+ *     function. If not provided, no arguments will be passed to the callback
+ *     function.
+ * @return {*} The function result.
  */
 Callback.prototype.invoke = function(argsArray) {
   return this.callbackFunction.apply(this.thisObject, argsArray);
@@ -1614,8 +1604,8 @@ Search.performIfSearchStringHasChanged = function() {
 
 
 /**
- * @return {string} the URL of the link currently displayed at the top of the
- *                  list, or null if no links are currently displayed.
+ * @return {string} The URL of the link currently displayed at the top of the
+ *     list, or null if no links are currently displayed.
  */
 Search.getTopLinkUrl = function() {
   if (Search.topLink) {
@@ -1626,7 +1616,7 @@ Search.getTopLinkUrl = function() {
 
 
 /**
- * @param {string} entireSearchString the search string.
+ * @param {string} entireSearchString The search string.
  */
 Search._performSearch = function(entireSearchString) {
   Option.CLASS_MENU.getValue(function(classMenu) {
@@ -1692,7 +1682,7 @@ Search._autoOpen = function() {
 
 /**
  * @class Search._PackagesAndClasses Component of the search functionality that
- *                                   deals with package and class links.
+ *     deals with package and class links.
  */
 Search._PackagesAndClasses = {
   previousQuery: null,
@@ -1704,10 +1694,10 @@ Search._PackagesAndClasses = {
 
 /**
  * Perform this portion of the search.
- * @param {Object} searchContext object which allows this search component to
- *                               store a result and to inspect results provided
- *                               by earlier search components.
- * @param {string} searchString the search string.
+ * @param {Object} searchContext Object which allows this search component to
+ *     store a result and to inspect results provided by earlier search
+ *     components.
+ * @param {string} searchString The search string.
  */
 Search._PackagesAndClasses._perform = function(searchContext, searchString) {
   var module = Search._PackagesAndClasses;
@@ -1739,10 +1729,10 @@ Search._PackagesAndClasses._perform = function(searchContext, searchString) {
 
 
 /**
- * @param {Array.<PackageLink|ClassLink>} links the package and class links
- *                                        matched by the current search.
- * @param {PackageLink|ClassLink} bestMatch the best match link.
- * @return {PackageLink|ClassLink} the top link.
+ * @param {Array.<PackageLink|ClassLink>} links The package and class links
+ *     matched by the current search.
+ * @param {PackageLink|ClassLink} bestMatch The best match link.
+ * @return {PackageLink|ClassLink} The top link.
  */
 Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
   if (bestMatch) {
@@ -1774,10 +1764,10 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink',
 
 /**
  * Get the best match (if any) from the given array of links.
- * @param {string} searchString the search string.
- * @param {Array.<PackageLink|ClassLink>} links the package and class links
- *                                        matched by the current search.
- * @return {PackageLink|ClassLink=} the best match.
+ * @param {string} searchString The search string.
+ * @param {Array.<PackageLink|ClassLink>} links The package and class links
+ *     matched by the current search.
+ * @return {PackageLink|ClassLink=} The best match.
  */
 Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
   var caseInsensitiveExactMatchCondition =
@@ -1871,7 +1861,7 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch',
 
 
 /**
- * @return {string} the HTML to display the search results.
+ * @return {string} The HTML to display the search results.
  */
 Search._PackagesAndClasses._constructHtml = function() {
   var module = Search._PackagesAndClasses;
@@ -1910,8 +1900,7 @@ Search._PackagesAndClasses._constructHtml = function() {
 
 /**
  * @class Search._ClassMembersAndKeywords Component of the search functionality
- *                                        that deals with class members and
- *                                        keyword links.
+ *     that deals with class members and keyword links.
  */
 Search._ClassMembersAndKeywords = {
   httpRequest: new HttpRequest(View),
@@ -1942,10 +1931,10 @@ Search._ClassMembersAndKeywords = {
 
 /**
  * Perform this portion of the search.
- * @param {Object} searchContext object which allows this search component to
- *                               store a result and to inspect results provided
- *                               by earlier search components.
- * @param {string} searchString the search string.
+ * @param {Object} searchContext Object which allows this search component to
+ *     store a result and to inspect results provided by earlier search
+ *     components.
+ * @param {string} searchString The search string.
  */
 Search._ClassMembersAndKeywords._perform = function(
     searchContext, searchString) {
@@ -1995,9 +1984,9 @@ Search._ClassMembersAndKeywords._perform = function(
 
 /**
  * Retrieve the member and keyword links from the given package or class page.
- * @param {string} baseUrl the URL of the page.
- * @param {string} packageOrClassPageHtml the contents of the page.
- * @return {Array.<MemberLink|KeywordLink>} the links.
+ * @param {string} baseUrl The URL of the page.
+ * @param {string} packageOrClassPageHtml The contents of the page.
+ * @return {Array.<MemberLink|KeywordLink>} The links.
  */
 Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
     baseUrl, packageOrClassPageHtml) {
@@ -2010,8 +1999,8 @@ Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
 
 /**
  * Retrieve the anchor names from the given package or class page.
- * @param {string} packageOrClassPageHtml the contents of the page.
- * @return {Array.<string>} the anchor names.
+ * @param {string} packageOrClassPageHtml The contents of the page.
+ * @return {Array.<string>} The anchor names.
  */
 Search._ClassMembersAndKeywords._getAnchorNames = function(
     packageOrClassPageHtml) {
@@ -2027,9 +2016,9 @@ Search._ClassMembersAndKeywords._getAnchorNames = function(
 
 /**
  * Create member and keyword links from the given anchor names.
- * @param {string} baseUrl the URL of the package or class page.
- * @param {names} names the anchor names.
- * @return {Array.<MemberLink|KeywordLink>} the links.
+ * @param {string} baseUrl The URL of the package or class page.
+ * @param {names} names The anchor names.
+ * @return {Array.<MemberLink|KeywordLink>} The links.
  */
 Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function(
     baseUrl, names) {
@@ -2050,7 +2039,7 @@ Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function(
 
 
 /**
- * @param {string} name the anchor name.
+ * @param {string} name The anchor name.
  * @return {boolean} Whether the anchor is a keyword.
  */
 Search._ClassMembersAndKeywords._isKeywordName = function(name) {
@@ -2075,7 +2064,7 @@ Search._ClassMembersAndKeywords._isKeywordName = function(name) {
 
 /**
  * @class Search._Menu Component of the search functionality that deals with
- *                     the package menu and class menu.
+ *     the package menu and class menu.
  */
 Search._Menu = {
   menuReplacement: null
@@ -2084,10 +2073,10 @@ Search._Menu = {
 
 /**
  * Perform this portion of the search.
- * @param {Object} searchContext object which allows this search component to
- *                               store a result and to inspect results provided
- *                               by earlier search components.
- * @param {string} searchString the search string.
+ * @param {Object} searchContext Object which allows this search component to
+ *     store a result and to inspect results provided by earlier search
+ *     components.
+ * @param {string} searchString The search string.
  */
 Search._Menu._perform = function(searchContext, searchString) {
   var module = Search._Menu;
@@ -2131,15 +2120,15 @@ Search._Menu._perform = function(searchContext, searchString) {
 
 /**
  * Construct the menu.
- * @param {Object} searchContext the search context.
+ * @param {Object} searchContext The search context.
  * @param {{Object.<function(ClassLink|PackageLink,MemberLink)>}}
- *     memberReplacement an object containing, for each placeholder value, a
+ *     memberReplacement An object containing, for each placeholder value, a
  *     function to resolve that value.
- * @param {ClassLink|PackageLink} classOrPackageLink the current class link or
+ * @param {ClassLink|PackageLink} classOrPackageLink The current class link or
  *     package link.
- * @param {MemberLink|KeywordLink} memberOrKeywordLink the current member link
+ * @param {MemberLink|KeywordLink} memberOrKeywordLink The current member link
  *     or keyword link.
- * @return {Array.<{mnemonic: string, label: string, url: string}>} the menu
+ * @return {Array.<{mnemonic: string, label: string, url: string}>} The menu
  *     items.
  */
 Search._Menu._constructMenu = function(searchContext, menuReplacement,
@@ -2192,7 +2181,7 @@ Search._Menu._constructMenu = function(searchContext, menuReplacement,
  * Placeholder values that can be entered into the class_menu or package_menu
  * options and will, when the menu is opened, be replaced with data relevant
  * to the current package or class.
- * @return {Object.<function(ClassLink|PackageLink,MemberLink)>} an object
+ * @return {Object.<function(ClassLink|PackageLink,MemberLink)>} An object
  *     containing, for each placeholder value, a function to resolve that
  *     value.
  */
@@ -2223,9 +2212,9 @@ Search._Menu._getMenuReplacement = function() {
 
 
 /**
- * @param {{Array.<{mnemonic: string, label: string, url: string}>}} the menu
+ * @param {{Array.<{mnemonic: string, label: string, url: string}>}} The menu
  *     items.
- * @return {string} an HTML representation of the menu items.
+ * @return {string} An HTML representation of the menu items.
  */
 Search._Menu._constructMenuHtml = function(menu) {
   var menuHtml = '';
@@ -2246,7 +2235,7 @@ Search._Menu._constructMenuHtml = function(menu) {
 
 /**
  * Initialise this script.
- * @param {function(UnitTestResult)} unitTestResultCallback function that is
+ * @param {function(UnitTestResult)} unitTestResultCallback Function that is
  *     called with the unit test results once the script has been initialised.
  */
 function init(unitTestResultCallback) {
@@ -2298,9 +2287,8 @@ function init(unitTestResultCallback) {
 
 /**
  * Parse packages from the given array of {ClassLink} objects.
- *
- * @param {Array.<ClassLink>} classLinks the class links.
- * @return {Array.<PackageLink>} the package links.
+ * @param {Array.<ClassLink>} classLinks The class links.
+ * @return {Array.<PackageLink>} The package links.
  */
 function getPackageLinks(classLinks) {
   var packageLinks = [];
@@ -2353,7 +2341,7 @@ UnitTestSuite.testFunctionFor('getPackageLinks', function() {
 
 
 /**
- * @return {string} the inner HTML of the body element of the classes list
+ * @return {string} The inner HTML of the body element of the classes list
  *    frame, or undefined if the element does not exist.
  */
 function getClassesInnerHtml() {
@@ -2368,17 +2356,24 @@ function getClassesInnerHtml() {
 /**
  * Parse interfaces, classes, enumerations, and annotations from the inner HTML
  * of the body element of the classes list frame.
- *
+ * <p>
  * Assumptions:
- * - The use of the title attribute is consistent: either all of the anchor
- *   elements on the page have it, or all of them do not have it.
- * - Double-quotes are used to declare the href or title attributes.
- * - The italic element is the only element that can be a child of the
- *   anchor element.
- *
- * @param {string} classesInnerHtml the inner HTML of the body element of the
+ * <ul>
+ * <li>
+ * The use of the title attribute is consistent: either all of the anchor
+ * elements on the page have it, or all of them do not have it.
+ * </li>
+ * <li>
+ * Double-quotes are used to declare the href or title attributes.
+ * </li>
+ * <li>
+ * The italic element is the only element that can be a child of the anchor
+ * element.
+ * </li>
+ * </ul>
+ * @param {string} classesInnerHtml The inner HTML of the body element of the
  *     classes list frame.
- * @return {Array.<ClassLink>} the class links.
+ * @return {Array.<ClassLink>} The class links.
  */
 function getClassLinks(classesInnerHtml) {
   if (!classesInnerHtml) {
@@ -2561,8 +2556,8 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
 
 /**
  * Determine whether stringOne ends with stringTwo.
- * @param {string} stringOne the first string.
- * @param {string} stringTwo the second string.
+ * @param {string} stringOne The first string.
+ * @param {string} stringTwo The second string.
  * @return {boolean} Whether stringOne ends with stringTwo.
  */
 function endsWith(stringOne, stringTwo) {
@@ -2594,8 +2589,8 @@ UnitTestSuite.testFunctionFor('endsWith', function() {
 
 /**
  * Trim whitespace from the start of the given string.
- * @param {string} stringToTrim the string to trim.
- * @return {string} the trimmed string.
+ * @param {string} stringToTrim The string to trim.
+ * @return {string} The trimmed string.
  */
 function trimFromStart(stringToTrim) {
   return stringToTrim.replace(/^\s+/, '');
@@ -2617,8 +2612,8 @@ UnitTestSuite.testFunctionFor('trimFromStart', function() {
 
 /**
  * Trim whitespace from the end of the given string.
- * @param {string} stringToTrim the string to trim.
- * @return {string} the trimmed string.
+ * @param {string} stringToTrim The string to trim.
+ * @return {string} The trimmed string.
  */
 function trimFromEnd(stringToTrim) {
   return stringToTrim.replace(/\s+$/, '');
@@ -2642,12 +2637,11 @@ UnitTestSuite.testFunctionFor('trimFromEnd', function() {
  * Split the given string on the first occurence of the given separator string.
  * Any whitespace surrounding the first occurence of the separator will be
  * removed.
- * @param {string} stringToSplit the string to split.
- * @param {string} separator the separator string.
- * @return {Array} an array containing two elements: the portion of the string
- *                  found before the first occurence of the separator, and the
- *                  portion of the string found after the first occurence of
- *                  the separator.
+ * @param {string} stringToSplit The string to split.
+ * @param {string} separator The separator string.
+ * @return {Array.<string>} An array containing two elements: the portion of
+ *     the string found before the first occurence of the separator, and the
+ *     portion of the string found after the first occurence of the separator.
  */
 function splitOnFirst(stringToSplit, separator) {
   var firstOccurrence = stringToSplit.indexOf(separator);
@@ -2697,7 +2691,7 @@ EventHandlers = {};
 
 /**
  * Called when a key has been pressed while the search field has focus.
- * @param {Event} evt the event.
+ * @param {Event} evt The event.
  */
 EventHandlers.searchFieldKeyup = function(evt) {
   var code = evt.keyCode;
@@ -2739,7 +2733,7 @@ EventHandlers.eraseButtonClick = function() {
 
 /**
  * Called when the Options link has been clicked.
- * @param {Event} evt the event.
+ * @param {Event} evt The event.
  */
 EventHandlers.optionsLinkClicked = function(evt) {
   OptionsPage.open();
@@ -2750,8 +2744,8 @@ EventHandlers.optionsLinkClicked = function(evt) {
 /**
  * Called when the return key has been pressed while the search field has
  * focus.
- * @param {boolean} ctrlModifier true if the CTRL key was held down when the
- *     return key was pressed, false otherwise.
+ * @param {boolean} ctrlModifier Whether the CTRL key was held down when the
+ *     return key was pressed.
  */
 EventHandlers._returnKeyPressed = function(ctrlModifier) {
   var searchFieldValue = View.getSearchFieldValue();

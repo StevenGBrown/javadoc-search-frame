@@ -59,8 +59,8 @@ OptionsPageGenerator.generate = function() {
 
 /**
  * Create the contents of the options page.
- * @param {Document} pageDocument the options page document.
- * @return {Array.<Element>} the contents of the options page.
+ * @param {Document} pageDocument The options page document.
+ * @return {Array.<Element>} The contents of the options page.
  */
 OptionsPageGenerator._createContents = function(pageDocument) {
   var contents = [];
@@ -98,8 +98,8 @@ OptionsPageGenerator._createContents = function(pageDocument) {
 
 
 /**
- * @param {Document} pageDocument the options page document.
- * @return {Element} a header element.
+ * @param {Document} pageDocument The options page document.
+ * @return {Element} A header element.
  */
 OptionsPageGenerator._createHeader = function(pageDocument) {
   var headerElement = pageDocument.createElement('h2');
@@ -109,8 +109,8 @@ OptionsPageGenerator._createHeader = function(pageDocument) {
 
 
 /**
- * @param {Document} pageDocument the options page document.
- * @return {Element} an error message element.
+ * @param {Document} pageDocument The options page document.
+ * @return {Element} An error message element.
  */
 OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function(
     pageDocument) {
@@ -122,12 +122,12 @@ OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function(
 
 
 /**
- * @param {Document} pageDocument the options page document.
- * @param {Option} option a boolean option.
- * @param {string} title the title to display.
- * @param {string} trueText the message to display when the option is true.
- * @param {string} falseText the message to display when the option is false.
- * @return {Element} an element that allows the option to be configured.
+ * @param {Document} pageDocument The options page document.
+ * @param {Option} option A boolean option.
+ * @param {string} title The title to display.
+ * @param {string} trueText The message to display when the option is true.
+ * @param {string} falseText The message to display when the option is false.
+ * @return {Element} An element that allows the option to be configured.
  */
 OptionsPageGenerator._booleanOption = function(
     pageDocument, option, title, trueText, falseText) {
@@ -167,11 +167,11 @@ OptionsPageGenerator._booleanOption = function(
 
 
 /**
- * @param {Document} pageDocument the options page document.
- * @param {Option} option a boolean option.
- * @param {string} name the name to display on the radio button.
- * @param {boolean} checked true to check the radio button, false otherwise.
- * @return {Element} a radio button element used to display the boolean option.
+ * @param {Document} pageDocument The options page document.
+ * @param {Option} option A boolean option.
+ * @param {string} name The name to display on the radio button.
+ * @param {boolean} checked Whether to check the radio button.
+ * @return {Element} A radio button element used to display the boolean option.
  */
 OptionsPageGenerator._radioButton = function(
     pageDocument, option, name, checked) {
@@ -187,10 +187,10 @@ OptionsPageGenerator._radioButton = function(
 
 
 /**
- * @param {Document} pageDocument the options page document.
- * @param {Element} radioButtonElement a radio button element.
- * @param {string} label a label for the radio button.
- * @return {Element} an element containing the radio button.
+ * @param {Document} pageDocument The options page document.
+ * @param {Element} radioButtonElement A radio button element.
+ * @param {string} label A label for the radio button.
+ * @return {Element} An element containing the radio button.
  */
 OptionsPageGenerator._tableContentElementForRadioButton = function(
     pageDocument, radioButtonElement, label) {
@@ -206,11 +206,11 @@ OptionsPageGenerator._tableContentElementForRadioButton = function(
 
 
 /**
- * @param {Document} pageDocument the options page document.
- * @param {Option} option a menu option.
- * @param {string} title the title to display for this option.
- * @param {string} subTitle the sub-title to display for this option.
- * @return {Element} an element that allows the option to be configured.
+ * @param {Document} pageDocument The options page document.
+ * @param {Option} option A menu option.
+ * @param {string} title The title to display for this option.
+ * @param {string} subTitle The sub-title to display for this option.
+ * @return {Element} An element that allows the option to be configured.
  */
 OptionsPageGenerator._menuOption = function(
     pageDocument, option, title, subTitle) {
@@ -249,11 +249,11 @@ OptionsPageGenerator._menuOption = function(
 
 
 /**
- * @param {Document} pageDocument the options page document.
- * @param {string} title the options page title.
- * @param {string} subTitle the option page sub-title.
- * @param {Array.<Element>} contentElements the contents of the options page.
- * @return {Element} a table element.
+ * @param {Document} pageDocument The options page document.
+ * @param {string} title The options page title.
+ * @param {string} subTitle The option page sub-title.
+ * @param {Array.<Element>} contentElements The contents of the options page.
+ * @return {Element} A table element.
  */
 OptionsPageGenerator._createTable = function(
     pageDocument, title, subTitle, contentElements) {

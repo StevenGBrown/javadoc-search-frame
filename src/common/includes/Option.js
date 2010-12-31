@@ -37,7 +37,8 @@
 
 /**
  * Provides persistent configuration of the script options.
- * @param {{key: string, defaultValue: string, type}} properties
+ * @param {{key: string, defaultValue: string, type}} properties The option
+ *     properties.
  * @constructor
  */
 Option = function(properties) {
@@ -57,14 +58,12 @@ Option.canGetAndSet = function() {
 
 /**
  * Retrieve the current value of this option.
- * @param {function(*)} callback callback function that is provided with the
- *                               value of this option. If the option cannot be
- *                               retrieved, has not yet been configured, or is
- *                               invalid, the default value will be returned.
+ * @param {function(*)} callback Callback function that is provided with the
+ *     value of this option. If the option cannot be retrieved, has not yet
+ *     been configured, or is invalid, the default value will be returned.
  * @param {Object=} thisObject Used as the "this" for each invocation of the
- *                             callback. If it is not provided, or is null, the
- *                             global object associated with callback is used
- *                             instead.
+ *     callback. If it is not provided, or is null, the global object
+ *     associated with callback is used instead.
  * @see Option.canGetAndSet
  */
 Option.prototype.getValue = function(callback, thisObject) {
@@ -92,7 +91,7 @@ Option.prototype.getValue = function(callback, thisObject) {
 
 
 /**
- * @return {*} the default value of this option.
+ * @return {*} The default value of this option.
  */
 Option.prototype.getDefaultValue = function() {
   return this.defaultValue;
@@ -101,8 +100,8 @@ Option.prototype.getDefaultValue = function() {
 
 /**
  * Set this option to a new value.
- * @param {*} newValue the new value.
- * @throws an exception if this option cannot be set
+ * @param {*} newValue The new value.
+ * @throws An exception if this option cannot be set.
  * @see Option.canGetAndSet
  */
 Option.prototype.setValue = function(newValue) {

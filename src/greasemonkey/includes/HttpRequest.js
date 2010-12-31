@@ -37,7 +37,7 @@
 
 /**
  * Asynchronously loads resources from external URLs.
- * @param {View} view the object responsible for updating the UI.
+ * @param {View} view The object responsible for updating the UI.
  * @constructor
  */
 HttpRequest = function(view) {
@@ -53,11 +53,9 @@ HttpRequest = function(view) {
 /**
  * Loads the resource at the given URL. If the resource at the given URL is
  * already being loaded, calling this function will have no effect.
- *
- * @param {string} url the URL.
- * @param {function()} progressCallback function that is called when whenever
- *                                      progress has been made towards loading
- *                                      the resource.
+ * @param {string} url The URL.
+ * @param {function()} progressCallback Function that is called when whenever
+ *     progress has been made towards loading the resource.
  */
 HttpRequest.prototype.load = function(url, progressCallback) {
   if (this.url === url) {
@@ -98,8 +96,8 @@ HttpRequest.prototype.isComplete = function() {
 
 
 /**
- * @return {string} a status message on the progress made towards loading the
- *                  resource.
+ * @return {string} A status message on the progress made towards loading the
+ *     resource.
  */
 HttpRequest.prototype.getStatusMessage = function() {
   if (this.bytesDownloaded === -1) {
@@ -119,8 +117,8 @@ HttpRequest.prototype.getStatusMessage = function() {
 
 
 /**
- * @return {string} the loaded resource, or null if the loading is not
- *                  complete.
+ * @return {string} The loaded resource, or null if the loading is not
+ *     complete.
  */
 HttpRequest.prototype.getResource = function() {
   return this.loadedResource;
@@ -144,7 +142,7 @@ HttpRequest.prototype.abort = function() {
 
 
 /**
- * @param {Event} e the progress event.
+ * @param {Event} e The progress event.
  */
 HttpRequest.prototype._onprogress = function(e) {
   this.bytesDownloaded = e.position;
@@ -154,7 +152,7 @@ HttpRequest.prototype._onprogress = function(e) {
 
 
 /**
- * @param {Event} e the load event.
+ * @param {Event} e The load event.
  */
 HttpRequest.prototype._onload = function(e) {
   this.loadedResource = this.xmlHttpRequest.responseText;
@@ -163,7 +161,7 @@ HttpRequest.prototype._onload = function(e) {
 
 
 /**
- * @param {Event} e the error event.
+ * @param {Event} e The error event.
  */
 HttpRequest.prototype._onerror = function(e) {
   this.bytesDownloaded = -1;
@@ -173,7 +171,7 @@ HttpRequest.prototype._onerror = function(e) {
 
 
 /**
- * @param {*} ex the exception.
+ * @param {*} ex The exception.
  */
 HttpRequest.prototype._onexception = function(ex) {
   this.bytesDownloaded = -1;
