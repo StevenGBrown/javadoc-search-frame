@@ -1559,9 +1559,9 @@ Callback = function(callbackFunction, thisObject) {
 
 /**
  * Invoke this callback function with the given arguments.
- * @param {Array<*>=} argsArray an array of arguments to pass to the callback
- *                              function. If not provided, no arguments will be
- *                              passed to the callback function.
+ * @param {Array.<*>=} argsArray an array of arguments to pass to the callback
+ *                               function. If not provided, no arguments will
+ *                               be passed to the callback function.
  * @return {*} the function result.
  */
 Callback.prototype.invoke = function(argsArray) {
@@ -1739,8 +1739,8 @@ Search._PackagesAndClasses._perform = function(searchContext, searchString) {
 
 
 /**
- * @param {Array<PackageLink|ClassLink>} links the package and class links
- *                                       matched by the current search.
+ * @param {Array.<PackageLink|ClassLink>} links the package and class links
+ *                                        matched by the current search.
  * @param {PackageLink|ClassLink} bestMatch the best match link.
  * @return {PackageLink|ClassLink} the top link.
  */
@@ -1775,8 +1775,8 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getTopLink',
 /**
  * Get the best match (if any) from the given array of links.
  * @param {string} searchString the search string.
- * @param {Array<PackageLink|ClassLink>} links the package and class links
- *                                       matched by the current search.
+ * @param {Array.<PackageLink|ClassLink>} links the package and class links
+ *                                        matched by the current search.
  * @return {PackageLink|ClassLink=} the best match.
  */
 Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
@@ -1997,7 +1997,7 @@ Search._ClassMembersAndKeywords._perform = function(
  * Retrieve the member and keyword links from the given package or class page.
  * @param {string} baseUrl the URL of the page.
  * @param {string} packageOrClassPageHtml the contents of the page.
- * @return {Array<MemberLink|KeywordLink>} the links.
+ * @return {Array.<MemberLink|KeywordLink>} the links.
  */
 Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
     baseUrl, packageOrClassPageHtml) {
@@ -2011,7 +2011,7 @@ Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
 /**
  * Retrieve the anchor names from the given package or class page.
  * @param {string} packageOrClassPageHtml the contents of the page.
- * @return {Array<string>} the anchor names.
+ * @return {Array.<string>} the anchor names.
  */
 Search._ClassMembersAndKeywords._getAnchorNames = function(
     packageOrClassPageHtml) {
@@ -2029,7 +2029,7 @@ Search._ClassMembersAndKeywords._getAnchorNames = function(
  * Create member and keyword links from the given anchor names.
  * @param {string} baseUrl the URL of the package or class page.
  * @param {names} names the anchor names.
- * @return {Array<MemberLink|KeywordLink>} the links.
+ * @return {Array.<MemberLink|KeywordLink>} the links.
  */
 Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function(
     baseUrl, names) {
@@ -2139,7 +2139,7 @@ Search._Menu._perform = function(searchContext, searchString) {
  *     package link.
  * @param {MemberLink|KeywordLink} memberOrKeywordLink the current member link
  *     or keyword link.
- * @return {Array<{mnemonic: string, label: string, url: string}>} the menu
+ * @return {Array.<{mnemonic: string, label: string, url: string}>} the menu
  *     items.
  */
 Search._Menu._constructMenu = function(searchContext, menuReplacement,
@@ -2223,7 +2223,7 @@ Search._Menu._getMenuReplacement = function() {
 
 
 /**
- * @param {{Array<{mnemonic: string, label: string, url: string}>}} the menu
+ * @param {{Array.<{mnemonic: string, label: string, url: string}>}} the menu
  *     items.
  * @return {string} an HTML representation of the menu items.
  */
@@ -2299,8 +2299,8 @@ function init(unitTestResultCallback) {
 /**
  * Parse packages from the given array of {ClassLink} objects.
  *
- * @param {Array<ClassLink>} classLinks the class links.
- * @return {Array<PackageLink>} the package links.
+ * @param {Array.<ClassLink>} classLinks the class links.
+ * @return {Array.<PackageLink>} the package links.
  */
 function getPackageLinks(classLinks) {
   var packageLinks = [];
@@ -2378,7 +2378,7 @@ function getClassesInnerHtml() {
  *
  * @param {string} classesInnerHtml the inner HTML of the body element of the
  *     classes list frame.
- * @return {Array<ClassLink>} the class links.
+ * @return {Array.<ClassLink>} the class links.
  */
 function getClassLinks(classesInnerHtml) {
   if (!classesInnerHtml) {
