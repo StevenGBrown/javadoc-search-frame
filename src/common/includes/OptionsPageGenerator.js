@@ -60,7 +60,7 @@ OptionsPageGenerator.generate = function() {
 /**
  * Create the contents of the options page.
  * @param {Document} pageDocument the options page document.
- * @return {Array<Element>} the contents of the options page.
+ * @return {Array.<Element>} the contents of the options page.
  */
 OptionsPageGenerator._createContents = function(pageDocument) {
   var contents = [];
@@ -252,7 +252,7 @@ OptionsPageGenerator._menuOption = function(
  * @param {Document} pageDocument the options page document.
  * @param {string} title the options page title.
  * @param {string} subTitle the option page sub-title.
- * @param {Array<Element>} contentElements the contents of the options page.
+ * @param {Array.<Element>} contentElements the contents of the options page.
  * @return {Element} a table element.
  */
 OptionsPageGenerator._createTable = function(
