@@ -50,9 +50,9 @@ Storage.canGet = function() {
 
 /**
  * Retrieve a value based on a key.
- * @param {string} key the key.
- * @param {function(*)} callback callback function that is provided with the
- *                      retrieved value.
+ * @param {string} key The key.
+ * @param {function(*)} Callback callback function that is provided with the
+ *     retrieved value.
  */
 Storage.get = function(key, callback) {
   chrome.extension.sendRequest({operation: 'get', key: key}, callback);
@@ -69,8 +69,8 @@ Storage.canSet = function() {
 
 /**
  * Store a value based on a key.
- * @param {string} key the key.
- * @param {*} value the value.
+ * @param {string} key The key.
+ * @param {*} value The value.
  */
 Storage.set = function(key, value) {
   chrome.extension.sendRequest({operation: 'set', key: key, value: value});

@@ -52,7 +52,7 @@ Frames.hideAllPackagesFrame = function() {
 /**
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will not be opened.
- * @param {string} url the URL to open.
+ * @param {string} url The URL to open.
  */
 Frames.openLinkInSummaryFrame = function(url) {
   if (window.top !== window) {
@@ -64,7 +64,7 @@ Frames.openLinkInSummaryFrame = function(url) {
 /**
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will be opened in a new tab or window.
- * @param {string} url the URL to open.
+ * @param {string} url The URL to open.
  */
 Frames.openLinkInSummaryFrameOrNewTab = function(url) {
   if (window.top !== window) {
@@ -77,7 +77,7 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
 
 /**
  * Open the given URL in a new tab.
- * @param {string} url the URL to open.
+ * @param {string} url The URL to open.
  */
 Frames.openLinkInNewTab = function(url) {
   chrome.extension.sendRequest(

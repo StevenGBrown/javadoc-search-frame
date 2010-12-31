@@ -66,7 +66,7 @@ Frames.hideAllPackagesFrame = function() {
 /**
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will not be opened.
- * @param {string} url the URL to open.
+ * @param {string} url The URL to open.
  */
 Frames.openLinkInSummaryFrame = function(url) {
   var summaryFrame = Frames._getFrame('classFrame');
@@ -79,7 +79,7 @@ Frames.openLinkInSummaryFrame = function(url) {
 /**
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will be opened in a new tab or window.
- * @param {string} url the URL to open.
+ * @param {string} url The URL to open.
  */
 Frames.openLinkInSummaryFrameOrNewTab = function(url) {
   var summaryFrame = Frames._getFrame('classFrame');
@@ -93,7 +93,7 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
 
 /**
  * Open the given URL in a new tab.
- * @param {string} url the URL to open.
+ * @param {string} url The URL to open.
  */
 Frames.openLinkInNewTab = function(url) {
   window.open(url);
@@ -103,8 +103,8 @@ Frames.openLinkInNewTab = function(url) {
 /**
  * Get the frame with the given name. This frame will share a parent with the
  * current frame.
- * @param {string} name the name.
- * @return {DOMWindow} the frame, or null if it could not be found.
+ * @param {string} name The name.
+ * @return {DOMWindow} The frame, or null if it could not be found.
  */
 Frames._getFrame = function(name) {
   if (Frames.siblingFramesByName[name]) {
