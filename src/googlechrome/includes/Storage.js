@@ -1,7 +1,7 @@
 /**
  * The MIT License
  *
- * Copyright (c) 2010 Steven G. Brown
+ * Copyright (c) 2011 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  *
  * Permission is hereby granted, free of charge, to any person
@@ -51,7 +51,7 @@ Storage.canGet = function() {
 /**
  * Retrieve a value based on a key.
  * @param {string} key The key.
- * @param {function(*)} Callback callback function that is provided with the
+ * @param {function(*)} callback Callback function that is provided with the
  *     retrieved value.
  */
 Storage.get = function(key, callback) {
