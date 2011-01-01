@@ -1,7 +1,7 @@
 /**
  * The MIT License
  *
- * Copyright (c) 2010 Steven G. Brown
+ * Copyright (c) 2011 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  *
  * Permission is hereby granted, free of charge, to any person
@@ -49,17 +49,6 @@ function main() {
   if (document.location.hash === '#JavadocSearchFrameOptions') {
     OptionsPageGenerator.generate();
     return;
-  }
-
-  var isGoogleChromeVersionOne =
-      navigator.userAgent.toLowerCase().indexOf('chrome/1') !== -1;
-  if (isGoogleChromeVersionOne) {
-    // Google Chrome version 1 ignores the @include metadata tag, so check that
-    // this is the correct document.
-    if (!endsWith(document.location.toString(), '/allclasses-frame.html') &&
-        !endsWith(document.location.toString(), '/package-frame.html')) {
-      return;
-    }
   }
 
   updateMenuOption(Option.CLASS_MENU);
