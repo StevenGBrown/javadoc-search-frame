@@ -1,7 +1,7 @@
 /**
  * The MIT License
  *
- * Copyright (c) 2010 Steven G. Brown
+ * Copyright (c) 2011 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  *
  * Permission is hereby granted, free of charge, to any person
@@ -31,6 +31,13 @@
  * Entry point of this script; called when the script has loaded.
  */
 function main() {
+
+  // Wait for the onload event. If the script runs too early, it will not see
+  // the document contents (the class anchors).
+  if (document.readyState !== 'complete') {
+    window.addEventListener('load', main, false);
+    return;
+  }
 
   // Version of this script. This value is set by the build script.
   var version = #INCLUDE version#;
