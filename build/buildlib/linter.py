@@ -1,7 +1,7 @@
 """
 The MIT License
 
-Copyright (c) 2010 Steven G. Brown
+Copyright (c) 2011 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import os, sys
+import os, sys, traceback
 from subprocess import *
 
 
@@ -40,7 +40,10 @@ def linter():
 
   srcPath = os.path.abspath(os.path.join(sys.path[0], '..', 'src'))
   args = ['gjslint', '-r', srcPath, '--strict', '--check_html']
-  proc = Popen(args, stdout=PIPE, stderr=STDOUT)
-  output = proc.communicate()[0]
-  if proc.returncode != 0:
-    print(output.decode())
+  try:
+    proc = Popen(args, stdout=PIPE, stderr=STDOUT)
+    output = proc.communicate()[0]
+    if proc.returncode != 0:
+      print(output.decode())
+  except:
+    traceback.print_exc(file=sys.stdout)
