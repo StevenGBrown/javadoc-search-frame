@@ -46,7 +46,7 @@ def insertValue(variableName, variableValue):
   return insertValueTransformation
 
 
-def insertExternalFiles(includesDirectories):
+def insertExternalFiles(*includesDirectories):
   '''
   Return a function that will transform the script contents by including the
   contents of external files. For example, if the script contains the line:
