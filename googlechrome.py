@@ -1,7 +1,7 @@
 """
 The MIT License
 
-Copyright (c) 2010 Steven G. Brown
+Copyright (c) 2011 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -79,7 +79,7 @@ def readVersionFromManifest():
   """
 
   manifestPath = os.path.join(
-      sys.path[0], '..', 'src', 'googlechrome', 'manifest.json')
+      sys.path[0], 'src', 'googlechrome', 'manifest.json')
   with io.open(manifestPath) as manifestFile:
     return json.loads(manifestFile.read())['version']
 
