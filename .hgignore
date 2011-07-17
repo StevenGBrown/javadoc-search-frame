@@ -1,3 +1,4 @@
-glob:*.pyc
-glob:.*.swp
-glob:*~
+syntax: glob
+*.pyc
+.*.swp
+*~
