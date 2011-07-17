@@ -28,17 +28,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import sys, traceback
+import os, sys, traceback
 from subprocess import *
 
 
-def linter(path):
+def linter(path, linterPath=''):
   '''
   Inspect the given path with Closure Linter and log any warnings to the
   console. http://code.google.com/p/closure-linter/
   '''
 
-  args = ['gjslint', '-r', path, '--strict', '--check_html']
+  gjslint = os.path.join(linterPath, 'gjslint')
+  args = [gjslint, '-r', path, '--strict', '--check_html']
   try:
     proc = Popen(args, stdout=PIPE, stderr=STDOUT)
     output = proc.communicate()[0]
