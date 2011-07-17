@@ -28,16 +28,16 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import datetime, io, os, sys
+import datetime, io, optparse, os, sys
 from buildlib.file_copy import *
 from buildlib.linter import *
 from buildlib.transformations import *
 
 
-def main():
+def main(linterPath=None):
   '''Package the sources into a user script and a Google Chrome extension.'''
 
-  linter(source())
+  linter(source(), linterPath=linterPath)
 
   with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
     version = f.read().strip()
@@ -101,4 +101,9 @@ def target(path=''):
 
 
 if __name__ == '__main__':
-  main()
+  parser = optparse.OptionParser()
+  parser.add_option('--linter',
+      help='directory containing the Closure Linter executable ' +
+           '(default: use the system path)')
+  (options, args) = parser.parse_args()
+  main(linterPath=options.linter)
