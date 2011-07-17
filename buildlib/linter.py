@@ -1,4 +1,4 @@
-"""
+'''
 The MIT License
 
 Copyright (c) 2011 Steven G. Brown
@@ -23,7 +23,7 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-"""
+'''
 
 
 # Developed with Python v3.0.1
@@ -33,10 +33,10 @@ from subprocess import *
 
 
 def linter():
-  """
+  '''
   Inspect the source code with Closure Linter and log any warnings to the
   console. http://code.google.com/p/closure-linter/
-  """
+  '''
 
   srcPath = os.path.abspath(os.path.join(sys.path[0], 'src'))
   args = ['gjslint', '-r', srcPath, '--strict', '--check_html']

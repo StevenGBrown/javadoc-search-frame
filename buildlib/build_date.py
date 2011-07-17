@@ -1,7 +1,7 @@
-"""
+'''
 The MIT License
 
-Copyright (c) 2010 Steven G. Brown
+Copyright (c) 2011 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -23,7 +23,7 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-"""
+'''
 
 
 # Developed with Python v3.0.1
@@ -35,19 +35,19 @@ scriptBuildDate = datetime.date.today()
 
 
 def buildDate():
-  """Return the build date."""
+  '''Return the build date.'''
 
   return scriptBuildDate
 
 
 def buildYear():
-  """Return the year component of the build date."""
+  '''Return the year component of the build date.'''
 
   return buildDate().strftime('%Y')
 
 
 def formattedBuildDate():
-  """Return the build date in a human-readable format."""
+  '''Return the build date in a human-readable format.'''
 
   formattedBuildDate = buildDate().strftime(
       '%d' + _getOrdinalIndicator(buildDate().day) + ' %B %Y')
@@ -57,13 +57,13 @@ def formattedBuildDate():
 
 
 def formattedBuildDateISO():
-  """Return the build date in ISO YYYYMMDD format."""
+  '''Return the build date in ISO YYYYMMDD format.'''
 
   return buildDate().strftime('%Y%m%d')
 
 
 def _getOrdinalIndicator(number):
-  """Return the ordinal indicator for the given number."""
+  '''Return the ordinal indicator for the given number.'''
 
   if (number < 10 or number > 20):
     leastSignificantDigit = number % 10

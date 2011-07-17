@@ -1,4 +1,4 @@
-"""
+'''
 The MIT License
 
 Copyright (c) 2011 Steven G. Brown
@@ -23,7 +23,7 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-"""
+'''
 
 
 # Developed with Python v3.0.1
@@ -32,13 +32,13 @@ import io, os, re, sys
 
 
 def insertValue(variableName, variableValue):
-  """
+  '''
   Return a function that will transform the script contents by replacing an
   inline #INCLUDE tag with variableValue. For example, if this function is
   called with variableName='version' and variableValue='1.0', then any
   occurances of '#INCLUDE version' in the given script will be replaced with
   '1.0'.
-  """
+  '''
 
   def insertValueTransformation(fileContents):
     return re.sub(r'#INCLUDE ' + variableName + '#', variableValue, fileContents)
@@ -47,14 +47,14 @@ def insertValue(variableName, variableValue):
 
 
 def insertExternalFiles(includesDirectories):
-  """
+  '''
   Return a function that will transform the script contents by including the
   contents of external files. For example, if the script contains the line:
   '#INCLUDE Frames.js;', then the file 'Frames.js' will be found in one of the
   includes directories and inserted in this location. If the inserted file has
   a license header, it will be removed. If the file to be inserted cannot be
   found, a ValueError will be thrown.
-  """
+  '''
 
   includesDirectories = [
       os.path.abspath(os.path.join(sys.path[0], 'src', directory))
@@ -86,10 +86,10 @@ def insertExternalFiles(includesDirectories):
 
 
 def _findFile(searchDirectories, filename):
-  """
+  '''
   Find a file in the given list of search directories. If found, the absolute
   path to this file will be returned. Otherwise, a ValueError will be thrown.
-  """
+  '''
 
   for directory in searchDirectories:
     absolutePath = os.path.join(directory, filename)
@@ -99,9 +99,9 @@ def _findFile(searchDirectories, filename):
 
 
 def _removeLicenseHeader(scriptContents):
-  """
+  '''
   Return the given script contents with the license header removed.
-  """
+  '''
 
   licenseHeaderRegex = re.compile(r'^.*?\n\s\*/\n\n\s*(.*)', re.DOTALL)
   licenseHeaderMatch = licenseHeaderRegex.match(scriptContents)
@@ -111,10 +111,10 @@ def _removeLicenseHeader(scriptContents):
 
 
 def prepend(filePath):
-  """
+  '''
   Return a function that will transform the script contents by prepending the
   contents of the given file.
-  """
+  '''
 
   absFilePath = os.path.abspath(os.path.join(sys.path[0], 'src', filePath))
   with io.open(absFilePath) as fileToPrepend:
