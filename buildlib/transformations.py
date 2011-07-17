@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import io, os, re, sys
+import io, os, re
 
 
 def insertValue(includeTagName, value):

@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import distutils.dir_util, fnmatch, io, os, shutil, sys
+import distutils.dir_util, fnmatch, io, os, shutil
 
 
 def copyFile(name, fromDir, toDir, transformations=()):
