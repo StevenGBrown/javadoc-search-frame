@@ -55,7 +55,7 @@ def insertExternalFiles(*includesDirectories):
   found, a ValueError will be thrown.
   '''
 
-  includesRegex = re.compile(r'^#INCLUDE ([^;]*);$', re.MULTILINE)
+  includesRegex = re.compile(r'^\s*#INCLUDE ([^;]*);$', re.MULTILINE)
 
   def insertExternalFilesTransformation(fileContents):
     while True:
