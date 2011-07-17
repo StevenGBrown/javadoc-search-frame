@@ -5,7 +5,7 @@
 // @copyright     #INCLUDE buildYear#, Steven G. Brown (http://code.google.com/p/javadoc-search-frame)
 // @copyright     2006, KOSEKI Kengo (http://www.teria.com/~koseki/tools/gm/javadoc_isearch/index.html)
 // @license       MIT License; http://www.opensource.org/licenses/mit-license.php
-// @version       #INCLUDE unquotedBuildDate#
+// @version       #INCLUDE version#
 // @include       */allclasses-frame.html
 // @include       */allclasses-frame.html#JavadocSearchFrameOptions
 // @include       */package-frame.html

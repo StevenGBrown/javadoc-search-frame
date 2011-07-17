@@ -28,15 +28,14 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import io, json, sys
-from buildlib.build_date import *
+import datetime, io, json, os, sys
 from buildlib.file_copy import *
 from buildlib.linter import *
 from buildlib.paths import *
 from buildlib.transformations import *
 
 
-def buildGreasemonkeyUserScript():
+def buildGreasemonkeyUserScript(version, buildYear):
   '''
   Build the Javadoc Search Frame user script for Greasemonkey.
   This script will be created in the current working directory.
@@ -44,22 +43,21 @@ def buildGreasemonkeyUserScript():
 
   copyAndRenameFile(
     fromPath=source('greasemonkey/allclasses-frame.js'),
-    toPath='javadoc_search_frame_' + formattedBuildDateISO() + '.user.js',
+    toPath='javadoc_search_frame_' + version.replace('.', '_') + '.user.js',
     transformations=(
       prepend(source('greasemonkey/metadata_block.txt')),
-      insertValue('unquotedBuildDate', formattedBuildDate()),
+      insertValue('version', version),
       insertExternalFiles([
           source('common/_locales/en'),
           source('common/includes'),
           source('greasemonkey/includes')
       ]),
-      insertValue('buildDate', '\'' + formattedBuildDate() + '\''),
-      insertValue('buildYear', buildYear())
+      insertValue('buildYear', buildYear)
     )
   )
 
 
-def buildGoogleChromeExtension():
+def buildGoogleChromeExtension(version, buildYear):
   '''
   Build the Javadoc Search Frame extension for Google Chrome.
   This extension will be created in the current working directory.
@@ -74,9 +72,8 @@ def buildGoogleChromeExtension():
           source('common/includes'),
           source('googlechrome/includes')
       ]),
-      insertValue('version', '\'' + readVersionFromManifest() + '\''),
-      insertValue('buildDate', '\'' + formattedBuildDate() + '\''),
-      insertValue('buildYear', buildYear())
+      insertValue('version', version),
+      insertValue('buildYear', buildYear)
     )
   )
 
@@ -86,13 +83,19 @@ def buildGoogleChromeExtension():
           source('common/includes'),
           source('googlechrome/includes')
       ]),
-      insertValue('buildYear', buildYear())
+      insertValue('buildYear', buildYear)
+    )
+  )
+
+  copyFile(name='manifest.json', fromDir=source('googlechrome'), toDir='.',
+    transformations=(
+      insertValue('version', version),
     )
   )
 
   copyFiles(
     names=('background.html', 'collect-class-members-and-keywords.js',
-           'hide-packages-frame.js', 'manifest.json', 'options.html'),
+           'hide-packages-frame.js', 'options.html'),
     fromDir=source('googlechrome'), toDir='.'
   )
 
@@ -114,7 +117,20 @@ def readVersionFromManifest():
     return json.loads(manifestFile.read())['version']
 
 
+def version():
+  '''Retrieve the version number.'''
+  with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
+    return f.read().strip()
+
+
+def buildYear():
+  '''Return the year component of the build date.'''
+  return datetime.date.today().strftime('%Y')
+
+
 if __name__ == '__main__':
   linter(source())
-  buildGreasemonkeyUserScript()
-  buildGoogleChromeExtension()
+  version = version()
+  buildYear = buildYear()
+  buildGreasemonkeyUserScript(version, buildYear)
+  buildGoogleChromeExtension(version, buildYear)
