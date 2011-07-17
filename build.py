@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import datetime, io, json, os, sys
+import datetime, io, os, sys
 from buildlib.file_copy import *
 from buildlib.linter import *
 from buildlib.transformations import *
