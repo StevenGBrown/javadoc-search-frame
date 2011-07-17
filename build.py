@@ -1,4 +1,4 @@
-"""
+'''
 The MIT License
 
 Copyright (c) 2011 Steven G. Brown
@@ -23,7 +23,7 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-"""
+'''
 
 
 # Developed with Python v3.0.1
@@ -36,10 +36,10 @@ from buildlib.transformations import *
 
 
 def buildGreasemonkeyUserScript():
-  """
+  '''
   Build the Javadoc Search Frame user script for Greasemonkey.
   This script will be created in the current working directory.
-  """
+  '''
 
   copyAndRenameFile(
     fromPath='greasemonkey/allclasses-frame.js',
@@ -56,10 +56,10 @@ def buildGreasemonkeyUserScript():
 
 
 def buildGoogleChromeExtension():
-  """
+  '''
   Build the Javadoc Search Frame extension for Google Chrome.
   This extension will be created in the current working directory.
-  """
+  '''
 
   copyFile(name='allclasses-frame.js', fromDir='googlechrome', toDir='.',
     transformations=(
@@ -92,9 +92,9 @@ def buildGoogleChromeExtension():
 
 
 def readVersionFromManifest():
-  """
+  '''
   Read and return the script version from the extension manifest.
-  """
+  '''
 
   manifestPath = os.path.join(
       sys.path[0], 'src', 'googlechrome', 'manifest.json')
@@ -102,7 +102,7 @@ def readVersionFromManifest():
     return json.loads(manifestFile.read())['version']
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   linter()
   buildGreasemonkeyUserScript()
   buildGoogleChromeExtension()
