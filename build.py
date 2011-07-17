@@ -44,12 +44,12 @@ def buildGreasemonkeyUserScript(version, buildYear):
                   version.replace('.', '_') + '.user.js'),
     transformations=(
       prepend(source('greasemonkey/metadata_block.txt')),
-      insertValue('version', version),
       insertExternalFiles(
           source('common/_locales/en'),
           source('common/includes'),
           source('greasemonkey/includes')
       ),
+      insertValue('version', version),
       insertValue('buildYear', buildYear)
     )
   )
