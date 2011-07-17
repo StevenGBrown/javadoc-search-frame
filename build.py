@@ -31,7 +31,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 import datetime, io, json, os, sys
 from buildlib.file_copy import *
 from buildlib.linter import *
-from buildlib.paths import *
 from buildlib.transformations import *
 
 
@@ -87,6 +86,18 @@ def main():
     fromDir=source('common/_locales'),
     toDir=target('googlechrome/_locales')
   )
+
+
+def source(path=''):
+  '''Return a path under the source directory.'''
+
+  return os.path.abspath(os.path.join(sys.path[0], 'src', path))
+
+
+def target(path=''):
+  '''Return a path under the target directory.'''
+
+  return os.path.abspath(os.path.join(sys.path[0], 'target', path))
 
 
 if __name__ == '__main__':
