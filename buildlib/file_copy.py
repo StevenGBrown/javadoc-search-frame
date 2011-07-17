@@ -33,12 +33,9 @@ import distutils.dir_util, fnmatch, io, os, shutil, sys
 
 def copyFile(name, fromDir, toDir, transformations=()):
   '''
-  Copy a single file.
-  name: Name of the file.
-  fromDir: Directory containing the file, relative to the source directory.
-  toDir: Directory to copy this file to, relative to the current directory.
-  transformations: Transformations to apply the contents of this file during
-                   the copy operation (the original file will be unchanged).
+  Copy the file with the given name from the source directory to the
+  destination directory, applying the given transformations to the file
+  contents.
   '''
 
   fromPath = os.path.join(fromDir, name)
@@ -48,12 +45,9 @@ def copyFile(name, fromDir, toDir, transformations=()):
 
 def copyFiles(names, fromDir, toDir, transformations=()):
   '''
-  Copy multiple files.
-  names: Names of the files.
-  fromDir: Directory containing the file, relative to the source directory.
-  toDir: Directory to copy this file to, relative to the current directory.
-  transformations: Transformations to apply the contents of this file during
-                   the copy operation (the original file will be unchanged).
+  Copy the files with the given names from the source directory to the
+  destination directory, applying the given transformations to the file
+  contents.
   '''
 
   for name in names:
@@ -62,39 +56,30 @@ def copyFiles(names, fromDir, toDir, transformations=()):
 
 def copyAndRenameFile(fromPath, toPath, transformations=()):
   '''
-  Copy and rename a single file.
-  fromPath: Path to the file.
-  toPath: Path to copy this file to, relative to the current directory.
-  transformations: Transformations to apply the contents of this file during
-                   the copy operation (the original file will be unchanged).
+  Copy and rename a single file, applying the given transformations to the
+  file contents.
   '''
 
-  absToPath = os.path.abspath(toPath)
-  absToPathDir = os.path.dirname(absToPath)
-  distutils.dir_util.mkpath(absToPathDir)
+  toPathDir = os.path.dirname(toPath)
+  distutils.dir_util.mkpath(toPathDir)
   if len(transformations) is 0:
-    shutil.copy(fromPath, absToPathDir)
+    shutil.copy(fromPath, toPathDir)
   else:
     with io.open(fromPath) as fromFile:
       fileContents = fromFile.read()
     for transformation in transformations:
       fileContents = transformation(fileContents)
-    with io.open(absToPath, 'w', newline='\n') as toFile:
+    with io.open(toPath, 'w', newline='\n') as toFile:
       toFile.write(fileContents)
 
 
 def copyDir(fromDir, toDir):
-  '''
-  Copy a directory.
-  fromDir: Directory to copy.
-  toDir: Location to copy this directory to, relative to the current directory.
-  '''
+  '''Copy a directory.'''
 
-  absToDir = os.path.abspath(toDir)
   for root, dirs, files in os.walk(fromDir):
     for file in [f for f in files if not _junkFile(f)]:
       sourceFile = os.path.join(root, file)
-      targetFile = os.path.join(absToDir,
+      targetFile = os.path.join(toDir,
           os.path.relpath(sourceFile, fromDir))
       targetFileDir = os.path.dirname(targetFile)
       if not os.path.isdir(targetFileDir):
@@ -103,10 +88,7 @@ def copyDir(fromDir, toDir):
 
 
 def _junkFile(fileName):
-  '''
-  Determine whether the given path points to a junk file.
-  filename: The file name path to test.
-  '''
+  '''Determine whether the given path points to a junk file.'''
 
   patterns = [
     '.*.swp', # Vim swap file.

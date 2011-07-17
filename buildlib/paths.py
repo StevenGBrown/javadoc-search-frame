@@ -34,3 +34,8 @@ import os, sys
 def source(path=''):
   '''Return a path under the source directory.'''
   return os.path.abspath(os.path.join(sys.path[0], 'src', path))
+
+
+def target(path=''):
+  '''Return a path under the target directory.'''
+  return os.path.abspath(os.path.join(sys.path[0], 'target', path))
