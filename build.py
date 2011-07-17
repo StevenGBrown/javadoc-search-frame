@@ -35,9 +35,17 @@ from buildlib.paths import *
 from buildlib.transformations import *
 
 
-def buildGreasemonkeyUserScript(version, buildYear):
-  '''Build the Javadoc Search Frame user script for Greasemonkey.'''
+def main():
+  '''Package the sources into a user script and a Google Chrome extension.'''
 
+  linter(source())
+
+  with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
+    version = f.read().strip()
+
+  buildYear = datetime.date.today().strftime('%Y')
+
+  # Greasemonkey user script
   copyAndRenameFile(
     fromPath=source('greasemonkey/allclasses-frame.js'),
     toPath=target('greasemonkey/javadoc_search_frame_' +
@@ -54,10 +62,7 @@ def buildGreasemonkeyUserScript(version, buildYear):
     )
   )
 
-
-def buildGoogleChromeExtension(version, buildYear):
-  '''Build the Javadoc Search Frame extension for Google Chrome.'''
-
+  # Google Chrome extension
   copyFiles(
     names=('allclasses-frame.js', 'background.html',
            'collect-class-members-and-keywords.js', 'hide-packages-frame.js',
@@ -73,35 +78,16 @@ def buildGoogleChromeExtension(version, buildYear):
       insertValue('buildYear', buildYear)
     )
   )
-
   copyFiles(
     names=('icon16.png', 'icon32.png', 'icon48.png', 'icon128.png'),
     fromDir=source('googlechrome/icons'),
     toDir=target('googlechrome/icons')
   )
-
   copyDir(
     fromDir=source('common/_locales'),
     toDir=target('googlechrome/_locales')
   )
 
 
-def version():
-  '''Retrieve the version number.'''
-
-  with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
-    return f.read().strip()
-
-
-def buildYear():
-  '''Return the year component of the build date.'''
-
-  return datetime.date.today().strftime('%Y')
-
-
 if __name__ == '__main__':
-  linter(source())
-  version = version()
-  buildYear = buildYear()
-  buildGreasemonkeyUserScript(version, buildYear)
-  buildGoogleChromeExtension(version, buildYear)
+  main()
