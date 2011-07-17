@@ -104,16 +104,14 @@ def _removeLicenseHeader(scriptContents):
   return scriptContents
 
 
-def prepend(filePath):
+def prepend(fileToPrepend):
   '''
   Return a function that will transform the script contents by prepending the
   contents of the given file.
   '''
 
-  with io.open(filePath) as fileToPrepend:
-    fileToPrependContents = fileToPrepend.read()
-
   def prependTransformation(fileContents):
-    return fileToPrependContents + '\n' + fileContents
+    with io.open(fileToPrepend) as f:
+      return f.read() + '\n' + fileContents
 
   return prependTransformation
