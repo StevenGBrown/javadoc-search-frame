@@ -62,7 +62,7 @@ def copyAndRenameFile(fromPath, toPath, transformations=()):
 
   toPathDir = os.path.dirname(toPath)
   distutils.dir_util.mkpath(toPathDir)
-  if len(transformations) is 0:
+  if len(transformations) == 0:
     shutil.copy(fromPath, toPathDir)
   else:
     with io.open(fromPath) as fromFile:
