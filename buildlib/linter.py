@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import os, sys, traceback
+import sys, traceback
 from subprocess import *
 
 
