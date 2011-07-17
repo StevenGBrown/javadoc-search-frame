@@ -45,11 +45,11 @@ def buildGreasemonkeyUserScript(version, buildYear):
     transformations=(
       prepend(source('greasemonkey/metadata_block.txt')),
       insertValue('version', version),
-      insertExternalFiles([
+      insertExternalFiles(
           source('common/_locales/en'),
           source('common/includes'),
           source('greasemonkey/includes')
-      ]),
+      ),
       insertValue('buildYear', buildYear)
     )
   )
@@ -65,10 +65,10 @@ def buildGoogleChromeExtension(version, buildYear):
     fromDir=source('googlechrome'),
     toDir=target('googlechrome'),
     transformations=(
-      insertExternalFiles([
+      insertExternalFiles(
           source('common/includes'),
           source('googlechrome/includes')
-      ]),
+      ),
       insertValue('version', version),
       insertValue('buildYear', buildYear)
     )
