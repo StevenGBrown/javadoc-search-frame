@@ -36,14 +36,12 @@ from buildlib.transformations import *
 
 
 def buildGreasemonkeyUserScript(version, buildYear):
-  '''
-  Build the Javadoc Search Frame user script for Greasemonkey.
-  This script will be created in the current working directory.
-  '''
+  '''Build the Javadoc Search Frame user script for Greasemonkey.'''
 
   copyAndRenameFile(
     fromPath=source('greasemonkey/allclasses-frame.js'),
-    toPath='javadoc_search_frame_' + version.replace('.', '_') + '.user.js',
+    toPath=target('greasemonkey/javadoc_search_frame_' +
+                  version.replace('.', '_') + '.user.js'),
     transformations=(
       prepend(source('greasemonkey/metadata_block.txt')),
       insertValue('version', version),
@@ -58,17 +56,14 @@ def buildGreasemonkeyUserScript(version, buildYear):
 
 
 def buildGoogleChromeExtension(version, buildYear):
-  '''
-  Build the Javadoc Search Frame extension for Google Chrome.
-  This extension will be created in the current working directory.
-  '''
+  '''Build the Javadoc Search Frame extension for Google Chrome.'''
 
   copyFiles(
     names=('allclasses-frame.js', 'background.html',
            'collect-class-members-and-keywords.js', 'hide-packages-frame.js',
            'manifest.json', 'options.js', 'options.html'),
     fromDir=source('googlechrome'),
-    toDir='.',
+    toDir=target('googlechrome'),
     transformations=(
       insertExternalFiles([
           source('common/includes'),
@@ -81,20 +76,26 @@ def buildGoogleChromeExtension(version, buildYear):
 
   copyFiles(
     names=('icon16.png', 'icon32.png', 'icon48.png', 'icon128.png'),
-    fromDir=source('googlechrome/icons'), toDir='icons'
+    fromDir=source('googlechrome/icons'),
+    toDir=target('googlechrome/icons')
   )
 
-  copyDir(fromDir=source('common/_locales'), toDir='_locales')
+  copyDir(
+    fromDir=source('common/_locales'),
+    toDir=target('googlechrome/_locales')
+  )
 
 
 def version():
   '''Retrieve the version number.'''
+
   with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
     return f.read().strip()
 
 
 def buildYear():
   '''Return the year component of the build date.'''
+
   return datetime.date.today().strftime('%Y')
 
 
