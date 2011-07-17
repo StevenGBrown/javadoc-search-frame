@@ -63,21 +63,19 @@ def copyFiles(names, fromDir, toDir, transformations=()):
 def copyAndRenameFile(fromPath, toPath, transformations=()):
   '''
   Copy and rename a single file.
-  fromPath: Path to the file, relative to the source directory.
+  fromPath: Path to the file.
   toPath: Path to copy this file to, relative to the current directory.
   transformations: Transformations to apply the contents of this file during
                    the copy operation (the original file will be unchanged).
   '''
 
-  absFromPath = os.path.abspath(
-      os.path.join(sys.path[0], 'src', fromPath))
   absToPath = os.path.abspath(toPath)
   absToPathDir = os.path.dirname(absToPath)
   distutils.dir_util.mkpath(absToPathDir)
   if len(transformations) is 0:
-    shutil.copy(absFromPath, absToPathDir)
+    shutil.copy(fromPath, absToPathDir)
   else:
-    with io.open(absFromPath) as fromFile:
+    with io.open(fromPath) as fromFile:
       fileContents = fromFile.read()
     for transformation in transformations:
       fileContents = transformation(fileContents)
@@ -88,18 +86,16 @@ def copyAndRenameFile(fromPath, toPath, transformations=()):
 def copyDir(fromDir, toDir):
   '''
   Copy a directory.
-  fromDir: Directory to copy, relative to the source directory.
+  fromDir: Directory to copy.
   toDir: Location to copy this directory to, relative to the current directory.
   '''
 
-  absFromDir = os.path.abspath(
-      os.path.join(sys.path[0], 'src', fromDir))
   absToDir = os.path.abspath(toDir)
-  for root, dirs, files in os.walk(absFromDir):
+  for root, dirs, files in os.walk(fromDir):
     for file in [f for f in files if not _junkFile(f)]:
       sourceFile = os.path.join(root, file)
       targetFile = os.path.join(absToDir,
-          os.path.relpath(sourceFile, absFromDir))
+          os.path.relpath(sourceFile, fromDir))
       targetFileDir = os.path.dirname(targetFile)
       if not os.path.isdir(targetFileDir):
         os.makedirs(targetFileDir)
