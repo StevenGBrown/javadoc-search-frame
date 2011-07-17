@@ -1,7 +1,7 @@
 """
 The MIT License
 
-Copyright (c) 2010 Steven G. Brown
+Copyright (c) 2011 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -57,7 +57,7 @@ def insertExternalFiles(includesDirectories):
   """
 
   includesDirectories = [
-      os.path.abspath(os.path.join(sys.path[0], '..', 'src', directory))
+      os.path.abspath(os.path.join(sys.path[0], 'src', directory))
       for directory in includesDirectories
   ]
 
@@ -116,7 +116,7 @@ def prepend(filePath):
   contents of the given file.
   """
 
-  absFilePath = os.path.abspath(os.path.join(sys.path[0], '..', 'src', filePath))
+  absFilePath = os.path.abspath(os.path.join(sys.path[0], 'src', filePath))
   with io.open(absFilePath) as fileToPrepend:
     fileToPrependContents = fileToPrepend.read()
 

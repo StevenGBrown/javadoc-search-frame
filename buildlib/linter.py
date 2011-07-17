@@ -38,7 +38,7 @@ def linter():
   console. http://code.google.com/p/closure-linter/
   """
 
-  srcPath = os.path.abspath(os.path.join(sys.path[0], '..', 'src'))
+  srcPath = os.path.abspath(os.path.join(sys.path[0], 'src'))
   args = ['gjslint', '-r', srcPath, '--strict', '--check_html']
   try:
     proc = Popen(args, stdout=PIPE, stderr=STDOUT)

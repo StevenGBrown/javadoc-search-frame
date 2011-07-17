@@ -1,7 +1,7 @@
 """
 The MIT License
 
-Copyright (c) 2010 Steven G. Brown
+Copyright (c) 2011 Steven G. Brown
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -70,7 +70,7 @@ def copyAndRenameFile(fromPath, toPath, transformations=()):
   """
 
   absFromPath = os.path.abspath(
-      os.path.join(sys.path[0], '..', 'src', fromPath))
+      os.path.join(sys.path[0], 'src', fromPath))
   absToPath = os.path.abspath(toPath)
   absToPathDir = os.path.dirname(absToPath)
   distutils.dir_util.mkpath(absToPathDir)
@@ -93,7 +93,7 @@ def copyDir(fromDir, toDir):
   """
 
   absFromDir = os.path.abspath(
-      os.path.join(sys.path[0], '..', 'src', fromDir))
+      os.path.join(sys.path[0], 'src', fromDir))
   absToDir = os.path.abspath(toDir)
   for root, dirs, files in os.walk(absFromDir):
     for file in [f for f in files if not _junkFile(f)]:
