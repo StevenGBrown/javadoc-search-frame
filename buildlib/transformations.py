@@ -31,17 +31,16 @@ OTHER DEALINGS IN THE SOFTWARE.
 import io, os, re, sys
 
 
-def insertValue(variableName, variableValue):
+def insertValue(includeTagName, value):
   '''
   Return a function that will transform the script contents by replacing an
-  inline #INCLUDE tag with variableValue. For example, if this function is
-  called with variableName='version' and variableValue='1.0', then any
-  occurances of '#INCLUDE version' in the given script will be replaced with
-  '1.0'.
+  inline #INCLUDE tag with the given value. For example, if this function is
+  called with includeTagName='version' and value='1.0', then any occurances of
+  '#INCLUDE version' in the given script will be replaced with '1.0'.
   '''
 
   def insertValueTransformation(fileContents):
-    return re.sub(r'#INCLUDE ' + variableName + '#', variableValue, fileContents)
+    return fileContents.replace('#INCLUDE ' + includeTagName + '#', value)
 
   return insertValueTransformation
 
