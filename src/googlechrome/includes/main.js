@@ -40,14 +40,11 @@ function main() {
   }
 
   // Version of this script. This value is set by the build script.
-  var version = #INCLUDE version#;
-
-  // Build date of this script. This value is set by the build script.
-  var buildDate = #INCLUDE buildDate#;
+  var version = '#INCLUDE version#';
 
   var startupLogMessage =
       'Javadoc Search Frame (Google Chrome Extension)\n' +
-      'Version ' + version + ', ' + buildDate + '\n' +
+      'Version ' + version + '\n' +
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
