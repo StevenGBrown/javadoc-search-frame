@@ -63,8 +63,10 @@ def buildGoogleChromeExtension(version, buildYear):
   This extension will be created in the current working directory.
   '''
 
-  copyFile(
-    name='allclasses-frame.js',
+  copyFiles(
+    names=('allclasses-frame.js', 'background.html',
+           'collect-class-members-and-keywords.js', 'hide-packages-frame.js',
+           'manifest.json', 'options.js', 'options.html'),
     fromDir=source('googlechrome'),
     toDir='.',
     transformations=(
@@ -77,44 +79,12 @@ def buildGoogleChromeExtension(version, buildYear):
     )
   )
 
-  copyFile(name='options.js', fromDir=source('googlechrome'), toDir='.',
-    transformations=(
-      insertExternalFiles([
-          source('common/includes'),
-          source('googlechrome/includes')
-      ]),
-      insertValue('buildYear', buildYear)
-    )
-  )
-
-  copyFile(name='manifest.json', fromDir=source('googlechrome'), toDir='.',
-    transformations=(
-      insertValue('version', version),
-    )
-  )
-
-  copyFiles(
-    names=('background.html', 'collect-class-members-and-keywords.js',
-           'hide-packages-frame.js', 'options.html'),
-    fromDir=source('googlechrome'), toDir='.'
-  )
-
   copyFiles(
     names=('icon16.png', 'icon32.png', 'icon48.png', 'icon128.png'),
     fromDir=source('googlechrome/icons'), toDir='icons'
   )
 
   copyDir(fromDir=source('common/_locales'), toDir='_locales')
-
-
-def readVersionFromManifest():
-  '''
-  Read and return the script version from the extension manifest.
-  '''
-
-  manifestPath = source('googlechrome/manifest.json')
-  with io.open(manifestPath) as manifestFile:
-    return json.loads(manifestFile.read())['version']
 
 
 def version():
