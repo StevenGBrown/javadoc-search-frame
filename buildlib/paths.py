@@ -1,4 +1,4 @@
-'''
+"""
 The MIT License
 
 Copyright (c) 2011 Steven G. Brown
@@ -23,26 +23,14 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-'''
+"""
 
 
 # Developed with Python v3.0.1
 
-import os, sys, traceback
-from subprocess import *
+import os, sys
 
 
-def linter(path):
-  '''
-  Inspect the given path with Closure Linter and log any warnings to the
-  console. http://code.google.com/p/closure-linter/
-  '''
-
-  args = ['gjslint', '-r', path, '--strict', '--check_html']
-  try:
-    proc = Popen(args, stdout=PIPE, stderr=STDOUT)
-    output = proc.communicate()[0]
-    if proc.returncode != 0:
-      print(output.decode())
-  except:
-    traceback.print_exc(file=sys.stdout)
+def source(path=''):
+  '''Return a path under the source directory.'''
+  return os.path.abspath(os.path.join(sys.path[0], 'src', path))

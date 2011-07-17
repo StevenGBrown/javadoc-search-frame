@@ -32,6 +32,7 @@ import io, json, sys
 from buildlib.build_date import *
 from buildlib.file_copy import *
 from buildlib.linter import *
+from buildlib.paths import *
 from buildlib.transformations import *
 
 
@@ -42,13 +43,16 @@ def buildGreasemonkeyUserScript():
   '''
 
   copyAndRenameFile(
-    fromPath='greasemonkey/allclasses-frame.js',
+    fromPath=source('greasemonkey/allclasses-frame.js'),
     toPath='javadoc_search_frame_' + formattedBuildDateISO() + '.user.js',
     transformations=(
-      prepend('greasemonkey/metadata_block.txt'),
+      prepend(source('greasemonkey/metadata_block.txt')),
       insertValue('unquotedBuildDate', formattedBuildDate()),
-      insertExternalFiles(
-          ['common/_locales/en', 'common/includes', 'greasemonkey/includes']),
+      insertExternalFiles([
+          source('common/_locales/en'),
+          source('common/includes'),
+          source('greasemonkey/includes')
+      ]),
       insertValue('buildDate', '\'' + formattedBuildDate() + '\''),
       insertValue('buildYear', buildYear())
     )
@@ -61,18 +65,27 @@ def buildGoogleChromeExtension():
   This extension will be created in the current working directory.
   '''
 
-  copyFile(name='allclasses-frame.js', fromDir='googlechrome', toDir='.',
+  copyFile(
+    name='allclasses-frame.js',
+    fromDir=source('googlechrome'),
+    toDir='.',
     transformations=(
-      insertExternalFiles(['common/includes', 'googlechrome/includes']),
+      insertExternalFiles([
+          source('common/includes'),
+          source('googlechrome/includes')
+      ]),
       insertValue('version', '\'' + readVersionFromManifest() + '\''),
       insertValue('buildDate', '\'' + formattedBuildDate() + '\''),
       insertValue('buildYear', buildYear())
     )
   )
 
-  copyFile(name='options.js', fromDir='googlechrome', toDir='.',
+  copyFile(name='options.js', fromDir=source('googlechrome'), toDir='.',
     transformations=(
-      insertExternalFiles(['common/includes', 'googlechrome/includes']),
+      insertExternalFiles([
+          source('common/includes'),
+          source('googlechrome/includes')
+      ]),
       insertValue('buildYear', buildYear())
     )
   )
@@ -80,15 +93,15 @@ def buildGoogleChromeExtension():
   copyFiles(
     names=('background.html', 'collect-class-members-and-keywords.js',
            'hide-packages-frame.js', 'manifest.json', 'options.html'),
-    fromDir='googlechrome', toDir='.'
+    fromDir=source('googlechrome'), toDir='.'
   )
 
   copyFiles(
     names=('icon16.png', 'icon32.png', 'icon48.png', 'icon128.png'),
-    fromDir='googlechrome/icons', toDir='icons'
+    fromDir=source('googlechrome/icons'), toDir='icons'
   )
 
-  copyDir(fromDir='common/_locales', toDir='_locales')
+  copyDir(fromDir=source('common/_locales'), toDir='_locales')
 
 
 def readVersionFromManifest():
@@ -96,13 +109,12 @@ def readVersionFromManifest():
   Read and return the script version from the extension manifest.
   '''
 
-  manifestPath = os.path.join(
-      sys.path[0], 'src', 'googlechrome', 'manifest.json')
+  manifestPath = source('googlechrome/manifest.json')
   with io.open(manifestPath) as manifestFile:
     return json.loads(manifestFile.read())['version']
 
 
 if __name__ == '__main__':
-  linter()
+  linter(source())
   buildGreasemonkeyUserScript()
   buildGoogleChromeExtension()

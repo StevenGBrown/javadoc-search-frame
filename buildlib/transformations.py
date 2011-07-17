@@ -56,11 +56,6 @@ def insertExternalFiles(includesDirectories):
   found, a ValueError will be thrown.
   '''
 
-  includesDirectories = [
-      os.path.abspath(os.path.join(sys.path[0], 'src', directory))
-      for directory in includesDirectories
-  ]
-
   includesRegex = re.compile(r'^#INCLUDE ([^;]*);$', re.MULTILINE)
 
   def insertExternalFilesTransformation(fileContents):
@@ -116,8 +111,7 @@ def prepend(filePath):
   contents of the given file.
   '''
 
-  absFilePath = os.path.abspath(os.path.join(sys.path[0], 'src', filePath))
-  with io.open(absFilePath) as fileToPrepend:
+  with io.open(filePath) as fileToPrepend:
     fileToPrependContents = fileToPrepend.read()
 
   def prependTransformation(fileContents):
