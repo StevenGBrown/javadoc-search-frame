@@ -44,6 +44,8 @@ def main(linterPath=None):
 
   buildYear = datetime.date.today().strftime('%Y')
 
+  rmDirectoryContents(target())
+
   # Greasemonkey user script
   copyAndRenameFile(
     fromPath=source('greasemonkey/allclasses-frame.js'),
@@ -98,6 +100,16 @@ def target(path=''):
   '''Return a path under the target directory.'''
 
   return os.path.abspath(os.path.join(sys.path[0], 'target', path))
+
+
+def rmDirectoryContents(dir):
+  '''Remove the contents of the given directory.'''
+
+  for root, dirs, files in os.walk(dir, topdown=False):
+    for name in files:
+      os.remove(os.path.join(root, name))
+    for name in dirs:
+      os.rmdir(os.path.join(root, name))
 
 
 if __name__ == '__main__':
