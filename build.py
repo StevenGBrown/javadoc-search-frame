@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # Developed with Python v3.0.1
 
-import datetime, io, optparse, os, sys
+import datetime, io, optparse, os, sys, zipfile
 from buildlib.file_copy import *
 from buildlib.linter import *
 from buildlib.transformations import *
@@ -88,6 +88,10 @@ def main(linterPath=None):
     fromDir=source('common/_locales'),
     toDir=target('googlechrome/_locales')
   )
+  mkzip(
+    newZipFile=target('googlechrome/javadoc_search_frame.zip'),
+    contentsDir=target('googlechrome')
+  )
 
 
 def source(path=''):
@@ -110,6 +114,19 @@ def rmDirectoryContents(dir):
       os.remove(os.path.join(root, name))
     for name in dirs:
       os.rmdir(os.path.join(root, name))
+
+
+def mkzip(newZipFile, contentsDir):
+  '''Create a zip file containing all files from the given directory.'''
+
+  zipf = zipfile.ZipFile(newZipFile, 'w')
+  try:
+    for dirpath, dirnames, filenames in os.walk(contentsDir):
+      for filename in [os.path.join(dirpath, f) for f in filenames]:
+        if filename != newZipFile:
+          zipf.write(filename, os.path.relpath(filename, contentsDir))
+  finally:
+    zipf.close()
 
 
 if __name__ == '__main__':
