@@ -64,7 +64,7 @@
     "description": "Label displayed on the each button to reset a menu option to the default value."
   },
   "optionsReadOnly": {
-    "message": "Options cannot be configured.",
+    "message": "This browser does not support changing the options.",
     "description": "Error message displayed when the options cannot be configured."
   }
 }
