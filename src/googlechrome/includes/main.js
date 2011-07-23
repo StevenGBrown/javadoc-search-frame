@@ -43,8 +43,7 @@ function main() {
   var version = '#INCLUDE version#';
 
   var startupLogMessage =
-      'Javadoc Search Frame (Google Chrome Extension)\n' +
-      'Version ' + version + '\n' +
+      'Javadoc Search Frame ' + version + ' (Google Chrome Extension)\n' +
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
