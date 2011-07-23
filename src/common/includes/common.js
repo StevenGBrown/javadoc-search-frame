@@ -460,7 +460,7 @@ UnitTestSuite.testFunctionFor('toAbsoluteUrl', function() {
   var api = 'http://java.sun.com/javase/6/docs/api/';
   assertThat('relative to "all classes" url', toAbsoluteUrl(
       'java/applet/AppletContext.html', api + 'allclasses-frame.html'),
-      is(baseUrl + 'java/applet/AppletContext.html'));
+      is(api + 'java/applet/AppletContext.html'));
   assertThat('relative to package url', toAbsoluteUrl(
       'java/applet/AppletContext.html', api + 'java/applet/package-frame.html'),
       is(api + 'java/applet/AppletContext.html'));
