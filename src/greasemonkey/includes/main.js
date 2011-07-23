@@ -58,8 +58,7 @@ function main() {
   var version = '#INCLUDE version#';
 
   var startupLogMessage =
-      'Javadoc Search Frame (Greasemonkey User Script)\n' +
-      'Version ' + version + '\n' +
+      'Javadoc Search Frame ' + version + ' (Greasemonkey User Script)\n' +
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
