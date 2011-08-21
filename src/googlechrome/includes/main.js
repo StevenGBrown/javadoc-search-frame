@@ -32,13 +32,6 @@
  */
 function main() {
 
-  // Wait for the onload event. If the script runs too early, it will not see
-  // the document contents (the class anchors).
-  if (document.readyState !== 'complete') {
-    window.addEventListener('load', main, false);
-    return;
-  }
-
   // Version of this script. This value is set by the build script.
   var version = '#INCLUDE version#';
 
