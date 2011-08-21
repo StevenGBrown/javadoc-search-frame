@@ -1,7 +1,7 @@
 /**
  * The MIT License
  *
- * Copyright (c) 2010 Steven G. Brown
+ * Copyright (c) 2011 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  *
  * Permission is hereby granted, free of charge, to any person
@@ -855,8 +855,7 @@ KeywordLink.prototype.getUrl = function() {
 View = {
   searchField: null,
   contentNodeParent: null,
-  contentNode: null,
-  innerFrame: null
+  contentNode: null
 };
 
 
@@ -923,28 +922,6 @@ View.getSearchFieldValue = function() {
  */
 View.focusOnSearchField = function() {
   View.searchField.focus();
-};
-
-
-/**
- * Add an inner frame with the given URL.
- * @param {string} url The URL.
- */
-View.addInnerFrame = function(url) {
-  View.innerFrame = document.createElement('iframe');
-  document.body.appendChild(View.innerFrame);
-  View.innerFrame.src = url;
-};
-
-
-/**
- * Remove the previously added inner frame.
- */
-View.removeInnerFrame = function() {
-  if (View.innerFrame) {
-    document.body.removeChild(View.innerFrame);
-  }
-  View.innerFrame = null;
 };
 
 
@@ -1903,7 +1880,7 @@ Search._PackagesAndClasses._constructHtml = function() {
  *     that deals with class members and keyword links.
  */
 Search._ClassMembersAndKeywords = {
-  httpRequest: new HttpRequest(View),
+  httpRequest: new HttpRequest(),
 
   keywords: {
     'navbar_top': 1,
