@@ -1,7 +1,7 @@
 /**
  * The MIT License
  *
- * Copyright (c) 2010 Steven G. Brown
+ * Copyright (c) 2011 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  *
  * Permission is hereby granted, free of charge, to any person
@@ -37,15 +37,15 @@
 
 /**
  * Asynchronously loads resources from external URLs.
- * @param {View} view The object responsible for updating the UI.
  * @constructor
  */
-HttpRequest = function(view) {
-  this.view = view;
-  this.port = null;
+HttpRequest = function() {
+  this.xmlHttpRequest = null;
   this.url = null;
   this.loadedResource = null;
-  this.statusMessage = null;
+  this.bytesDownloaded = 0;
+  this.errorMessage = null;
+  this.progressCallback = null;
 };
 
 
@@ -63,40 +63,26 @@ HttpRequest.prototype.load = function(url, progressCallback) {
   }
   this.abort();
   this.url = url;
-
+  this.progressCallback = progressCallback;
   var thisObj = this;
-
-  if (url.indexOf('file://') === 0) {
-    chrome.extension.sendRequest(
-        {
-          operation: 'requestContent',
-          contentUrl: url
-        },
-        function(response) {
-          thisObj.view.removeInnerFrame(url);
-          thisObj.loadedResource = response;
-          progressCallback();
-        }
-    );
-    this.view.addInnerFrame(url);
-    return;
+  try {
+    var xmlHttpRequest = new XMLHttpRequest();
+    xmlHttpRequest.onprogress = function(e) {
+      thisObj._onprogress(e);
+    };
+    xmlHttpRequest.open('GET', url);
+    xmlHttpRequest.onload = function(e) {
+      thisObj._onload(e);
+    };
+    xmlHttpRequest.onerror = function(e) {
+      thisObj._onerror(e);
+    };
+    xmlHttpRequest.overrideMimeType('text/plain; charset=x-user-defined');
+    xmlHttpRequest.send(null);
+  } catch (ex) {
+    thisObj._onexception(ex);
   }
-
-  var connectionInfo = {name: 'httpRequest', httpRequestUrl: url};
-  this.port = chrome.extension.connect(connectionInfo);
-
-  this.port.onMessage.addListener(function(msg) {
-    if (msg.type === 'status') {
-      thisObj.statusMessage = msg.status;
-      progressCallback();
-    }
-    if (msg.type === 'resource') {
-      thisObj.loadedResource = msg.resource;
-      progressCallback();
-    }
-  });
-
-  this.port.postMessage({httpRequestUrl: url});
+  this.xmlHttpRequest = xmlHttpRequest;
 };
 
 
@@ -113,8 +99,17 @@ HttpRequest.prototype.isComplete = function() {
  *     resource.
  */
 HttpRequest.prototype.getStatusMessage = function() {
-  if (this.statusMessage) {
-    return this.statusMessage;
+  if (this.bytesDownloaded === -1) {
+    return this.errorMessage;
+  }
+  if (this.bytesDownloaded > 1048576) {
+    return 'loading... (' + Math.floor(this.bytesDownloaded / 1048576) + ' MB)';
+  }
+  if (this.bytesDownloaded > 1024) {
+    return 'loading... (' + Math.floor(this.bytesDownloaded / 1024) + ' kB)';
+  }
+  if (this.bytesDownloaded > 0) {
+    return 'loading... (' + this.bytesDownloaded + ' bytes)';
   }
   return 'loading...';
 };
@@ -133,11 +128,52 @@ HttpRequest.prototype.getResource = function() {
  * Abort the current anchor load operation.
  */
 HttpRequest.prototype.abort = function() {
-  if (this.port) {
-    this.port.disconnect();
+  if (this.xmlHttpRequest) {
+    this.xmlHttpRequest.abort();
   }
-  this.port = null;
+  this.xmlHttpRequest = null;
   this.url = null;
   this.loadedResource = null;
-  this.statusMessage = null;
+  this.bytesDownloaded = 0;
+  this.errorMessage = null;
+  this.progressCallback = null;
+};
+
+
+/**
+ * @param {Event} e The progress event.
+ */
+HttpRequest.prototype._onprogress = function(e) {
+  this.bytesDownloaded = e.position;
+  this.errorMessage = null;
+  this.progressCallback();
+};
+
+
+/**
+ * @param {Event} e The load event.
+ */
+HttpRequest.prototype._onload = function(e) {
+  this.loadedResource = this.xmlHttpRequest.responseText;
+  this.progressCallback();
+};
+
+
+/**
+ * @param {Event} e The error event.
+ */
+HttpRequest.prototype._onerror = function(e) {
+  this.bytesDownloaded = -1;
+  this.errorMessage = 'ERROR';
+  this.progressCallback();
+};
+
+
+/**
+ * @param {*} ex The exception.
+ */
+HttpRequest.prototype._onexception = function(ex) {
+  this.bytesDownloaded = -1;
+  this.errorMessage = ex;
+  this.progressCallback();
 };
