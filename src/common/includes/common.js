@@ -2247,15 +2247,19 @@ function init(unitTestResultCallback) {
 
     // Initialise stored package and class links.
     var classLinks = getClassLinks(classesInnerHtml);
+    var packageAndClassLinks;
     if (hidePackageFrame) {
       var packageLinks = getPackageLinks(classLinks);
-      ALL_PACKAGE_AND_CLASS_LINKS = packageLinks.concat(classLinks);
+      packageAndClassLinks = packageLinks.concat(classLinks);
     } else {
-      ALL_PACKAGE_AND_CLASS_LINKS = classLinks;
+      packageAndClassLinks = classLinks;
     }
-    if (ALL_PACKAGE_AND_CLASS_LINKS.length === 0) {
-      return false;
+    if (packageAndClassLinks.length === 0) {
+      // Another instance of this script is already running and it has not yet
+      // added the package and class links to the page.
+      return;
     }
+    ALL_PACKAGE_AND_CLASS_LINKS = packageAndClassLinks;
 
     // Initialise class frame.
     View.initialise(EventHandlers);
