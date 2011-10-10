@@ -43,7 +43,7 @@
       "all_frames": true
     }
   ],
-  "minimum_chrome_version": "13.0.782.107",
+  "minimum_chrome_version": "14.0.835.163",
   "options_page": "options.html",
   "permissions": [
     "http://*/*",
