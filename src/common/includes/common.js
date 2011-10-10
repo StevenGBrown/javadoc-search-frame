@@ -1098,10 +1098,10 @@ Query.update = function(searchFieldContents) {
   /*
    * Update the view on a timer (see r204) as a workaround for a Webkit bug:
    * https://bugs.webkit.org/show_bug.cgi?id=34374
-   * 
+   *
    * This workaround is no longer necessary since at least Google Chrome
    * 12.0.742.112 and Safari 5.1.
-   * 
+   *
    * However, it shouldn't be removed, because the script may be running under
    * an older version of Safari. This isn't a problem for Google Chrome, which
    * will only install extensions that are compatible with the browser version.
