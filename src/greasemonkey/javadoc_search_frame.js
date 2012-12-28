@@ -1,7 +1,24 @@
+// ==UserScript==
+// @name          Javadoc Search Frame
+// @namespace     http://userscripts.org/users/46156
+// @description   Javadoc incremental search for packages and classes (Greasemonkey User Script)
+// @copyright     2012, Steven G. Brown (http://code.google.com/p/javadoc-search-frame)
+// @copyright     2006, KOSEKI Kengo (http://www.teria.com/~koseki/tools/gm/javadoc_isearch/index.html)
+// @license       MIT License; http://www.opensource.org/licenses/mit-license.php
+// @version       #INCLUDE version#
+// @include       */allclasses-frame.html
+// @include       */allclasses-frame.html#JavadocSearchFrameOptions
+// @include       */package-frame.html
+// @include       */package-frame.html#JavadocSearchFrameOptions
+// @grant         GM_getValue
+// @grant         GM_setValue
+// @grant         GM_log
+// ==/UserScript==
+
 /**
  * The MIT License
  *
- * Copyright (c) 2011 Steven G. Brown
+ * Copyright (c) 2012 Steven G. Brown
  * Copyright (c) 2006 KOSEKI Kengo
  *
  * Permission is hereby granted, free of charge, to any person
@@ -73,5 +90,9 @@ function main() {
 }
 
 
-// Call the main method.
-main();
+// Call the main method once the rest of the script has executed.
+setTimeout(main, 0);
+
+var messages =
+    // remainder of file added by the build script
+

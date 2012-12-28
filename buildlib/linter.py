@@ -32,7 +32,7 @@ import os, sys, traceback
 from subprocess import *
 
 
-def linter(path, linterPath=None):
+def linter(path, exclude=None, linterPath=None):
   '''
   Inspect the given path with Closure Linter and log any warnings to the
   console. http://code.google.com/p/closure-linter/
@@ -41,7 +41,9 @@ def linter(path, linterPath=None):
   gjslint = 'gjslint'
   if linterPath:
     gjslint = os.path.join(linterPath, gjslint)
-  args = [gjslint, '-r', path, '--strict', '--check_html']
+  args = [gjslint, '--recurse', path, '--strict', '--check_html']
+  if exclude:
+    args += ['--exclude_files', exclude]
   try:
     proc = Popen(args, stdout=PIPE, stderr=STDOUT)
     output = proc.communicate()[0]
