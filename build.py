@@ -65,7 +65,7 @@ def main(linterPath=None):
 
   # Google Chrome extension
   copyFiles(
-    names=('allclasses-frame.js', 'background.html', 'hide-packages-frame.js',
+    names=('allclasses-frame.js', 'event-page.js', 'hide-packages-frame.js',
            'manifest.json', 'options.js', 'options.html'),
     fromDir=source('googlechrome'),
     toDir=target('googlechrome'),

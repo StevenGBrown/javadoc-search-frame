@@ -5,3 +5,6 @@
 #INCLUDE Storage.js;
 #INCLUDE Option.js;
 #INCLUDE OptionsPageGenerator.js;
+
+OptionsPageGenerator.generate();
+
