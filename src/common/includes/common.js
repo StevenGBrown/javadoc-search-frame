@@ -954,7 +954,17 @@ View._create = function(eventHandlers) {
   var tableDataCellElementTwo = document.createElement('td');
 
   View.searchField = View._createSearchField(eventHandlers);
-  if (View.searchField.type === 'text') {
+  var webKitBrowser = RegExp(' AppleWebKit/').test(navigator.userAgent);
+  if (View.searchField.type === 'text' || !webKitBrowser) {
+    // Three cases:
+    // 1) WebKit browsers, e.g. Google Chrome and Safari, will display an
+    //    erase button on type="search" input fields once some text has been
+    //    entered into the field. Do not manually add an erase button.
+    // 2) If searchType.type === 'text', this is a pre-HTML5 browser that is
+    //    unaware of the search type. Manually add an erase button.
+    // 3) HTML5-aware versions of Mozilla Firefox will report that
+    //    searchType.type is 'search', but will not change the behaviour of the
+    //    field. Manually add an erase button.
     var eraseButton = View._createEraseButton(eventHandlers);
   }
   var optionsLink = View._createOptionsLink(eventHandlers);
