@@ -440,19 +440,22 @@ UnitTestSuite.testFunctionFor('extractUrl', function() {
  * @return {string} The absolute URL.
  */
 function toAbsoluteUrl(relativeUrl, opt_documentUrl) {
+  var colonIndex = relativeUrl.indexOf(':');
+  if (colonIndex != -1 && colonIndex < relativeUrl.indexOf('/')) {
+    // Already an absolute URL.
+    return relativeUrl;
+  }
   if (!opt_documentUrl) {
     opt_documentUrl = location.href;
   }
   var documentUrlPath = opt_documentUrl.substring(
       0, opt_documentUrl.lastIndexOf('/') + 1);
-
   var relativeUrlPath = relativeUrl.substring(
       0, relativeUrl.lastIndexOf('/') + 1);
   if (endsWith(documentUrlPath, relativeUrlPath)) {
     documentUrlPath = documentUrlPath.substring(
         0, documentUrlPath.length - relativeUrlPath.length);
   }
-
   return documentUrlPath + relativeUrl;
 }
 
@@ -463,6 +466,9 @@ UnitTestSuite.testFunctionFor('toAbsoluteUrl', function() {
       is(api + 'java/applet/AppletContext.html'));
   assertThat('relative to package url', toAbsoluteUrl(
       'java/applet/AppletContext.html', api + 'java/applet/package-frame.html'),
+      is(api + 'java/applet/AppletContext.html'));
+  assertThat('already an absolute url', toAbsoluteUrl(
+      api + 'java/applet/AppletContext.html', api + 'allclasses-frame.html'),
       is(api + 'java/applet/AppletContext.html'));
 });
 
@@ -578,6 +584,8 @@ ClassLink = function(type, packageName, className) {
     this.innerClassNames.push(name);
   }
 
+  var url = toAbsoluteUrl(packageName.replace(/\./g, '/') + '/' + className +
+      '.html');
   var typeInHtml = type;
   if (type === LinkType.EXCEPTION || type === LinkType.ERROR) {
     typeInHtml = LinkType.CLASS;
@@ -588,10 +596,10 @@ ClassLink = function(type, packageName, className) {
     openingTag = '<I>';
     closingTag = '</I>';
   }
-  this.html = '<A HREF="' + packageName.replace(/\./g, '/') + '/' + className +
-      '.html" title="' + typeInHtml.getSingularName().toLowerCase() + ' in ' +
-      packageName + '" target="classFrame">' + openingTag + className +
-      closingTag + '</A>&nbsp;[&nbsp;' + packageName + '&nbsp;]';
+  this.html = '<A HREF="' + url + '" title="' +
+      typeInHtml.getSingularName().toLowerCase() + ' in ' + packageName +
+      '" target="classFrame">' + openingTag + className + closingTag +
+      '</A>&nbsp;[&nbsp;' + packageName + '&nbsp;]';
 };
 
 
@@ -616,35 +624,44 @@ ClassLink.prototype.getHtml = function() {
 };
 
 UnitTestSuite.testFunctionFor('ClassLink.getHtml', function() {
+  var url = toAbsoluteUrl;
   assertThat('interface', new ClassLink(LinkType.INTERFACE, 'javax.swing.text',
       'AbstractDocument.AttributeContext').getHtml(), is(
-      '<A HREF="javax/swing/text/AbstractDocument.AttributeContext.html" ' +
-      'title="interface in javax.swing.text" target="classFrame"><I>' +
+      '<A HREF="' +
+      url('javax/swing/text/AbstractDocument.AttributeContext.html') +
+      '" title="interface in javax.swing.text" target="classFrame"><I>' +
       'AbstractDocument.AttributeContext</I></A>&nbsp;[&nbsp;' +
       'javax.swing.text&nbsp;]'));
   assertThat('class', new ClassLink(LinkType.CLASS, 'javax.lang.model.util',
       'AbstractAnnotationValueVisitor6').getHtml(), is(
-      '<A HREF="javax/lang/model/util/AbstractAnnotationValueVisitor6.html" ' +
-      'title="class in javax.lang.model.util" target="classFrame">' +
+      '<A HREF="' +
+      url('javax/lang/model/util/AbstractAnnotationValueVisitor6.html') +
+      '" title="class in javax.lang.model.util" target="classFrame">' +
       'AbstractAnnotationValueVisitor6</A>&nbsp;[&nbsp;javax.lang.model.util' +
       '&nbsp;]'));
   assertThat('enum', new ClassLink(LinkType.ENUM, 'java.lang',
       'Thread.State').getHtml(), is(
-      '<A HREF="java/lang/Thread.State.html" title="enum in java.lang" ' +
+      '<A HREF="' +
+      url('java/lang/Thread.State.html') +
+      '" title="enum in java.lang" ' +
       'target="classFrame">Thread.State</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
   assertThat('exception', new ClassLink(LinkType.EXCEPTION, 'java.security',
       'AccessControlException').getHtml(), is(
-      '<A HREF="java/security/AccessControlException.html" ' +
-      'title="class in java.security" target="classFrame">' +
+      '<A HREF="' +
+      url('java/security/AccessControlException.html') +
+      '" title="class in java.security" target="classFrame">' +
       'AccessControlException</A>&nbsp;[&nbsp;java.security&nbsp;]'));
   assertThat('error', new ClassLink(LinkType.ERROR, 'java.lang.annotation',
       'AnnotationFormatError').getHtml(), is(
-      '<A HREF="java/lang/annotation/AnnotationFormatError.html" ' +
-      'title="class in java.lang.annotation" target="classFrame">' +
+      '<A HREF="' +
+      url('java/lang/annotation/AnnotationFormatError.html') +
+      '" title="class in java.lang.annotation" target="classFrame">' +
       'AnnotationFormatError</A>&nbsp;[&nbsp;java.lang.annotation&nbsp;]'));
   assertThat('annotation', new ClassLink(LinkType.ANNOTATION, 'java.lang',
       'Deprecated').getHtml(), is(
-      '<A HREF="java/lang/Deprecated.html" title="annotation in java.lang" ' +
+      '<A HREF="' +
+      url('java/lang/Deprecated.html') +
+      '" title="annotation in java.lang" ' +
       'target="classFrame">Deprecated</A>&nbsp;[&nbsp;java.lang&nbsp;]'));
 });
 
