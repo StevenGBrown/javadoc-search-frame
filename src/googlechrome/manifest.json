@@ -1,6 +1,7 @@
 {
   "name": "__MSG_extName__",
   "version": "#INCLUDE version#",
+  "manifest_version": 2,
   "description": "__MSG_extDescription__",
   "icons": {
      "16": "icons/icon16.png",
@@ -9,7 +10,10 @@
     "128": "icons/icon128.png"
   },
   "default_locale": "en",
-  "background_page": "background.html",
+  "background": {
+    "scripts": ["event-page.js"],
+    "persistent": false
+  },
   "content_scripts": [
     {
       "matches": [
@@ -43,7 +47,7 @@
       "all_frames": true
     }
   ],
-  "minimum_chrome_version": "14.0.835.163",
+  "minimum_chrome_version": "18",
   "options_page": "options.html",
   "permissions": [
     "http://*/*",
