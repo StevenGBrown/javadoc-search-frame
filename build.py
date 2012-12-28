@@ -37,7 +37,8 @@ from buildlib.transformations import *
 def main(linterPath=None):
   '''Package the sources into a user script and a Google Chrome extension.'''
 
-  linter(source(), linterPath=linterPath)
+  linter(source(), exclude=source('greasemonkey/javadoc_search_frame.js'),
+         linterPath=linterPath)
 
   with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
     version = f.read().strip()
@@ -48,16 +49,19 @@ def main(linterPath=None):
 
   # Greasemonkey user script
   copyAndRenameFile(
-    fromPath=source('greasemonkey/allclasses-frame.js'),
+    fromPath=source('greasemonkey/javadoc_search_frame.js'),
     toPath=target('greasemonkey/javadoc_search_frame_' +
                   version.replace('.', '_') + '.user.js'),
     transformations=(
-      prepend(source('greasemonkey/metadata_block.txt')),
-      insertExternalFiles(
-          source('common/_locales/en'),
-          source('common/lib'),
-          source('greasemonkey/lib')
-      ),
+      append(source('common/_locales/en/messages.json')),
+      append(source('greasemonkey/lib/Messages.js')),
+      append(source('greasemonkey/lib/Storage.js')),
+      append(source('common/lib/Option.js')),
+      append(source('greasemonkey/lib/Frames.js')),
+      append(source('greasemonkey/lib/OptionsPage.js')),
+      append(source('common/lib/HttpRequest.js')),
+      append(source('common/lib/OptionsPageGenerator.js')),
+      append(source('common/lib/common.js')),
       insertValue('version', version),
       insertValue('buildYear', buildYear)
     )

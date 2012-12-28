@@ -45,51 +45,17 @@ def insertValue(includeTagName, value):
   return insertValueTransformation
 
 
-def insertExternalFiles(*includesDirectories):
+def append(fileToAppend):
   '''
-  Return a function that will transform the script contents by including the
-  contents of external files. For example, if the script contains the line:
-  '#INCLUDE Frames.js;', then the file 'Frames.js' will be found in one of the
-  includes directories and inserted in this location. If the inserted file has
-  a license header, it will be removed. If the file to be inserted cannot be
-  found, a ValueError will be thrown.
+  Return a function that will transform the script contents by appending the
+  contents of the given file, without the license header.
   '''
 
-  includesRegex = re.compile(r'^\s*#INCLUDE ([^;]*);$', re.MULTILINE)
+  def appendTransformation(fileContents):
+    with io.open(fileToAppend) as f:
+      return fileContents + '\n' + _removeLicenseHeader(f.read())
 
-  def insertExternalFilesTransformation(fileContents):
-    while True:
-      includesMatch = includesRegex.search(fileContents)
-      if not includesMatch:
-        break
-      with io.open(_findFile(includesDirectories, includesMatch.group(1))) as includeFile:
-        includeFileContents = _removeLicenseHeader(includeFile.read())
-        leadingFileContents = fileContents[:includesMatch.start()]
-        trailingFileContents = fileContents[includesMatch.end():]
-        if len(trailingFileContents) >= 2 and trailingFileContents[:2] != '\n\n':
-          trailingFileContents = '\n\n' + trailingFileContents
-        fileContents =\
-            leadingFileContents +\
-            '//' + includesMatch.group() + '\n' +\
-            '\n' +\
-            includeFileContents.strip() +\
-            trailingFileContents
-    return fileContents
-
-  return insertExternalFilesTransformation
-
-
-def _findFile(searchDirectories, filename):
-  '''
-  Find a file in the given list of search directories. If found, the absolute
-  path to this file will be returned. Otherwise, a ValueError will be thrown.
-  '''
-
-  for directory in searchDirectories:
-    absolutePath = os.path.join(directory, filename)
-    if os.path.exists(absolutePath):
-      return absolutePath
-  raise ValueError('\'' + filename + '\' not found in ' + str(searchDirectories))
+  return appendTransformation
 
 
 def _removeLicenseHeader(scriptContents):
@@ -103,15 +69,3 @@ def _removeLicenseHeader(scriptContents):
     scriptContents = licenseHeaderMatch.group(1)
   return scriptContents
 
-
-def prepend(fileToPrepend):
-  '''
-  Return a function that will transform the script contents by prepending the
-  contents of the given file.
-  '''
-
-  def prependTransformation(fileContents):
-    with io.open(fileToPrepend) as f:
-      return f.read() + '\n' + fileContents
-
-  return prependTransformation
