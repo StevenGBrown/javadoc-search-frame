@@ -435,16 +435,16 @@ UnitTestSuite.testFunctionFor('extractUrl', function() {
 /**
  * Convert the given relative URL to an absolute URL.
  * @param {string} relativeUrl The relative URL.
- * @param {string=} documentUrl The document's current URL, given by
+ * @param {string=} opt_documentUrl The document's current URL, given by
  *     location.href (optional).
  * @return {string} The absolute URL.
  */
-function toAbsoluteUrl(relativeUrl, documentUrl) {
-  if (!documentUrl) {
-    documentUrl = location.href;
+function toAbsoluteUrl(relativeUrl, opt_documentUrl) {
+  if (!opt_documentUrl) {
+    opt_documentUrl = location.href;
   }
-  var documentUrlPath = documentUrl.substring(
-      0, documentUrl.lastIndexOf('/') + 1);
+  var documentUrlPath = opt_documentUrl.substring(
+      0, opt_documentUrl.lastIndexOf('/') + 1);
 
   var relativeUrlPath = relativeUrl.substring(
       0, relativeUrl.lastIndexOf('/') + 1);
@@ -1535,13 +1535,13 @@ Callback = function(callbackFunction, thisObject) {
 
 /**
  * Invoke this callback function with the given arguments.
- * @param {Array.<*>=} argsArray An array of arguments to pass to the callback
- *     function. If not provided, no arguments will be passed to the callback
- *     function.
+ * @param {Array.<*>=} opt_argsArray An array of arguments to pass to the
+ *     callback function. If not provided, no arguments will be passed to the
+ *     callback function.
  * @return {*} The function result.
  */
-Callback.prototype.invoke = function(argsArray) {
-  return this.callbackFunction.apply(this.thisObject, argsArray);
+Callback.prototype.invoke = function(opt_argsArray) {
+  return this.callbackFunction.apply(this.thisObject, opt_argsArray);
 };
 
 
