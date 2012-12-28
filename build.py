@@ -55,8 +55,8 @@ def main(linterPath=None):
       prepend(source('greasemonkey/metadata_block.txt')),
       insertExternalFiles(
           source('common/_locales/en'),
-          source('common/includes'),
-          source('greasemonkey/includes')
+          source('common/lib'),
+          source('greasemonkey/lib')
       ),
       insertValue('version', version),
       insertValue('buildYear', buildYear)
@@ -70,13 +70,20 @@ def main(linterPath=None):
     fromDir=source('googlechrome'),
     toDir=target('googlechrome'),
     transformations=(
-      insertExternalFiles(
-          source('common/includes'),
-          source('googlechrome/includes')
-      ),
       insertValue('version', version),
       insertValue('buildYear', buildYear)
     )
+  )
+  copyFiles(
+    names=('Frames.js', 'Messages.js', 'OptionsPage.js', 'Storage.js'),
+    fromDir=source('googlechrome/lib'),
+    toDir=target('googlechrome/lib')
+  )
+  copyFiles(
+    names=('common.js', 'OptionsPageGenerator.js', 'HttpRequest.js',
+           'Option.js'),
+    fromDir=source('common/lib'),
+    toDir=target('googlechrome/lib')
   )
   copyFiles(
     names=('icon16.png', 'icon32.png', 'icon48.png', 'icon128.png'),

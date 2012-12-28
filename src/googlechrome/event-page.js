@@ -25,6 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 chrome.extension.onRequest.addListener(
     function(request, sender, sendResponse) {
       var response = {};
