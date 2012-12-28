@@ -31,6 +31,13 @@
           "file://*/*/package-frame.html"
       ],
       "js": [
+          "lib/Messages.js",
+          "lib/Storage.js",
+          "lib/Option.js",
+          "lib/Frames.js",
+          "lib/OptionsPage.js",
+          "lib/HttpRequest.js",
+          "lib/common.js",
           "allclasses-frame.js"
       ],
       "all_frames": true
