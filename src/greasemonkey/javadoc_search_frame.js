@@ -75,18 +75,17 @@ function main() {
   var version = '#VERSION#';
 
   var startupLogMessage =
-      'Javadoc Search Frame ' + version + ' (Greasemonkey User Script)\n' +
+      '\nJavadoc Search Frame ' + version + ' (Greasemonkey User Script)\n' +
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
-  init(function(unitTestResults) {
-    var logMessage = '\n' + startupLogMessage + unitTestResults;
-    try {
-      GM_log(logMessage);
-    } catch (ex) {
-      console.log(logMessage);
-    }
-  });
+  try {
+    GM_log(startupLogMessage);
+  } catch (ex) {
+    console.log(startupLogMessage);
+  }
+
+  init();
 }
 
 

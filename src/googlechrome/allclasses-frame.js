@@ -39,9 +39,9 @@ function main() {
       'http://code.google.com/p/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
-  init(function(unitTestResults) {
-    console.log(startupLogMessage + unitTestResults);
-  });
+  console.log(startupLogMessage);
+
+  init();
 }
 
 
