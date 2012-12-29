@@ -2042,9 +2042,5 @@ EventHandlers._returnKeyPressed = function(ctrlModifier) {
  * focus.
  */
 EventHandlers._escapeKeyPressed = function() {
-  var searchFieldValue = View.getSearchFieldValue();
-  if (searchFieldValue) {
-    Query.update('');
-    Search.performIfSearchStringHasChanged();
-  }
+  View.clearSearchField();
 };
