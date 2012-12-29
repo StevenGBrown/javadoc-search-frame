@@ -668,6 +668,8 @@ View._createSearchField = function(eventHandlers) {
   searchField.setAttribute('autofocus', 'true');
   searchField.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
   searchField.addEventListener(
+      'keydown', eventHandlers.searchFieldKeydown, false);
+  searchField.addEventListener(
       'input', eventHandlers.searchFieldChanged, false);
   searchField.addEventListener('focus', eventHandlers.searchFieldFocus, false);
   if (View.searchAccessKey) {
@@ -1966,7 +1968,7 @@ EventHandlers = {};
 
 
 /**
- * Called when a key has been pressed while the search field has focus.
+ * Called on a 'keyup' event while the search field has focus.
  * @param {Event} evt The event.
  */
 EventHandlers.searchFieldKeyup = function(evt) {
@@ -1975,6 +1977,20 @@ EventHandlers.searchFieldKeyup = function(evt) {
     EventHandlers._returnKeyPressed(evt.ctrlKey);
   } else if (code === 27) {
     EventHandlers._escapeKeyPressed();
+  }
+};
+
+
+/**
+ * Called on a 'keydown' event while the search field has focus.
+ * @param {Event} evt The event.
+ */
+EventHandlers.searchFieldKeydown = function(evt) {
+  // Disable the default behaviour of completely clearing the search field when
+  // the ESCAPE key is pressed. Instead, the ESCAPE key will clear only the
+  // currently displayed portion of the search query.
+  if (evt.keyCode === 27) {
+    evt.preventDefault();
   }
 };
 
