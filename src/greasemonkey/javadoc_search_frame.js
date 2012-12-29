@@ -5,7 +5,7 @@
 // @copyright     2012, Steven G. Brown (http://code.google.com/p/javadoc-search-frame)
 // @copyright     2006, KOSEKI Kengo (http://www.teria.com/~koseki/tools/gm/javadoc_isearch/index.html)
 // @license       MIT License; http://www.opensource.org/licenses/mit-license.php
-// @version       #INCLUDE version#
+// @version       #VERSION#
 // @include       */allclasses-frame.html
 // @include       */allclasses-frame.html#JavadocSearchFrameOptions
 // @include       */package-frame.html
@@ -72,7 +72,7 @@ function main() {
   updateMenuOption(Option.PACKAGE_MENU);
 
   // Version of this script. This value is set by the build script.
-  var version = '#INCLUDE version#';
+  var version = '#VERSION#';
 
   var startupLogMessage =
       'Javadoc Search Frame ' + version + ' (Greasemonkey User Script)\n' +
