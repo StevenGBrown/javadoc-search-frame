@@ -79,6 +79,6 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
  * @param {string} url The URL to open.
  */
 Frames.openLinkInNewTab = function(url) {
-  chrome.extension.sendRequest(
+  chrome.extension.sendMessage(
       {operation: 'openInNewTab', urlToOpen: url});
 };
