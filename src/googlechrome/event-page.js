@@ -1,7 +1,7 @@
 /**
  * The MIT License
  *
- * Copyright (c) 2012 Steven G. Brown
+ * Copyright (c) 2009 Steven G. Brown
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
