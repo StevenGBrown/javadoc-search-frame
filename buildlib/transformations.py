@@ -31,18 +31,16 @@ OTHER DEALINGS IN THE SOFTWARE.
 import io, os, re
 
 
-def insertValue(includeTagName, value):
+def replaceVersionPlaceholder(version):
   '''
-  Return a function that will transform the script contents by replacing an
-  inline #INCLUDE tag with the given value. For example, if this function is
-  called with includeTagName='version' and value='1.0', then any occurances of
-  '#INCLUDE version' in the given script will be replaced with '1.0'.
+  Return a function that will transform the script contents by replacing inline
+  #VERSION# tags with the given version numebr.
   '''
 
-  def insertValueTransformation(fileContents):
-    return fileContents.replace('#INCLUDE ' + includeTagName + '#', value)
+  def replaceVersionPlaceholderTransformation(fileContents):
+    return fileContents.replace('#VERSION#', version)
 
-  return insertValueTransformation
+  return replaceVersionPlaceholderTransformation
 
 
 def append(fileToAppend):

@@ -43,8 +43,6 @@ def main(linterPath=None):
   with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
     version = f.read().strip()
 
-  buildYear = datetime.date.today().strftime('%Y')
-
   rmDirectoryContents(target())
 
   # Greasemonkey user script
@@ -62,8 +60,7 @@ def main(linterPath=None):
       append(source('common/lib/HttpRequest.js')),
       append(source('common/lib/OptionsPageGenerator.js')),
       append(source('common/lib/common.js')),
-      insertValue('version', version),
-      insertValue('buildYear', buildYear)
+      replaceVersionPlaceholder(version),
     )
   )
 
@@ -74,8 +71,7 @@ def main(linterPath=None):
     fromDir=source('googlechrome'),
     toDir=target('googlechrome'),
     transformations=(
-      insertValue('version', version),
-      insertValue('buildYear', buildYear)
+      replaceVersionPlaceholder(version),
     )
   )
   copyFiles(

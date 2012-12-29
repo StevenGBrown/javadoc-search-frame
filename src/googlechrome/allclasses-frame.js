@@ -32,7 +32,7 @@
 function main() {
 
   // Version of this script. This value is set by the build script.
-  var version = '#INCLUDE version#';
+  var version = '#VERSION#';
 
   var startupLogMessage =
       'Javadoc Search Frame ' + version + ' (Google Chrome Extension)\n' +
