@@ -595,6 +595,16 @@ View.focusOnSearchField = function() {
 
 
 /**
+ * Clear the search field.
+ */
+View.clearSearchField = function() {
+  Query.update('');
+  View.focusOnSearchField();
+  Search.performIfSearchStringHasChanged();
+};
+
+
+/**
  * Create the view elements and add them to the current document.
  * @param {EventHandlers} eventHandlers The event handlers.
  */
@@ -1991,9 +2001,7 @@ EventHandlers.searchFieldFocus = function() {
  * Caled when the erase button has been clicked.
  */
 EventHandlers.eraseButtonClick = function() {
-  Query.update('');
-  View.focusOnSearchField();
-  Search.performIfSearchStringHasChanged();
+  View.clearSearchField();
 };
 
 

@@ -42,6 +42,16 @@ function main() {
   console.log(startupLogMessage);
 
   init();
+
+  chrome.extension.onMessage.addListener(
+      function(request, sender, sendResponse) {
+        if (request === 'focus') {
+          View.focusOnSearchField();
+        } else if (request === 'clear') {
+          View.clearSearchField();
+        }
+      }
+  );
 }
 
 

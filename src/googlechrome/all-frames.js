@@ -26,6 +26,16 @@
  */
 
 
+// This script is loaded into every frame for every URL, which is obviously
+// not ideal. It can be removed once certain features are implemented in the
+// Google Chrome browser. See each item below for details.
+
+
+// This can be removed once Chromium Issue 20773  (let content scripts see
+// other frames) is implemented. The content script loaded into the
+// "all classes" frame can then hide the "packages" frame itself, just like the
+// Greasemonkey user script does.
+// http://code.google.com/p/chromium/issues/detail?id=20773
 chrome.extension.sendMessage(
     {
       operation: 'get',
@@ -52,3 +62,18 @@ chrome.extension.sendMessage(
       }
     }
 );
+
+
+// This can be removed once the chrome.commands API reaches the stable channel.
+// http://developer.chrome.com/stable/extensions/commands.html
+addEventListener('keyup', function(evt) {
+  if (evt.altKey && evt.shiftKey && evt.keyCode == 83) {
+    // alt + shift + s
+    chrome.extension.sendMessage({operation: 'focus'});
+  }
+  if (evt.altKey && evt.shiftKey && evt.keyCode == 65) {
+    // alt + shift + a
+    chrome.extension.sendMessage({operation: 'clear'});
+  }
+}, false);
+

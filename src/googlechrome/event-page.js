@@ -40,6 +40,9 @@ chrome.extension.onMessage.addListener(
           url: request.urlToOpen
         };
         chrome.tabs.create(tabProperties);
+      } else if (request.operation === 'focus' ||
+                 request.operation === 'clear') {
+        chrome.tabs.sendMessage(sender.tab.id, request.operation);
       }
       sendResponse(response);
     }

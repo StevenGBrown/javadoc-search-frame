@@ -49,7 +49,7 @@
           "file://*/*"
       ],
       "js": [
-          "hide-packages-frame.js"
+          "all-frames.js"
       ],
       "all_frames": true
     }
