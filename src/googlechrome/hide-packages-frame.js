@@ -26,7 +26,7 @@
  */
 
 
-chrome.extension.sendRequest(
+chrome.extension.sendMessage(
     {
       operation: 'get',
       key: 'hide_package_frame'
