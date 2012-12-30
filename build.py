@@ -25,13 +25,21 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 '''
 
+import io
+import optparse
+import os
+import os.path
+import re
+import shutil
+import sys
+import traceback
+import zipfile
+from subprocess import Popen, PIPE, STDOUT
 
-# Developed with Python v3.0.1
 
-import datetime, io, optparse, os, sys, zipfile
-from buildlib.file_copy import *
-from buildlib.linter import *
-from buildlib.transformations import *
+# Read version number.
+with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
+  version = f.read().strip()
 
 
 def main(linterPath=None):
@@ -40,60 +48,30 @@ def main(linterPath=None):
   linter(source(), exclude=source('greasemonkey/javadoc_search_frame.js'),
          linterPath=linterPath)
 
-  with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
-    version = f.read().strip()
 
   rmDirectoryContents(target())
 
   # Greasemonkey user script
-  copyAndRenameFile(
+  copyFile(
     fromPath=source('greasemonkey/javadoc_search_frame.js'),
     toPath=target('greasemonkey/javadoc_search_frame_' +
                   version.replace('.', '_') + '.user.js'),
-    transformations=(
-      append(source('common/_locales/en/messages.json')),
-      append(source('greasemonkey/lib/Messages.js')),
-      append(source('greasemonkey/lib/Storage.js')),
-      append(source('common/lib/Option.js')),
-      append(source('greasemonkey/lib/Frames.js')),
-      append(source('greasemonkey/lib/OptionsPage.js')),
-      append(source('common/lib/HttpRequest.js')),
-      append(source('common/lib/OptionsPageGenerator.js')),
-      append(source('common/lib/common.js')),
-      replaceVersionPlaceholder(version),
+    append=(
+      source('common/_locales/en/messages.json'),
+      source('greasemonkey/lib/Messages.js'),
+      source('greasemonkey/lib/Storage.js'),
+      source('common/lib/Option.js'),
+      source('greasemonkey/lib/Frames.js'),
+      source('greasemonkey/lib/OptionsPage.js'),
+      source('common/lib/HttpRequest.js'),
+      source('common/lib/OptionsPageGenerator.js'),
+      source('common/lib/common.js')
     )
   )
 
   # Google Chrome extension
-  copyFiles(
-    names=('all-frames.js', 'allclasses-frame.js', 'event-page.js',
-           'manifest.json', 'options.js', 'options.html'),
-    fromDir=source('googlechrome'),
-    toDir=target('googlechrome'),
-    transformations=(
-      replaceVersionPlaceholder(version),
-    )
-  )
-  copyFiles(
-    names=('Frames.js', 'Messages.js', 'OptionsPage.js', 'Storage.js'),
-    fromDir=source('googlechrome/lib'),
-    toDir=target('googlechrome/lib')
-  )
-  copyFiles(
-    names=('common.js', 'OptionsPageGenerator.js', 'HttpRequest.js',
-           'Option.js'),
-    fromDir=source('common/lib'),
-    toDir=target('googlechrome/lib')
-  )
-  copyFiles(
-    names=('icon16.png', 'icon32.png', 'icon48.png', 'icon128.png'),
-    fromDir=source('googlechrome/icons'),
-    toDir=target('googlechrome/icons')
-  )
-  copyDir(
-    fromDir=source('common/_locales'),
-    toDir=target('googlechrome/_locales')
-  )
+  copyDir(fromDir=source('googlechrome'), toDir=target('googlechrome'))
+  copyDir(fromDir=source('common'), toDir=target('googlechrome'))
   mkzip(
     newZipFile=target('googlechrome/javadoc_search_frame.zip'),
     contentsDir=target('googlechrome')
@@ -112,6 +90,27 @@ def target(path=''):
   return os.path.abspath(os.path.join(sys.path[0], 'target', path))
 
 
+def linter(path, exclude=None, linterPath=None):
+  '''
+  Inspect the given path with Closure Linter and log any warnings to the
+  console. http://code.google.com/p/closure-linter/
+  '''
+
+  gjslint = 'gjslint'
+  if linterPath:
+    gjslint = os.path.join(linterPath, gjslint)
+  args = [gjslint, '--recurse', path, '--strict', '--check_html']
+  if exclude:
+    args += ['--exclude_files', exclude]
+  try:
+    proc = Popen(args, stdout=PIPE, stderr=STDOUT)
+    output = proc.communicate()[0]
+    if proc.returncode != 0:
+      print(output.decode())
+  except:
+    traceback.print_exc(file=sys.stdout)
+
+
 def rmDirectoryContents(dir):
   '''Remove the contents of the given directory.'''
 
@@ -120,6 +119,58 @@ def rmDirectoryContents(dir):
       os.remove(os.path.join(root, name))
     for name in dirs:
       os.rmdir(os.path.join(root, name))
+
+
+def copyFile(fromPath, toPath, append=()):
+  '''
+  Copy a single file, optionally appending other files to the copy.
+  '''
+
+  toPathDir = os.path.dirname(toPath)
+  if not os.path.isdir(toPathDir):
+    os.makedirs(toPathDir)
+  fromExt = os.path.splitext(fromPath)[1]
+  if fromExt == '.png':
+    if append:
+      raise ValueError('cannot append to binary file: ' + toPath)
+    shutil.copy(fromPath, toPathDir)
+  elif fromExt in ('.js', '.json', '.html'):
+    with io.open(fromPath) as fromFile:
+      fileContents = fromFile.read()
+    # Replace #VERSION# placeholders.
+    fileContents = fileContents.replace('#VERSION#', version)
+    # Append files to the end.
+    for appendPath in append:
+      with io.open(appendPath, 'r') as appendFile:
+        fileContents += '\n' + _removeLicenseHeader(appendFile.read())
+    # Write file with Unix newlines.
+    with io.open(toPath, 'w', newline='\n') as toFile:
+      toFile.write(fileContents)
+  else:
+    raise ValueError('unrecognised type: ' + toPath)
+
+
+def _removeLicenseHeader(scriptContents):
+  '''
+  Return the given script contents with the license header removed.
+  '''
+
+  licenseHeaderRegex = re.compile(r'^.*?\n\s\*/\n\n\s*(.*)', re.DOTALL)
+  licenseHeaderMatch = licenseHeaderRegex.match(scriptContents)
+  if licenseHeaderMatch:
+    scriptContents = licenseHeaderMatch.group(1)
+  return scriptContents
+
+
+def copyDir(fromDir, toDir):
+  '''Copy a directory.'''
+
+  for root, dirs, files in os.walk(fromDir):
+    for filename in files:
+      if not filename.endswith(('.swp', '~', '.orig')):
+        fromPath = os.path.join(root, filename)
+        toPath = os.path.join(toDir, os.path.relpath(fromPath, fromDir))
+        copyFile(fromPath=fromPath, toPath=toPath)
 
 
 def mkzip(newZipFile, contentsDir):
