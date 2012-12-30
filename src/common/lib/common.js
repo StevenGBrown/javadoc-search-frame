@@ -1713,48 +1713,46 @@ Search._Menu._constructMenuHtml = function(menu) {
 
 /**
  * Initialise this script.
+ * @param {boolean} hidePackageFrame Whether to hide the package frame.
  */
-function init() {
+function init(hidePackageFrame) {
 
-  Option.HIDE_PACKAGE_FRAME.getValue(function(hidePackageFrame) {
+  // Retrieve the inner HTML of the class frame.
+  var classesInnerHtml = getClassesInnerHtml();
 
-    // Retrieve the inner HTML of the class frame.
-    var classesInnerHtml = getClassesInnerHtml();
+  // Initialise stored package and class links.
+  var classLinks = getClassLinks(classesInnerHtml);
+  var packageAndClassLinks;
+  if (hidePackageFrame) {
+    var packageLinks = getPackageLinks(classLinks);
+    packageAndClassLinks = packageLinks.concat(classLinks);
+  } else {
+    packageAndClassLinks = classLinks;
+  }
+  if (packageAndClassLinks.length === 0) {
+    // Another instance of this script is already running and it has not yet
+    // added the package and class links to the page.
+    return;
+  }
+  ALL_PACKAGE_AND_CLASS_LINKS = packageAndClassLinks;
 
-    // Initialise stored package and class links.
-    var classLinks = getClassLinks(classesInnerHtml);
-    var packageAndClassLinks;
-    if (hidePackageFrame) {
-      var packageLinks = getPackageLinks(classLinks);
-      packageAndClassLinks = packageLinks.concat(classLinks);
-    } else {
-      packageAndClassLinks = classLinks;
-    }
-    if (packageAndClassLinks.length === 0) {
-      // Another instance of this script is already running and it has not yet
-      // added the package and class links to the page.
-      return;
-    }
-    ALL_PACKAGE_AND_CLASS_LINKS = packageAndClassLinks;
+  // Initialise class frame.
+  View.initialise(EventHandlers);
 
-    // Initialise class frame.
-    View.initialise(EventHandlers);
+  // Perform an initial search. This will populate the class frame with the
+  // entire list of packages and classes.
+  Search.perform();
 
-    // Perform an initial search. This will populate the class frame with the
-    // entire list of packages and classes.
-    Search.perform();
+  // Hide the package list frame.
+  if (hidePackageFrame) {
+    Frames.hideAllPackagesFrame();
+  }
 
-    // Hide the package list frame.
-    if (hidePackageFrame) {
-      Frames.hideAllPackagesFrame();
-    }
-
-    // If the autofocus attribute is not supported, manually give focus to the
-    // search field.
-    if (!('autofocus' in document.createElement('input'))) {
-      View.focusOnSearchField();
-    }
-  });
+  // If the autofocus attribute is not supported, manually give focus to the
+  // search field.
+  if (!('autofocus' in document.createElement('input'))) {
+    View.focusOnSearchField();
+  }
 }
 
 

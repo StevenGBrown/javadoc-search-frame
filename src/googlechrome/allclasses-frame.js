@@ -41,17 +41,19 @@ function main() {
 
   console.log(startupLogMessage);
 
-  init();
+  Option.HIDE_PACKAGE_FRAME.getValue(function(hidePackageFrame) {
+    init(hidePackageFrame);
 
-  chrome.extension.onMessage.addListener(
-      function(request, sender, sendResponse) {
-        if (request === 'focus') {
-          View.focusOnSearchField();
-        } else if (request === 'clear') {
-          View.clearSearchField();
+    chrome.extension.onMessage.addListener(
+        function(request, sender, sendResponse) {
+          if (request === 'focus') {
+            View.focusOnSearchField();
+          } else if (request === 'clear') {
+            View.clearSearchField();
+          }
         }
-      }
-  );
+    );
+  });
 }
 
 
