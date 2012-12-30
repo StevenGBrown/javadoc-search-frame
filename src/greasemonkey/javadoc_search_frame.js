@@ -89,7 +89,9 @@ function main() {
     console.log(startupLogMessage);
   }
 
-  init();
+  Option.HIDE_PACKAGE_FRAME.getValue(function(hidePackageFrame) {
+    init(hidePackageFrame);
+  });
 }
 
 
