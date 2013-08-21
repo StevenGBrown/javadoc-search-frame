@@ -798,9 +798,9 @@ Query.update = function(searchFieldContents) {
    * will only install extensions that are compatible with the browser version.
    */
   if (Query.timeoutId !== null) {
-    clearTimeout(Query.timeoutId);
+    window.clearTimeout(Query.timeoutId);
   }
-  Query.timeoutId = setTimeout(function() {
+  Query.timeoutId = window.setTimeout(function() {
     Query._updateView.apply(Query);
   }, 0);
 };
@@ -1140,9 +1140,9 @@ Search.performIfSearchStringHasChanged = function() {
   var entireSearchString = Query.getEntireSearchString();
   if (entireSearchString !== Search.previousEntireSearchString) {
     if (Search.timeoutId !== null) {
-      clearTimeout(Search.timeoutId);
+      window.clearTimeout(Search.timeoutId);
     }
-    Search.timeoutId = setTimeout(function() {
+    Search.timeoutId = window.setTimeout(function() {
       Search.perform.apply(Search);
     }, 100);
   }
