@@ -96,7 +96,7 @@ function main() {
 
 
 // Call the main method once the rest of the script has executed.
-setTimeout(main, 0);
+window.setTimeout(main, 0);
 
 var messages =
     // remainder of file added by the build script
