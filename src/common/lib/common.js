@@ -1810,21 +1810,6 @@ function getClassesInnerHtml() {
 /**
  * Parse interfaces, classes, enumerations, and annotations from the inner HTML
  * of the body element of the classes list frame.
- * <p>
- * Assumptions:
- * <ul>
- * <li>
- * The use of the title attribute is consistent: either all of the anchor
- * elements on the page have it, or all of them do not have it.
- * </li>
- * <li>
- * Double-quotes are used to declare the href or title attributes.
- * </li>
- * <li>
- * The italic element is the only element that can be a child of the anchor
- * element.
- * </li>
- * </ul>
  * @param {string} classesInnerHtml The inner HTML of the body element of the
  *     classes list frame.
  * @return {Array.<ClassLink>} The class links.
@@ -1856,18 +1841,20 @@ function getClassLinks(classesInnerHtml) {
   }
 
   var classesRegexWithTitle =
-      /title\s*=\s*\"\s*([^\s]+)\s+in\s+([^\s\"]+)[^>]+>(?:\s*<i\s*>)?\s*([^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
+      /<a\s+href\s*=\s*\"([^\"]+)\.html?\"\s*title\s*=\s*\"\s*([^\s]+)\s/gi;
   var anchorWithTitleFound = false;
   while ((matches = classesRegexWithTitle.exec(classesInnerHtml)) !== null) {
-    var typeInTitle = matches[1];
-    var packageName = matches[2];
-    var className = trimFromEnd(matches[3]);
-    var type = LinkType.getByName(typeInTitle);
-    type = checkForExceptionOrErrorType(type, className);
+    var hrefTokens = matches[1].split('/');
+    if (hrefTokens.length >= 2) {
+      var packageName = hrefTokens.slice(0, -1).join('.');
+      var className = hrefTokens[hrefTokens.length - 1];
+      var type = LinkType.getByName(matches[2]);
+      type = checkForExceptionOrErrorType(type, className);
 
-    var classLink = new ClassLink(type, packageName, className);
-    classLinksMap[type].push(classLink);
-    anchorWithTitleFound = true;
+      var classLink = new ClassLink(type, packageName, className);
+      classLinksMap[type].push(classLink);
+      anchorWithTitleFound = true;
+    }
   }
 
   if (!anchorWithTitleFound) {
@@ -1875,17 +1862,20 @@ function getClassLinks(classesInnerHtml) {
     // attributes, but the interfaces can be identified by looking for a
     // surrounding italic element. There are no enumerations or annotations.
     var classesWithoutTitleRegex =
-        /<a\s+href\s*=\s*\"([^\"]+)(?:\/|\\)[^\"]+\"[^>]*>(\s*<i\s*>)?\s*([^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
+        /<a\s+href\s*=\s*\"([^\"]+)\.html?\"\s*[^>]*>(\s*<i\s*>)?\s*(?:[^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
     while ((matches = classesWithoutTitleRegex.exec(classesInnerHtml)) !==
         null) {
-      var packageName = matches[1].replace(/\/|\\/g, '.');
-      var openingItalicTag = matches[2];
-      var className = trimFromEnd(matches[3]);
-      var type = openingItalicTag ? LinkType.INTERFACE : LinkType.CLASS;
-      type = checkForExceptionOrErrorType(type, className);
+      var hrefTokens = matches[1].split('/');
+      if (hrefTokens.length >= 2) {
+        var packageName = hrefTokens.slice(0, -1).join('.');
+        var className = hrefTokens[hrefTokens.length - 1];
+        var openingItalicTag = matches[2];
+        var type = openingItalicTag ? LinkType.INTERFACE : LinkType.CLASS;
+        type = checkForExceptionOrErrorType(type, className);
 
-      var classLink = new ClassLink(type, packageName, className);
-      classLinksMap[type].push(classLink);
+        var classLink = new ClassLink(type, packageName, className);
+        classLinksMap[type].push(classLink);
+      }
     }
   }
 

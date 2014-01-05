@@ -368,6 +368,20 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
           'TARGET  =  "classFrame"  >  Appendable  </a  >  ';
   links.push(new ClassLink(LinkType.INTERFACE, 'java.lang', 'Appendable'));
 
+  // Interface (Java 8 syntax)
+  html += '<a href="java/util/concurrent/Callable.html" ' +
+          'title="interface in java.util.concurrent" target="classFrame">' +
+          '<span class="interfaceName">Callable</span></a>';
+  links.push(new ClassLink(LinkType.INTERFACE, 'java.util.concurrent',
+      'Callable'));
+  html += '  <A  HREF  =  "java/sql/CallableStatement.html"  ' +
+          'TITLE  =  "  INTERFACE  IN  java.sql  "  ' +
+          'TARGET  =  "  classFrame  "  >  ' +
+          '<SPAN  CLASS  =  "  interfaceName"  >  ' +
+          'CallableStatement  </span  >  </a  >';
+  links.push(new ClassLink(LinkType.INTERFACE, 'java.sql',
+      'CallableStatement'));
+
   // Class
   html += '<a href="javax/swing/AbstractAction.html" ' +
           'title="class in javax.swing" target="classFrame">' +
