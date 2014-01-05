@@ -349,116 +349,104 @@ UnitTestSuite.testFunctionFor('getPackageLinks', function() {
 
 UnitTestSuite.testFunctionFor('getClassLinks', function() {
 
-  function assert(args, html, description) {
-    var link = new ClassLink(args.type, args.package, args.class);
-    assertThat(description, getClassLinks(html), is([link]));
-  }
+  //
+  // Modern Javadoc syntax (with title attribute)
+  //
 
-  function runClassesHtmlTestCase(args, includeTitle) {
-    if (!args.typeInTitle) {
-      args.typeInTitle = args.type;
-    }
+  var html = '';
+  var links = [];
 
-    var descriptionPrefix = args.type + ' ' +
-        (includeTitle ? 'with title' : 'without title') + ',' +
-        (args.italic ? 'with italic tag' : 'without italic tag') + ': ';
+  // Interface
+  html += '<a href="' +
+          'javax/swing/text/AbstractDocument.AttributeContext.html" ' +
+          'title="interface in javax.swing.text" target="classFrame">' +
+          '<i>AbstractDocument.AttributeContext</i></a>';
+  links.push(new ClassLink(LinkType.INTERFACE, 'javax.swing.text',
+      'AbstractDocument.AttributeContext'));
+  html += '  <A  HREF  =  "java/lang/Appendable.html"  ' +
+          'TITLE  =  "  INTERFACE  IN  java.lang  "   ' + 
+          'TARGET  =  "classFrame"  >  Appendable  </a  >  ';
+  links.push(new ClassLink(LinkType.INTERFACE, 'java.lang', 'Appendable'));
 
-    var lowerCaseHtml =
-        '<a href="' + args.href + '"' +
-        (includeTitle ?
-            ' title="' + args.typeInTitle + ' in ' + args.package : '') +
-        '" target="classFrame">' +
-        (args.italic ? '<i>' + args.class + '</i>' : args.class) +
-        '</a>';
-    assert(args, lowerCaseHtml, descriptionPrefix + 'lowercase html tags');
+  // Class
+  html += '<a href="javax/swing/AbstractAction.html" ' +
+          'title="class in javax.swing" target="classFrame">' +
+          'AbstractAction</a>';
+  links.push(new ClassLink(LinkType.CLASS, 'javax.swing', 'AbstractAction'));
+  html += '  <A  HREF  =  "java/lang/Object.html"  ' +
+          'TITLE  =  "  CLASS  IN  java.lang  "   ' + 
+          'TARGET  =  "classFrame"  >  Object  </a  >  ';
+  links.push(new ClassLink(LinkType.CLASS, 'java.lang', 'Object'));
 
-    var upperCaseHtml =
-        '<A HREF="' + args.href + '"' +
-        (includeTitle ?
-            ' TITLE="' + args.typeInTitle + ' IN ' + args.package : '') +
-        '" TARGET="classFrame">' +
-        (args.italic ? '<I>' + args.class + '</I>' : args.class) +
-        '</A>';
-    assert(args, upperCaseHtml, descriptionPrefix + 'uppercase html tags');
+  // Enum
+  html += '<a href="' +
+          'java/net/Authenticator.RequestorType.html" ' +
+          'title="enum in java.net" target="classFrame">' +
+          'Authenticator.RequestorType</a>';
+  links.push(new ClassLink(LinkType.ENUM, 'java.net',
+      'Authenticator.RequestorType'));
 
-    var lowerCaseWithWhitespaceHtml =
-        '<a   href  =   "' + args.href + '"' +
-        (includeTitle ? '   title  =  "  ' + args.typeInTitle + '   in   ' +
-            args.package : '') +
-        '  "   target  =  "classFrame"  >  ' +
-        (args.italic ? '<i  >  ' + args.class + '  </i  >' : args.class) +
-        '   </a  >';
-    assert(args, lowerCaseWithWhitespaceHtml, descriptionPrefix +
-        'lowercase html tags with additonal whitespace');
+  // Exception
+  html += '<a href="java/security/AccessControlException.html" ' +
+          'title="class in java.security" target="classFrame">' +
+          'AccessControlException</a>';
+  links.push(new ClassLink(LinkType.EXCEPTION, 'java.security',
+      'AccessControlException'));
 
-    var upperCaseWithWhitespaceHtml =
-        '<A   HREF  =  "' + args.href + '"' +
-        (includeTitle ? '   TITLE="' + args.typeInTitle +
-            '   in   ' + args.package : '') +
-        '   "   TARGET  =  "classFrame"  >  ' +
-        (args.italic ? '<I  >  ' + args.class + '  </I  >' : args.class) +
-        '   </A  >';
-    assert(args, upperCaseWithWhitespaceHtml, descriptionPrefix +
-        'uppercase html tags with additional whitespace');
-  }
+  // Error
+  html += '<a href="java/lang/AbstractMethodError.html" ' +
+          'title="class in java.lang" target="classFrame">' +
+          'AbstractMethodError</a>';
+  links.push(new ClassLink(LinkType.ERROR, 'java.lang',
+      'AbstractMethodError'));
 
-  function runTitleTestCase(args) {
-    runClassesHtmlTestCase(args, true);
-  }
+  // Annotation
+  html += '<a href="' +
+          'javax/xml/ws/Action.html" ' +
+          'title="annotation in javax.xml.ws" target="classFrame">' +
+          'Action</a>';
+  links.push(new ClassLink(LinkType.ANNOTATION, 'javax.xml.ws', 'Action'));
 
-  function runTitleAndNoTitleTestCase(args) {
-    runClassesHtmlTestCase(args, true);
-    runClassesHtmlTestCase(args, false);
-  }
+  assertThat('modern javadoc syntax', getClassLinks(html), is(links));
 
-  // Assert that classes are matched correctly. Classes can be matched with or
-  // without a title attribute.
-  runTitleAndNoTitleTestCase({
-    href: 'javax/swing/AbstractAction.html', type: LinkType.CLASS,
-    package: 'javax.swing', class: 'AbstractAction', italic: false});
+  //
+  // Javadoc 1.2 or 1.3 syntax (without title attribute)
+  //
 
-  // Assert that interfaces are matched correctly. Interfaces can be matched
-  // with or without a title attribute. If an anchor has no title attribute,
-  // the contents of the anchor must in italics to be recognised as an
-  // interface.
-  runTitleAndNoTitleTestCase({
-    href: 'javax/swing/text/AbstractDocument.AttributeContext.html',
-    type: LinkType.INTERFACE,
-    package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext',
-    italic: true});
-  runTitleTestCase({
-    href: 'javax/swing/text/AbstractDocument.AttributeContext.html',
-    type: LinkType.INTERFACE,
-    package: 'javax.swing.text', class: 'AbstractDocument.AttributeContext',
-    italic: false});
+  html = '';
+  links = [];
 
-  // Assert that enumerations are matched correctly. Anchors must have a title
-  // attribute to be recognised as an enumeration.
-  runTitleTestCase({
-    href: 'java/net/Authenticator.RequestorType.html', type: LinkType.ENUM,
-    package: 'java.net', class: 'Authenticator.RequestorType',
-    italic: false});
+  // Interface (has italics)
+  html += '<a href="' +
+          'javax/swing/text/AbstractDocument.AttributeContext.html" ' +
+          'target="classFrame"><i>AbstractDocument.AttributeContext</i></a>';
+  links.push(new ClassLink(LinkType.INTERFACE, 'javax.swing.text',
+      'AbstractDocument.AttributeContext'));
+  html += '  <A  HREF  =  "java/lang/Appendable.html"  ' +
+          'TARGET  =  "classFrame"  >  <i  >  Appendable  </i  >  </a  >  ';
+  links.push(new ClassLink(LinkType.INTERFACE, 'java.lang', 'Appendable'));
 
-  // Assert that exceptions are matched correctly. Exceptions can be matched
-  // with or without a title attribute.
-  runTitleAndNoTitleTestCase({
-    href: 'java/security/AccessControlException.html',
-    type: LinkType.EXCEPTION, typeInTitle: 'class',
-    package: 'java.security', class: 'AccessControlException',
-    italic: false});
+  // Class (no italics)
+  html += '<a href="javax/swing/AbstractAction.html" target="classFrame">' +
+          'AbstractAction</a>';
+  links.push(new ClassLink(LinkType.CLASS, 'javax.swing', 'AbstractAction'));
+  html += '  <A  HREF  =  "java/lang/Object.html"  ' +
+          'TARGET  =  "classFrame"  >  Object  </a  >  ';
+  links.push(new ClassLink(LinkType.CLASS, 'java.lang', 'Object'));
 
-  // Assert that errors are matched correctly. Errors can be matched with or
-  // without a title attribute.
-  runTitleAndNoTitleTestCase({
-    href: 'java/lang/AbstractMethodError.html',
-    type: LinkType.ERROR, typeInTitle: 'class',
-    package: 'java.lang', class: 'AbstractMethodError', italic: false});
+  // Exception (no italics)
+  html += '<a href="java/security/AccessControlException.html" ' +
+          'target="classFrame">AccessControlException</a>';
+  links.push(new ClassLink(LinkType.EXCEPTION, 'java.security',
+      'AccessControlException'));
 
-  // Assert that annotations are matched correctly. Anchors must have a title
-  // attribute to be recognised as an annotation.
-  runTitleTestCase({
-    href: 'javax/xml/ws/Action.html', type: LinkType.ANNOTATION,
-    package: 'javax.xml.ws', class: 'Action', italic: false});
+  // Error (no italics)
+  html += '<a href="java/lang/AbstractMethodError.html" ' +
+          'target="classFrame">AbstractMethodError</a>';
+  links.push(new ClassLink(LinkType.ERROR, 'java.lang',
+      'AbstractMethodError'));
+
+  assertThat('javadoc 1.2 or 1.3 syntax', getClassLinks(html), is(links));
 });
 
 
