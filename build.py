@@ -45,9 +45,10 @@ with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
 def main(linterPath=None):
   '''Package the sources into a user script and a Google Chrome extension.'''
 
-  linter(source(), exclude=source('greasemonkey/javadoc_search_frame.js'),
-         linterPath=linterPath)
-
+  linter(
+    paths=[source(), test()],
+    exclude=source('greasemonkey/javadoc_search_frame.js'),
+    linterPath=linterPath)
 
   rmDirectoryContents(target())
 
@@ -84,22 +85,30 @@ def source(path=''):
   return os.path.abspath(os.path.join(sys.path[0], 'src', path))
 
 
+def test(path=''):
+  '''Return a path under the test directory.'''
+
+  return os.path.abspath(os.path.join(sys.path[0], 'test', path))
+
+
 def target(path=''):
   '''Return a path under the target directory.'''
 
   return os.path.abspath(os.path.join(sys.path[0], 'target', path))
 
 
-def linter(path, exclude=None, linterPath=None):
+def linter(paths, exclude, linterPath):
   '''
-  Inspect the given path with Closure Linter and log any warnings to the
+  Inspect the given paths with Closure Linter and log any warnings to the
   console. http://code.google.com/p/closure-linter/
   '''
 
   gjslint = 'gjslint'
   if linterPath:
     gjslint = os.path.join(linterPath, gjslint)
-  args = [gjslint, '--recurse', path, '--strict', '--check_html']
+  args = [gjslint, '--strict', '--check_html']
+  for path in paths:
+    args += ['--recurse', path]
   if exclude:
     args += ['--exclude_files', exclude]
   try:

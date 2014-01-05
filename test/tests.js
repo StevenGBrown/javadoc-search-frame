@@ -364,7 +364,7 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
   links.push(new ClassLink(LinkType.INTERFACE, 'javax.swing.text',
       'AbstractDocument.AttributeContext'));
   html += '  <A  HREF  =  "java/lang/Appendable.html"  ' +
-          'TITLE  =  "  INTERFACE  IN  java.lang  "   ' + 
+          'TITLE  =  "  INTERFACE  IN  java.lang  "   ' +
           'TARGET  =  "classFrame"  >  Appendable  </a  >  ';
   links.push(new ClassLink(LinkType.INTERFACE, 'java.lang', 'Appendable'));
 
@@ -374,7 +374,7 @@ UnitTestSuite.testFunctionFor('getClassLinks', function() {
           'AbstractAction</a>';
   links.push(new ClassLink(LinkType.CLASS, 'javax.swing', 'AbstractAction'));
   html += '  <A  HREF  =  "java/lang/Object.html"  ' +
-          'TITLE  =  "  CLASS  IN  java.lang  "   ' + 
+          'TITLE  =  "  CLASS  IN  java.lang  "   ' +
           'TARGET  =  "classFrame"  >  Object  </a  >  ';
   links.push(new ClassLink(LinkType.CLASS, 'java.lang', 'Object'));
 
@@ -520,6 +520,6 @@ UnitTestSuite.testFunctionFor('splitOnFirst', function() {
 
 // Run the tests
 var unitTestResult = UnitTestSuite.run();
-document.write(new Date() + "<p>");
+document.write(new Date() + '<p>');
 document.write(unitTestResult);
 
