@@ -199,15 +199,14 @@ UnitTestResult = function(numberOfAssertions, failures) {
 UnitTestResult.prototype.toString = function() {
   var result = '';
   if (this.failures.length >= 1) {
-    result += 'Unit test FAILED: ';
+    result += '<font color="red">' + this.failures.length + ' of ' +
+        this.numberOfAssertions + ' assertions FAILED</font><p>';
+  } else {
+    result += '<font color="green">All ' + this.numberOfAssertions +
+        ' unit test assertions passed.</font><p>';
   }
-  result +=
-      this.numberOfAssertions - this.failures.length +
-      ' of ' +
-      this.numberOfAssertions +
-      ' unit test assertions passed.\n';
   this.failures.forEach(function(unitTestFailure) {
-    result += '\n' + unitTestFailure + '\n';
+    result += unitTestFailure + '<p>';
   });
   return result;
 };
@@ -242,12 +241,12 @@ UnitTestAssertionFailure = function(
  * @return {string} A description of this unit test failure.
  */
 UnitTestAssertionFailure.prototype.toString = function() {
-  var failureString = this.functionUnderTestName + '\n';
+  var failureString = '<b>' + this.functionUnderTestName + '</b><br>';
   if (this.description) {
-    failureString += this.description + '\n';
+    failureString += this.description + '<br>';
   }
-  failureString += 'Expected "' + this.expected + '"' +
-                   ' but was "' + this.actual + '"';
+  failureString += 'Expected<br>"' + this.expected + '"<br>' +
+                   'but was<br>"' + this.actual + '"';
   return failureString;
 };
 
