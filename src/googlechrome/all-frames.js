@@ -26,16 +26,8 @@
  */
 
 
-// This script is loaded into every frame for every URL, which is obviously
-// not ideal. It can be removed once certain features are implemented in the
-// Google Chrome browser. See each item below for details.
+// The top-level page hides the package frame before it appears.
 
-
-// This can be removed once Chromium Issue 20773  (let content scripts see
-// other frames) is implemented. The content script loaded into the
-// "all classes" frame can then hide the "packages" frame itself, just like the
-// Greasemonkey user script does.
-// http://code.google.com/p/chromium/issues/detail?id=20773
 chrome.extension.sendMessage(
     {
       operation: 'get',
