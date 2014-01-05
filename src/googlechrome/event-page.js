@@ -40,11 +40,16 @@ chrome.extension.onMessage.addListener(
           url: request.urlToOpen
         };
         chrome.tabs.create(tabProperties);
-      } else if (request.operation === 'focus' ||
-                 request.operation === 'clear') {
-        chrome.tabs.sendMessage(sender.tab.id, request.operation);
       }
       sendResponse(response);
     }
 );
+
+chrome.commands.onCommand.addListener(function(command) {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    tabs.forEach(function(tab) {
+      chrome.tabs.sendMessage(tab.id, command);
+    });
+  });
+});
 

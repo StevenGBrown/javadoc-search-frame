@@ -14,6 +14,20 @@
     "scripts": ["event-page.js"],
     "persistent": false
   },
+  "commands": {
+    "focus-on-search-field": {
+      "suggested_key": {
+        "default": "Alt+Shift+S"
+      },
+      "description": "Focus on the search field"
+    },
+    "clear-search-field": {
+      "suggested_key": {
+        "default": "Alt+Shift+A"
+      },
+      "description": "Clear the contents of the search field"
+    }
+  },
   "content_scripts": [
     {
       "matches": [
@@ -54,7 +68,7 @@
       "all_frames": true
     }
   ],
-  "minimum_chrome_version": "18",
+  "minimum_chrome_version": "25",
   "options_page": "options.html",
   "permissions": [
     "http://*/*",
