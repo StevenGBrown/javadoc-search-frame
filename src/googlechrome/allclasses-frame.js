@@ -46,9 +46,9 @@ function main() {
 
     chrome.extension.onMessage.addListener(
         function(request, sender, sendResponse) {
-          if (request === 'focus') {
+          if (request === 'focus-on-search-field') {
             View.focusOnSearchField();
-          } else if (request === 'clear') {
+          } else if (request === 'clear-search-field') {
             View.clearSearchField();
           }
         }

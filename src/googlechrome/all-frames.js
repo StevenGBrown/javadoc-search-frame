@@ -63,17 +63,3 @@ chrome.extension.sendMessage(
     }
 );
 
-
-// This can be removed once the chrome.commands API reaches the stable channel.
-// http://developer.chrome.com/stable/extensions/commands.html
-addEventListener('keyup', function(evt) {
-  if (evt.altKey && evt.shiftKey && evt.keyCode == 83) {
-    // alt + shift + s
-    chrome.extension.sendMessage({operation: 'focus'});
-  }
-  if (evt.altKey && evt.shiftKey && evt.keyCode == 65) {
-    // alt + shift + a
-    chrome.extension.sendMessage({operation: 'clear'});
-  }
-}, false);
-
