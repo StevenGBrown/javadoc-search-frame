@@ -28,7 +28,7 @@
 
 // The top-level page hides the package frame before it appears.
 
-chrome.extension.sendMessage(
+chrome.runtime.sendMessage(
     {
       operation: 'get',
       key: 'hide_package_frame'

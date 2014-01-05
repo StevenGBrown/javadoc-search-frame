@@ -44,7 +44,7 @@ function main() {
   Option.HIDE_PACKAGE_FRAME.getValue(function(hidePackageFrame) {
     init(hidePackageFrame);
 
-    chrome.extension.onMessage.addListener(
+    chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {
           if (request === 'focus-on-search-field') {
             View.focusOnSearchField();
