@@ -1871,6 +1871,9 @@ function getClassLinks(classesInnerHtml) {
   }
 
   if (!anchorWithTitleFound) {
+    // Javadoc created with Java 1.2 or 1.3. The anchors do not have title
+    // attributes, but the interfaces can be identified by looking for a
+    // surrounding italic element. There are no enumerations or annotations.
     var classesWithoutTitleRegex =
         /<a\s+href\s*=\s*\"([^\"]+)(?:\/|\\)[^\"]+\"[^>]*>(\s*<i\s*>)?\s*([^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
     while ((matches = classesWithoutTitleRegex.exec(classesInnerHtml)) !==
