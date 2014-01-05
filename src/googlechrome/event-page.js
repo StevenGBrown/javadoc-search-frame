@@ -26,7 +26,7 @@
  */
 
 
-chrome.extension.onMessage.addListener(
+chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
       var response = {};
       if (request.operation === 'get') {
