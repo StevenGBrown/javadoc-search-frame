@@ -28,30 +28,25 @@
 
 // The top-level page hides the package frame before it appears.
 
-chrome.runtime.sendMessage(
-    {
-      operation: 'get',
-      key: 'hide_package_frame'
-    },
-    function(hidePackageFrame) {
-      if (hidePackageFrame !== 'false') {
-        var framesets = document.getElementsByTagName('frameset');
-        if (framesets) {
-          for (var i = 0; i < framesets.length; i++) {
-            var frameset = framesets[i];
-            var framesetChildren = frameset.children;
-            if (framesetChildren &&
-                framesetChildren.length === 2 &&
-                framesetChildren[0].name === 'packageListFrame' &&
-                framesetChildren[1].name === 'packageFrame') {
-              frameset.setAttribute('rows', '0,*');
-              frameset.setAttribute('border', 0);
-              frameset.setAttribute('frameborder', 0);
-              frameset.setAttribute('framespacing', 0);
-            }
-          }
+var framesets = document.getElementsByTagName('frameset');
+if (framesets) {
+  for (var i = 0; i < framesets.length; i++) {
+    var frameset = framesets[i];
+    var framesetChildren = frameset.children;
+    if (framesetChildren &&
+        framesetChildren.length === 2 &&
+        framesetChildren[0].name === 'packageListFrame' &&
+        framesetChildren[1].name === 'packageFrame') {
+      var message = {operation: 'get', key: 'hide_package_frame'};
+      chrome.runtime.sendMessage(message, function(hidePackageFrame) {
+        if (hidePackageFrame !== 'false') {
+          frameset.setAttribute('rows', '0,*');
+          frameset.setAttribute('border', 0);
+          frameset.setAttribute('frameborder', 0);
+          frameset.setAttribute('framespacing', 0);
         }
-      }
+      });
     }
-);
+  }
+}
 
