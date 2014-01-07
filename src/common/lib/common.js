@@ -41,6 +41,14 @@
 var ALL_PACKAGE_AND_CLASS_LINKS = [];
 
 
+/**
+ * The window URL (cached).
+ * @type {string}
+ */
+var LOCATION_HREF = location.href;
+
+
+
 /*
  * ----------------------------------------------------------------------------
  * LinkType
@@ -184,7 +192,7 @@ function toAbsoluteUrl(relativeUrl, opt_documentUrl) {
     return relativeUrl;
   }
   if (!opt_documentUrl) {
-    opt_documentUrl = location.href;
+    opt_documentUrl = LOCATION_HREF;
   }
   var documentUrlPath = opt_documentUrl.substring(
       0, opt_documentUrl.lastIndexOf('/') + 1);
