@@ -62,7 +62,7 @@ def main(linterPath=None):
       source('greasemonkey/lib/Messages.js'),
       source('greasemonkey/lib/Storage.js'),
       source('common/lib/Option.js'),
-      source('greasemonkey/lib/Frames.js'),
+      source('common/lib/Frames.js'),
       source('greasemonkey/lib/OptionsPage.js'),
       source('common/lib/HttpRequest.js'),
       source('common/lib/OptionsPageGenerator.js'),

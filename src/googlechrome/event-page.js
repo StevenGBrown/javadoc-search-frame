@@ -33,11 +33,11 @@ chrome.runtime.onMessage.addListener(
         response = localStorage.getItem(request.key);
       } else if (request.operation === 'set') {
         localStorage.setItem(request.key, request.value);
-      } else if (request.operation === 'openInNewTab') {
+      } else if (request.operation === 'open-options-page') {
         var tabProperties = {
           windowId: sender.tab.windowId,
           index: sender.tab.index + 1,
-          url: request.urlToOpen
+          url: chrome.extension.getURL('options.html')
         };
         chrome.tabs.create(tabProperties);
       }
