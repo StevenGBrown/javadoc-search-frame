@@ -90,6 +90,9 @@ function main() {
   }
 
   Option.HIDE_PACKAGE_FRAME.getValue(function(hidePackageFrame) {
+    if (hidePackageFrame) {
+      Frames.hideAllPackagesFrame();
+    }
     init(hidePackageFrame);
   });
 }

@@ -44,7 +44,17 @@ Frames = {};
  * function will have no effect.
  */
 Frames.hideAllPackagesFrame = function() {
-  // Nothing to do. The packages frame is hidden by a different content script.
+  var framesets = parent.document.getElementsByTagName('frameset');
+  if (framesets) {
+    var frameset = framesets[1];
+    var framesetChildren = frameset.children;
+    if (framesetChildren && framesetChildren[0].name === 'packageListFrame') {
+      frameset.setAttribute('rows', '0,*');
+      frameset.setAttribute('border', 0);
+      frameset.setAttribute('frameborder', 0);
+      frameset.setAttribute('framespacing', 0);
+    }
+  }
 };
 
 
@@ -79,6 +89,5 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
  * @param {string} url The URL to open.
  */
 Frames.openLinkInNewTab = function(url) {
-  chrome.runtime.sendMessage(
-      {operation: 'openInNewTab', urlToOpen: url});
+  window.open(url);
 };

@@ -41,8 +41,9 @@ function main() {
 
   console.log(startupLogMessage);
 
-  Option.HIDE_PACKAGE_FRAME.getValue(function(hidePackageFrame) {
-    init(hidePackageFrame);
+  Option.HIDE_PACKAGE_FRAME.getValue(function(packageFrameHidden) {
+    // The packages frame is hidden by a different content script.
+    init(packageFrameHidden);
 
     chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {
