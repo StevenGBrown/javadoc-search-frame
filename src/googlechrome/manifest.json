@@ -70,6 +70,7 @@
   ],
   "minimum_chrome_version": "25",
   "options_page": "options.html",
+  "offline_enabled": true,
   "permissions": [
     "http://*/*",
     "https://*/*"
