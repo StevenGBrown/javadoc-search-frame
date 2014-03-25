@@ -16,48 +16,40 @@
     "description": "Title of the options page."
   },
   "autoOpenOptionTitle": {
-    "message": "Automatic Opening of Links",
+    "message": "Open the top search result",
     "description": "Title of the options page section used to configure the auto-open option."
   },
   "autoOpenOptionOn": {
-    "message": "On. Automatically open the first package, class or method in the list after each search.",
+    "message": "Automatically after each search",
     "description": "Label displayed for the button to turn on the auto-open option."
   },
   "autoOpenOptionOff": {
-    "message": "Off. Wait for the Enter key to be pressed.",
+    "message": "When the Enter key is pressed",
     "description": "Label displayed for the button to turn off the auto-open option."
   },
   "mergeFramesOptionTitle": {
-    "message": "Merge the Package and Class Frames",
+    "message": "Page layout",
     "description": "Title of the options page section used to configure the merge frames option."
   },
   "mergeFramesOptionOn": {
-    "message": "Yes. All packages and classes can be searched using a single combined frame.",
+    "message": "Merge the package list and class list",
     "description": "Label displayed next to the button to turn on the merge frames option."
   },
   "mergeFramesOptionOff": {
-    "message": "No. The package frame will not be hidden. Only one package can be searched at a time.",
+    "message": "Use separate frames for packages and classes",
     "description": "Label displayed next to the button to turn off the merge frames option."
   },
-  "classOrMethodMenuTitle": {
-    "message": "Class/Method Menu",
-    "description": "Title of the options page section used to configure the class/method menu."
+  "menuOptionTitle": {
+    "message": "Menu displayed by pressing the @ key",
+    "description": "Title of the options page section used to configure the menus."
   },
-  "classOrMethodMenuDescription": {
-    "message": "Menu displayed when pressing the @ key if a class or method is currently at the top of the search list.",
-    "description": "Further description of the class/method menu."
+  "classOrMethodMenuOptionDescription": {
+    "message": "When the top search result is a class or method:",
+    "description": "Label for the class/method menu configuration."
   },
-  "packageMenuTitle": {
-    "message": "Package Menu",
-    "description": "Title of the options page section used to configure the package menu."
-  },
-  "packageMenuDescription": {
-    "message": "Menu displayed when pressing the @ key if a package is currently at the top of the search list.",
-    "description": "Further description of the package menu."
-  },
-  "default": {
-    "message": "(Default)",
-    "description": "Tag displayed on the default option. This applies to the boolean options only."
+  "packageMenuOptionDescription": {
+    "message": "When the top search result is a package:",
+    "description": "Label for the package menu configuration."
   },
   "restoreDefault": {
     "message": "Restore Default",
