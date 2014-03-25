@@ -45,5 +45,9 @@ Messages = {};
  * @return {string} The localised string.
  */
 Messages.get = function(key) {
-  return chrome.i18n.getMessage(key);
+  var message = chrome.i18n.getMessage(key);
+  if (!message) {
+    throw new Error('Messages.get(' + key + ') not found');
+  }
+  return message;
 };
