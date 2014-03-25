@@ -63,7 +63,12 @@ OptionsPageGenerator.generate = function() {
  */
 OptionsPageGenerator._createContents = function(pageDocument) {
   var contents = [];
-  contents.push(OptionsPageGenerator._createHeader(pageDocument));
+  var optionsTitleElement = OptionsPageGenerator._text(
+      pageDocument, 'h1', Messages.get('optionsTitle'));
+  optionsTitleElement.setAttribute('style', 'font-family: sans-serif; ' +
+      'font-weight:normal; font-size:1.5em; margin-bottom:0.2em');
+  contents.push(optionsTitleElement);
+  contents.push(pageDocument.createElement('hr'));
   contents.push(pageDocument.createElement('p'));
   if (!Option.canGetAndSet()) {
     contents.push(
@@ -71,39 +76,59 @@ OptionsPageGenerator._createContents = function(pageDocument) {
             pageDocument));
     contents.push(pageDocument.createElement('p'));
   }
+  contents.push(OptionsPageGenerator._title(
+      pageDocument, Messages.get('autoOpenOptionTitle')));
   contents.push(OptionsPageGenerator._booleanOption(
       pageDocument, Option.AUTO_OPEN,
-      Messages.get('autoOpenOptionTitle'),
+      'autoOpen',
       Messages.get('autoOpenOptionOn'),
       Messages.get('autoOpenOptionOff')));
   contents.push(pageDocument.createElement('p'));
+  contents.push(OptionsPageGenerator._title(
+      pageDocument, Messages.get('mergeFramesOptionTitle')));
   contents.push(OptionsPageGenerator._booleanOption(
       pageDocument, Option.HIDE_PACKAGE_FRAME,
-      Messages.get('mergeFramesOptionTitle'),
+      'hidePackageFrame',
       Messages.get('mergeFramesOptionOn'),
       Messages.get('mergeFramesOptionOff')));
   contents.push(pageDocument.createElement('p'));
+  contents.push(OptionsPageGenerator._title(
+      pageDocument, Messages.get('menuOptionTitle')));
   contents.push(OptionsPageGenerator._menuOption(
-      pageDocument, Option.CLASS_MENU,
-      Messages.get('classOrMethodMenuTitle'),
-      Messages.get('classOrMethodMenuDescription')));
+      pageDocument, Messages.get('classOrMethodMenuOptionDescription'),
+      Option.CLASS_MENU));
   contents.push(pageDocument.createElement('p'));
   contents.push(OptionsPageGenerator._menuOption(
-      pageDocument, Option.PACKAGE_MENU,
-      Messages.get('packageMenuTitle'),
-      Messages.get('packageMenuDescription')));
+      pageDocument, Messages.get('packageMenuOptionDescription'),
+      Option.PACKAGE_MENU));
   return contents;
 };
 
 
 /**
  * @param {Document} pageDocument The options page document.
- * @return {Element} A header element.
+ * @param {string} elementType The type of element to create.
+ * @param {string} text The text content of the element.
+ * @return {Element} The text element.
  */
-OptionsPageGenerator._createHeader = function(pageDocument) {
-  var headerElement = pageDocument.createElement('h2');
-  headerElement.textContent = Messages.get('optionsTitle');
-  return headerElement;
+OptionsPageGenerator._text = function(pageDocument, elementType, text) {
+  var labelElement = pageDocument.createElement(elementType);
+  labelElement.textContent = text;
+  labelElement.setAttribute('style', 'font-family: sans-serif');
+  return labelElement;
+};
+
+
+/**
+ * @param {Document} pageDocument The options page document.
+ * @param {string} title The title text.
+ * @return {Element} An element that displays the title for an option.
+ */
+OptionsPageGenerator._title = function(pageDocument, title) {
+  var titleElement = OptionsPageGenerator._text(pageDocument, 'h2', title);
+  titleElement.setAttribute('style', 'font-family: sans-serif; ' +
+      'font-weight:normal; font-size:1.3em; margin-top:1em');
+  return titleElement;
 };
 
 
@@ -123,17 +148,22 @@ OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage = function(
 /**
  * @param {Document} pageDocument The options page document.
  * @param {Option} option A boolean option.
- * @param {string} title The title to display.
+ * @param {string} name The option name, used to name the form elements.
  * @param {string} trueText The message to display when the option is true.
  * @param {string} falseText The message to display when the option is false.
  * @return {Element} An element that allows the option to be configured.
  */
 OptionsPageGenerator._booleanOption = function(
-    pageDocument, option, title, trueText, falseText) {
+    pageDocument, option, name, trueText, falseText) {
+
   var trueRadioButtonElement = OptionsPageGenerator._radioButton(
-      pageDocument, option, title, true);
+      pageDocument, option, name, true);
+  var trueLabelElement = OptionsPageGenerator._text(
+      pageDocument, 'label', '   ' + trueText);
   var falseRadioButtonElement = OptionsPageGenerator._radioButton(
-      pageDocument, option, title, false);
+      pageDocument, option, name, false);
+  var falseLabelElement = OptionsPageGenerator._text(
+      pageDocument, 'label', '   ' + falseText);
 
   option.getValue(function(value) {
     var radioButtonToCheck =
@@ -150,18 +180,22 @@ OptionsPageGenerator._booleanOption = function(
         'click', clickEventListener, false);
   });
 
+  var blockElement = pageDocument.createElement('div');
+  blockElement.setAttribute('style', 'margin-left:20px');
   if (option.getDefaultValue()) {
-    trueText += ' ' + Messages.get('default');
+    blockElement.appendChild(trueRadioButtonElement);
+    blockElement.appendChild(trueLabelElement);
+    blockElement.appendChild(pageDocument.createElement('p'));
+    blockElement.appendChild(falseRadioButtonElement);
+    blockElement.appendChild(falseLabelElement);
   } else {
-    falseText += ' ' + Messages.get('default');
+    blockElement.appendChild(falseRadioButtonElement);
+    blockElement.appendChild(falseLabelElement);
+    blockElement.appendChild(pageDocument.createElement('p'));
+    blockElement.appendChild(trueRadioButtonElement);
+    blockElement.appendChild(trueLabelElement);
   }
-
-  return OptionsPageGenerator._createTable(pageDocument, title, '', [
-    OptionsPageGenerator._tableContentElementForRadioButton(
-        pageDocument, trueRadioButtonElement, trueText),
-    OptionsPageGenerator._tableContentElementForRadioButton(
-        pageDocument, falseRadioButtonElement, falseText)
-  ]);
+  return blockElement;
 };
 
 
@@ -187,32 +221,11 @@ OptionsPageGenerator._radioButton = function(
 
 /**
  * @param {Document} pageDocument The options page document.
- * @param {Element} radioButtonElement A radio button element.
- * @param {string} label A label for the radio button.
- * @return {Element} An element containing the radio button.
- */
-OptionsPageGenerator._tableContentElementForRadioButton = function(
-    pageDocument, radioButtonElement, label) {
-  var spanElement = pageDocument.createElement('span');
-  spanElement.innerHTML = label;
-
-  var labelElement = pageDocument.createElement('label');
-  labelElement.appendChild(radioButtonElement);
-  labelElement.appendChild(spanElement);
-
-  return labelElement;
-};
-
-
-/**
- * @param {Document} pageDocument The options page document.
+ * @param {string} description A description of the option.
  * @param {Option} option A menu option.
- * @param {string} title The title to display for this option.
- * @param {string} subTitle The sub-title to display for this option.
  * @return {Element} An element that allows the option to be configured.
  */
-OptionsPageGenerator._menuOption = function(
-    pageDocument, option, title, subTitle) {
+OptionsPageGenerator._menuOption = function(pageDocument, description, option) {
   var textAreaElement = pageDocument.createElement('textarea');
   textAreaElement.setAttribute('rows', 5);
   textAreaElement.setAttribute('cols', 100);
@@ -242,50 +255,14 @@ OptionsPageGenerator._menuOption = function(
     }, false);
   });
 
-  return OptionsPageGenerator._createTable(pageDocument, title, subTitle,
-      [textAreaElement, restoreDefaultButtonElement]);
+  var blockElement = pageDocument.createElement('div');
+  blockElement.setAttribute('style', 'margin-left:20px');
+  blockElement.appendChild(OptionsPageGenerator._text(
+      pageDocument, 'span', description));
+  blockElement.appendChild(pageDocument.createElement('p'));
+  blockElement.appendChild(restoreDefaultButtonElement);
+  blockElement.appendChild(pageDocument.createElement('br'));
+  blockElement.appendChild(textAreaElement);
+  return blockElement;
 };
 
-
-/**
- * @param {Document} pageDocument The options page document.
- * @param {string} title The options page title.
- * @param {string} subTitle The option page sub-title.
- * @param {Array.<Element>} contentElements The contents of the options page.
- * @return {Element} A table element.
- */
-OptionsPageGenerator._createTable = function(
-    pageDocument, title, subTitle, contentElements) {
-  var tableElement = pageDocument.createElement('table');
-  tableElement.style.borderStyle = 'groove';
-  tableElement.style.borderColor = 'blue';
-  tableElement.style.borderWidth = 'thick';
-
-  var headerTableRow = pageDocument.createElement('tr');
-  headerTableRow.style.backgroundColor = '#AFEEEE';
-  tableElement.appendChild(headerTableRow);
-
-  var headerTableDataElement = pageDocument.createElement('td');
-  var headerInnerHTML = '<b>' + title + '</b>';
-  if (subTitle) {
-    headerInnerHTML += '<br/>' + subTitle;
-  }
-  headerTableDataElement.innerHTML = headerInnerHTML;
-  headerTableRow.appendChild(headerTableDataElement);
-
-  var contentsTableRow = pageDocument.createElement('tr');
-  contentsTableRow.style.backgroundColor = '#F0FFF0';
-  tableElement.appendChild(contentsTableRow);
-
-  var contentsTableDataElement = pageDocument.createElement('td');
-  contentsTableRow.appendChild(contentsTableDataElement);
-
-  var contentsParagraphElement = pageDocument.createElement('p');
-  contentElements.forEach(function(tableContentElement) {
-    contentsParagraphElement.appendChild(tableContentElement);
-    contentsParagraphElement.appendChild(pageDocument.createElement('br'));
-  });
-  contentsTableDataElement.appendChild(contentsParagraphElement);
-
-  return tableElement;
-};
