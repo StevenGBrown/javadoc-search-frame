@@ -213,7 +213,7 @@ OptionsPageGenerator._radioButton = function(
   radioButtonElement.setAttribute('name', name);
   radioButtonElement.setAttribute('value', checked);
   if (!Option.canGetAndSet()) {
-    radioButtonElement.setAttribute('disabled', true);
+    radioButtonElement.disabled = true;
   }
   return radioButtonElement;
 };
@@ -226,33 +226,40 @@ OptionsPageGenerator._radioButton = function(
  * @return {Element} An element that allows the option to be configured.
  */
 OptionsPageGenerator._menuOption = function(pageDocument, description, option) {
-  var textAreaElement = pageDocument.createElement('textarea');
-  textAreaElement.setAttribute('rows', 5);
-  textAreaElement.setAttribute('cols', 100);
-  textAreaElement.setAttribute('wrap', 'off');
-  if (!Option.canGetAndSet()) {
-    textAreaElement.setAttribute('disabled', true);
-  }
-
   var restoreDefaultButtonElement = pageDocument.createElement('input');
   restoreDefaultButtonElement.setAttribute('type', 'button');
   restoreDefaultButtonElement.setAttribute('value',
       Messages.get('restoreDefault'));
-  if (!Option.canGetAndSet()) {
-    restoreDefaultButtonElement.setAttribute('disabled', true);
-  }
+  restoreDefaultButtonElement.disabled = true;
+
+  var saveButtonElement = pageDocument.createElement('input');
+  saveButtonElement.setAttribute('type', 'button');
+  saveButtonElement.setAttribute('value', Messages.get('saveChanges'));
+  saveButtonElement.disabled = true;
+
+  var textAreaElement = pageDocument.createElement('textarea');
+  textAreaElement.setAttribute('rows', 5);
+  textAreaElement.setAttribute('cols', 100);
+  textAreaElement.setAttribute('wrap', 'off');
+  textAreaElement.disabled = true;
 
   option.getValue(function(value) {
     textAreaElement.textContent = value;
 
-    textAreaElement.addEventListener('keyup', function() {
-      option.setValue(textAreaElement.value);
-    }, false);
+    if (Option.canGetAndSet()) {
+      saveButtonElement.disabled = false;
+      saveButtonElement.addEventListener('click', function() {
+        option.setValue(textAreaElement.value);
+      }, false);
 
-    restoreDefaultButtonElement.addEventListener('click', function() {
-      textAreaElement.value = option.getDefaultValue();
-      option.setValue(option.getDefaultValue());
-    }, false);
+      restoreDefaultButtonElement.disabled = false;
+      restoreDefaultButtonElement.addEventListener('click', function() {
+        textAreaElement.value = option.getDefaultValue();
+        option.setValue(option.getDefaultValue());
+      }, false);
+
+      textAreaElement.disabled = false;
+    }
   });
 
   var blockElement = pageDocument.createElement('div');
@@ -261,6 +268,7 @@ OptionsPageGenerator._menuOption = function(pageDocument, description, option) {
       pageDocument, 'span', description));
   blockElement.appendChild(pageDocument.createElement('p'));
   blockElement.appendChild(restoreDefaultButtonElement);
+  blockElement.appendChild(saveButtonElement);
   blockElement.appendChild(pageDocument.createElement('br'));
   blockElement.appendChild(textAreaElement);
   return blockElement;
