@@ -53,7 +53,11 @@
   },
   "restoreDefault": {
     "message": "Restore Default",
-    "description": "Label displayed on the each button to reset a menu option to the default value."
+    "description": "Label displayed on the buttons that reset a menu option to the default value."
+  },
+  "saveChanges": {
+    "message": "Save Changes",
+    "description": "Label displayed on the buttons that save a new value for an option."
   },
   "optionsReadOnly": {
     "message": "This browser does not support changing the options.",
