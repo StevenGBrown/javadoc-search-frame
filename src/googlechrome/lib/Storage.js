@@ -34,7 +34,7 @@
 
 
 /**
- * @class Provides local storage functionality.
+ * @class Provides storage functionality.
  */
 Storage = {};
 
@@ -43,7 +43,7 @@ Storage = {};
  * @return {boolean} Whether retrieval of stored data is supported.
  */
 Storage.canGet = function() {
-  return Storage._localStorageDefined();
+  return true;
 };
 
 
@@ -54,7 +54,14 @@ Storage.canGet = function() {
  *     retrieved value.
  */
 Storage.get = function(key, callback) {
-  chrome.runtime.sendMessage({operation: 'get', key: key}, callback);
+  chrome.storage.sync.get(key, function(items) {
+    var item = items[key];
+    if (item) {
+      callback(item['value']);
+    } else {
+      callback(undefined);
+    }
+  });
 };
 
 
@@ -62,7 +69,7 @@ Storage.get = function(key, callback) {
  * @return {boolean} Whether modification of stored data is supported.
  */
 Storage.canSet = function() {
-  return Storage._localStorageDefined();
+  return true;
 };
 
 
@@ -72,17 +79,9 @@ Storage.canSet = function() {
  * @param {*} value The value.
  */
 Storage.set = function(key, value) {
-  chrome.runtime.sendMessage({operation: 'set', key: key, value: value});
+  var items = {};
+  var version = chrome.runtime.getManifest().version;
+  items[key] = {'value': value, 'version': version};
+  chrome.storage.sync.set(items);
 };
 
-
-/**
- * @return {boolean} Whether the localStorage object is defined.
- */
-Storage._localStorageDefined = function() {
-  try {
-    return localStorage !== undefined;
-  } catch (ex) {
-    return false;
-  }
-};

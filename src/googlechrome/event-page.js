@@ -29,11 +29,7 @@
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
       var response = {};
-      if (request.operation === 'get') {
-        response = localStorage.getItem(request.key);
-      } else if (request.operation === 'set') {
-        localStorage.setItem(request.key, request.value);
-      } else if (request.operation === 'open-options-page') {
+      if (request.operation === 'open-options-page') {
         var tabProperties = {
           windowId: sender.tab.windowId,
           index: sender.tab.index + 1,

@@ -34,7 +34,7 @@
 
 
 /**
- * @class Provides local storage functionality.
+ * @class Provides storage functionality.
  */
 Storage = {};
 

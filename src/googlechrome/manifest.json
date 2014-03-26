@@ -73,6 +73,7 @@
   "offline_enabled": true,
   "permissions": [
     "http://*/*",
-    "https://*/*"
+    "https://*/*",
+    "storage"
   ]
 }
