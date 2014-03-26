@@ -244,19 +244,33 @@ OptionsPageGenerator._menuOption = function(pageDocument, description, option) {
   textAreaElement.disabled = true;
 
   option.getValue(function(value) {
-    textAreaElement.textContent = value;
+    textAreaElement.value = value;
 
     if (Option.canGetAndSet()) {
-      saveButtonElement.disabled = false;
-      saveButtonElement.addEventListener('click', function() {
-        option.setValue(textAreaElement.value);
-      }, false);
+      var savedValue = value;
 
-      restoreDefaultButtonElement.disabled = false;
+      var updateEnabled = function() {
+        var hasDefault = (textAreaElement.value === option.getDefaultValue());
+        restoreDefaultButtonElement.disabled = hasDefault;
+        var hasSaved = (textAreaElement.value === savedValue);
+        saveButtonElement.disabled = hasSaved;
+      };
+
+      var save = function() {
+        option.setValue(textAreaElement.value);
+        savedValue = textAreaElement.value;
+        updateEnabled();
+      };
+
       restoreDefaultButtonElement.addEventListener('click', function() {
         textAreaElement.value = option.getDefaultValue();
-        option.setValue(option.getDefaultValue());
+        save();
       }, false);
+
+      saveButtonElement.addEventListener('click', save, false);
+
+      textAreaElement.addEventListener('input', updateEnabled, false);
+      updateEnabled();
 
       textAreaElement.disabled = false;
     }
