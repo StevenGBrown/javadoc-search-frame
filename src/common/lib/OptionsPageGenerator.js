@@ -171,7 +171,7 @@ OptionsPageGenerator._booleanOption = function(
     radioButtonToCheck.setAttribute('checked', true);
 
     var clickEventListener = function() {
-      option.setValue(trueRadioButtonElement.checked);
+      Storage.set(option, trueRadioButtonElement.checked);
     };
 
     trueRadioButtonElement.addEventListener(
@@ -257,7 +257,7 @@ OptionsPageGenerator._menuOption = function(pageDocument, description, option) {
       };
 
       var save = function() {
-        option.setValue(textAreaElement.value);
+        Storage.set(option, textAreaElement.value);
         savedValue = textAreaElement.value;
         updateEnabled();
       };

@@ -35,7 +35,7 @@
 
 
 /**
- * Provides persistent configuration of the script options.
+ * Option which can be configured to change the behaviour of the script.
  * @param {{key: string, defaultValue: string, type}} properties The option
  *     properties.
  * @constructor
@@ -44,16 +44,6 @@ Option = function(properties) {
   this.key = properties.key;
   this.defaultValue = properties.defaultValue;
   this.type = properties.type;
-};
-
-
-/**
- * Set this option to a new value.
- * @param {*} newValue The new value.
- * @throws An exception if this option cannot be set.
- */
-Option.prototype.setValue = function(newValue) {
-  Storage.set(this.key, newValue);
 };
 
 
