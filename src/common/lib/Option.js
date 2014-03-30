@@ -36,14 +36,15 @@
 
 /**
  * Option which can be configured to change the behaviour of the script.
- * @param {{key: string, defaultValue: string, type}} properties The option
- *     properties.
+ * @param {{key: string, defaultValue: string, type,
+ *        upgrade: function(string, string)}} properties The option properties.
  * @constructor
  */
 Option = function(properties) {
   this.key = properties.key;
   this.defaultValue = properties.defaultValue;
   this.type = properties.type;
+  this.upgrade = properties.upgrade;
 };
 
 
@@ -58,7 +59,10 @@ Option = function(properties) {
 Option.AUTO_OPEN = new Option({
   key: 'auto_open',
   defaultValue: false,
-  type: Boolean
+  type: Boolean,
+  upgrade: function(value, lastSavedVersion) {
+    return value;
+  }
 });
 
 
@@ -68,7 +72,10 @@ Option.AUTO_OPEN = new Option({
 Option.HIDE_PACKAGE_FRAME = new Option({
   key: 'hide_package_frame',
   defaultValue: true,
-  type: Boolean
+  type: Boolean,
+  upgrade: function(value, lastSavedVersion) {
+    return value;
+  }
 });
 
 
@@ -80,7 +87,10 @@ Option.PACKAGE_MENU = new Option({
   defaultValue:
       '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##\n' +
       '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##',
-  type: String
+  type: String,
+  upgrade: function(value, lastSavedVersion) {
+    return this._upgradeMenuOption(value, lastSavedVersion);
+  }
 });
 
 
@@ -95,8 +105,28 @@ Option.CLASS_MENU = new Option({
       '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
       '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
       '##PACKAGE_PATH##/##CLASS_NAME##.java.html',
-  type: String
+  type: String,
+  upgrade: function(value, lastSavedVersion) {
+    return this._upgradeMenuOption(value, lastSavedVersion);
+  }
 });
 
 /**#@-
  */
+
+
+/**
+ * Upgrade a configured menu option. This function performs the changes which
+ * are used to upgrade both the class menu and package menu.
+ * @param {string} value The current value of the option.
+ * @param {string} lastSavedVersion The last version of the script to save the
+ *                 option.
+ * @return {string} The new value.
+ */
+Option.prototype._upgradeMenuOption = function(value, lastSavedVersion) {
+  if (lastSavedVersion === '1.4.6' && value.indexOf('->') === -1) {
+    value = this.defaultValue;
+  }
+  return value;
+};
+

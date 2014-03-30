@@ -60,6 +60,7 @@ Storage.get = function(option, callback) {
     var item = items[option.key];
     if (item) {
       value = item['value'];
+      value = option.upgrade(value, item['version']);
     }
     callback(value);
   });

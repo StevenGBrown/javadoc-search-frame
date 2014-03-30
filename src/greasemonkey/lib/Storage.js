@@ -78,6 +78,9 @@ Storage.get = function(option, callback) {
   }
   if (value === undefined || value === null) {
     value = option.defaultValue;
+  } else {
+    var version = GM_getValue(option.key + '_version', '1.4.6');
+    value = option.upgrade(value, version);
   }
   callback(value);
 };
@@ -103,5 +106,7 @@ Storage._canSet = function() {
  */
 Storage.set = function(option, value) {
   GM_setValue(option.key, value);
+  var version = '#VERSION#'; // The version number is set by the build script.
+  GM_setValue(option.key + '_version', version);
 };
 
