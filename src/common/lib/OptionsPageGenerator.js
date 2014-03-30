@@ -182,7 +182,7 @@ OptionsPageGenerator._booleanOption = function(
 
   var blockElement = pageDocument.createElement('div');
   blockElement.setAttribute('style', 'margin-left:20px');
-  if (option.getDefaultValue()) {
+  if (option.defaultValue) {
     blockElement.appendChild(trueRadioButtonElement);
     blockElement.appendChild(trueLabelElement);
     blockElement.appendChild(pageDocument.createElement('p'));
@@ -250,7 +250,7 @@ OptionsPageGenerator._menuOption = function(pageDocument, description, option) {
       var savedValue = value;
 
       var updateEnabled = function() {
-        var hasDefault = (textAreaElement.value === option.getDefaultValue());
+        var hasDefault = (textAreaElement.value === option.defaultValue);
         restoreDefaultButtonElement.disabled = hasDefault;
         var hasSaved = (textAreaElement.value === savedValue);
         saveButtonElement.disabled = hasSaved;
@@ -263,7 +263,7 @@ OptionsPageGenerator._menuOption = function(pageDocument, description, option) {
       };
 
       restoreDefaultButtonElement.addEventListener('click', function() {
-        textAreaElement.value = option.getDefaultValue();
+        textAreaElement.value = option.defaultValue;
         save();
       }, false);
 

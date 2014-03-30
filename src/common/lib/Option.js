@@ -81,14 +81,6 @@ Option.prototype.getValue = function(callback) {
 
 
 /**
- * @return {*} The default value of this option.
- */
-Option.prototype.getDefaultValue = function() {
-  return this.defaultValue;
-};
-
-
-/**
  * Set this option to a new value.
  * @param {*} newValue The new value.
  * @throws An exception if this option cannot be set.
