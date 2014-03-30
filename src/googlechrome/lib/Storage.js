@@ -40,6 +40,14 @@ Storage = {};
 
 
 /**
+ * @return {boolean} Whether storage is supported by this browser.
+ */
+Storage.isSupported = function() {
+  return true;
+};
+
+
+/**
  * @return {boolean} Whether retrieval of stored data is supported.
  */
 Storage.canGet = function() {

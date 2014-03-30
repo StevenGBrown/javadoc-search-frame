@@ -70,7 +70,7 @@ OptionsPageGenerator._createContents = function(pageDocument) {
   contents.push(optionsTitleElement);
   contents.push(pageDocument.createElement('hr'));
   contents.push(pageDocument.createElement('p'));
-  if (!Option.canGetAndSet()) {
+  if (!Storage.isSupported()) {
     contents.push(
         OptionsPageGenerator._createOptionsCannotBeConfiguredErrorMessage(
             pageDocument));
@@ -212,7 +212,7 @@ OptionsPageGenerator._radioButton = function(
   radioButtonElement.setAttribute('type', 'radio');
   radioButtonElement.setAttribute('name', name);
   radioButtonElement.setAttribute('value', checked);
-  if (!Option.canGetAndSet()) {
+  if (!Storage.isSupported()) {
     radioButtonElement.disabled = true;
   }
   return radioButtonElement;
@@ -246,7 +246,7 @@ OptionsPageGenerator._menuOption = function(pageDocument, description, option) {
   option.getValue(function(value) {
     textAreaElement.value = value;
 
-    if (Option.canGetAndSet()) {
+    if (Storage.isSupported()) {
       var savedValue = value;
 
       var updateEnabled = function() {

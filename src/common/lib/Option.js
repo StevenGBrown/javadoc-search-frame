@@ -48,19 +48,10 @@ Option = function(properties) {
 
 
 /**
- * @return {boolean} Whether options can be both retrieved and set.
- */
-Option.canGetAndSet = function() {
-  return Storage.canGet() && Storage.canSet();
-};
-
-
-/**
  * Retrieve the current value of this option.
  * @param {function(*)} callback Callback function that is provided with the
  *     value of this option. If the option cannot be retrieved, has not yet
  *     been configured, or is invalid, the default value will be returned.
- * @see Option.canGetAndSet
  */
 Option.prototype.getValue = function(callback) {
   var defaultValue = this.defaultValue;
@@ -84,7 +75,6 @@ Option.prototype.getValue = function(callback) {
  * Set this option to a new value.
  * @param {*} newValue The new value.
  * @throws An exception if this option cannot be set.
- * @see Option.canGetAndSet
  */
 Option.prototype.setValue = function(newValue) {
   Storage.set(this.key, newValue);
