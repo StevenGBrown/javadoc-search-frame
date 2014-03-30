@@ -104,10 +104,23 @@ Option.CLASS_MENU = new Option({
       '?s=##PACKAGE_NAME##+##CLASS_NAME##+##MEMBER_NAME##\n' +
       '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
       '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
-      '##PACKAGE_PATH##/##CLASS_NAME##.java.html',
+      '##PACKAGE_PATH##/##CLASS_NAME##.java.html\n' +
+      '@4:search(grepcode) -> http://grepcode.com/' +
+      'search/?query=##PACKAGE_NAME##.##CLASS_NAME##.##MEMBER_NAME##',
   type: String,
   upgrade: function(value, lastSavedVersion) {
-    return this._upgradeMenuOption(value, lastSavedVersion);
+    value = this._upgradeMenuOption(value, lastSavedVersion);
+    if (lastSavedVersion === '1.4.6' && value.indexOf('grepcode') === -1) {
+      for (var i = 1; i < 10; i++) {
+        if (value.indexOf('@' + i + ':') === -1) {
+          value += '\n@' + i + ':search(grepcode) -> http://grepcode.com/' +
+                   'search/?query=' +
+                   '##PACKAGE_NAME##.##CLASS_NAME##.##MEMBER_NAME##';
+          break;
+        }
+      }
+    }
+    return value;
   }
 });
 
