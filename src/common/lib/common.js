@@ -1174,8 +1174,8 @@ Search.getTopLinkUrl = function() {
  * @param {string} entireSearchString The search string.
  */
 Search._performSearch = function(entireSearchString) {
-  Option.CLASS_MENU.getValue(function(classMenu) {
-    Option.PACKAGE_MENU.getValue(function(packageMenu) {
+  Storage.get(Option.CLASS_MENU, function(classMenu) {
+    Storage.get(Option.PACKAGE_MENU, function(packageMenu) {
       var searchContext = {};
       searchContext.classMenu = classMenu;
       searchContext.packageMenu = packageMenu;
@@ -1219,7 +1219,7 @@ Search._collapseMenu = function() {
 Search._autoOpen = function() {
   var url = Search.getTopLinkUrl();
   if (url) {
-    Option.AUTO_OPEN.getValue(function(autoOpen) {
+    Storage.get(Option.AUTO_OPEN, function(autoOpen) {
       if (autoOpen) {
         Frames.openLinkInSummaryFrame(url);
       }

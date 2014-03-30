@@ -48,30 +48,6 @@ Option = function(properties) {
 
 
 /**
- * Retrieve the current value of this option.
- * @param {function(*)} callback Callback function that is provided with the
- *     value of this option. If the option cannot be retrieved, has not yet
- *     been configured, or is invalid, the default value will be returned.
- */
-Option.prototype.getValue = function(callback) {
-  var defaultValue = this.defaultValue;
-  var type = this.type;
-  if (Storage.canGet()) {
-    Storage.get(this.key, function(value) {
-      if (type === Boolean) {
-        value = '' + value;
-        callback(defaultValue ? value !== 'false' : value === 'true');
-      } else {
-        callback(value === undefined || value === null ? defaultValue : value);
-      }
-    });
-  } else {
-    callback(defaultValue);
-  }
-};
-
-
-/**
  * Set this option to a new value.
  * @param {*} newValue The new value.
  * @throws An exception if this option cannot be set.
