@@ -1222,6 +1222,7 @@ Search._autoOpen = function() {
     Storage.get(Option.AUTO_OPEN, function(autoOpen) {
       if (autoOpen) {
         Frames.openLinkInSummaryFrame(url);
+        self.focus();
       }
     });
   }
