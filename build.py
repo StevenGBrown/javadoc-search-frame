@@ -151,7 +151,8 @@ def copyFile(fromPath, toPath, append=()):
     # Append files to the end.
     for appendPath in append:
       with io.open(appendPath, 'r') as appendFile:
-        fileContents += '\n' + _removeLicenseHeader(appendFile.read())
+        appendContents = _removeLicenseHeader(appendFile.read())
+        fileContents += '\n' + appendContents.replace('#VERSION#', version)
     # Write file with Unix newlines.
     with io.open(toPath, 'w', newline='\n') as toFile:
       toFile.write(fileContents)

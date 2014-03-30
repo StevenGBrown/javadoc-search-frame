@@ -49,20 +49,6 @@
 
 
 /**
- * If the given menu option does not match the new format, set it to the
- * default.
- * @param {Option} option The menu option.
- */
-function updateMenuOption(option) {
-  Storage.get(option, function(value) {
-    if (value && value.indexOf('->') === -1) {
-      Storage.set(option, option.defaultValue);
-    }
-  });
-}
-
-
-/**
  * Entry point of this script; called when the script has loaded.
  */
 function main() {
@@ -71,9 +57,6 @@ function main() {
     OptionsPageGenerator.generate();
     return;
   }
-
-  updateMenuOption(Option.CLASS_MENU);
-  updateMenuOption(Option.PACKAGE_MENU);
 
   // Version of this script. This value is set by the build script.
   var version = '#VERSION#';
