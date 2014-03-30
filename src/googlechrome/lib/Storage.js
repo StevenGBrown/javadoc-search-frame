@@ -67,22 +67,15 @@ Storage.get = function(option, callback) {
 
 
 /**
- * @return {boolean} Whether modification of stored data is supported.
+ * Set an option to a new value.
+ * @param {Option} option The option to configure.
+ * @param {*} value The new value.
+ * @throws An exception if this option cannot be set.
  */
-Storage.canSet = function() {
-  return true;
-};
-
-
-/**
- * Store a value based on a key.
- * @param {string} key The key.
- * @param {*} value The value.
- */
-Storage.set = function(key, value) {
+Storage.set = function(option, value) {
   var items = {};
   var version = chrome.runtime.getManifest().version;
-  items[key] = {'value': value, 'version': version};
+  items[option.key] = {'value': value, 'version': version};
   chrome.storage.sync.set(items);
 };
 

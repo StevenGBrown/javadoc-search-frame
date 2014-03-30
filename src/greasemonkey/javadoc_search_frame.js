@@ -56,7 +56,7 @@
 function updateMenuOption(option) {
   Storage.get(option, function(value) {
     if (value && value.indexOf('->') === -1) {
-      option.setValue(option.defaultValue);
+      Storage.set(option, option.defaultValue);
     }
   });
 }

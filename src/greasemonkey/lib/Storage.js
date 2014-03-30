@@ -43,7 +43,7 @@ Storage = {};
  * @return {boolean} Whether storage is supported by this browser.
  */
 Storage.isSupported = function() {
-  return Storage._canGet() && Storage.canSet();
+  return Storage._canGet() && Storage._canSet();
 };
 
 
@@ -86,7 +86,7 @@ Storage.get = function(option, callback) {
 /**
  * @return {boolean} Whether modification of stored data is supported.
  */
-Storage.canSet = function() {
+Storage._canSet = function() {
   try {
     return Boolean(GM_setValue);
   } catch (ex) {
@@ -96,10 +96,12 @@ Storage.canSet = function() {
 
 
 /**
- * Store a value based on a key.
- * @param {string} key The key.
- * @param {*} value The value.
+ * Set an option to a new value.
+ * @param {Option} option The option to configure.
+ * @param {*} value The new value.
+ * @throws An exception if this option cannot be set.
  */
-Storage.set = function(key, value) {
-  GM_setValue(key, value);
+Storage.set = function(option, value) {
+  GM_setValue(option.key, value);
 };
+
