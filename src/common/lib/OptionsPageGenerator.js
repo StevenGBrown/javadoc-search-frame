@@ -165,7 +165,7 @@ OptionsPageGenerator._booleanOption = function(
   var falseLabelElement = OptionsPageGenerator._text(
       pageDocument, 'label', '   ' + falseText);
 
-  option.getValue(function(value) {
+  Storage.get(option, function(value) {
     var radioButtonToCheck =
         value ? trueRadioButtonElement : falseRadioButtonElement;
     radioButtonToCheck.setAttribute('checked', true);
@@ -243,7 +243,7 @@ OptionsPageGenerator._menuOption = function(pageDocument, description, option) {
   textAreaElement.setAttribute('wrap', 'off');
   textAreaElement.disabled = true;
 
-  option.getValue(function(value) {
+  Storage.get(option, function(value) {
     textAreaElement.value = value;
 
     if (Storage.isSupported()) {

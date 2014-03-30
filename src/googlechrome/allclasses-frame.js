@@ -41,7 +41,7 @@ function main() {
 
   console.log(startupLogMessage);
 
-  Option.HIDE_PACKAGE_FRAME.getValue(function(packageFrameHidden) {
+  Storage.get(Option.HIDE_PACKAGE_FRAME, function(packageFrameHidden) {
     // The packages frame is hidden by a different content script.
     init(packageFrameHidden);
 

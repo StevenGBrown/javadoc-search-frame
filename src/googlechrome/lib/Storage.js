@@ -48,27 +48,20 @@ Storage.isSupported = function() {
 
 
 /**
- * @return {boolean} Whether retrieval of stored data is supported.
- */
-Storage.canGet = function() {
-  return true;
-};
-
-
-/**
- * Retrieve a value based on a key.
- * @param {string} key The key.
+ * Retrieve the current value of an option.
+ * @param {Option} option the Option to retrieve.
  * @param {function(*)} callback Callback function that is provided with the
- *     retrieved value.
+ *     value of this option. If the option cannot be retrieved, or has not yet
+ *     been configured, then the default value will be returned.
  */
-Storage.get = function(key, callback) {
-  chrome.storage.sync.get(key, function(items) {
-    var item = items[key];
+Storage.get = function(option, callback) {
+  chrome.storage.sync.get(option.key, function(items) {
+    var value = option.defaultValue;
+    var item = items[option.key];
     if (item) {
-      callback(item['value']);
-    } else {
-      callback(undefined);
+      value = item['value'];
     }
+    callback(value);
   });
 };
 

@@ -54,7 +54,7 @@
  * @param {Option} option The menu option.
  */
 function updateMenuOption(option) {
-  option.getValue(function(value) {
+  Storage.get(option, function(value) {
     if (value && value.indexOf('->') === -1) {
       option.setValue(option.defaultValue);
     }
@@ -89,7 +89,7 @@ function main() {
     console.log(startupLogMessage);
   }
 
-  Option.HIDE_PACKAGE_FRAME.getValue(function(hidePackageFrame) {
+  Storage.get(Option.HIDE_PACKAGE_FRAME, function(hidePackageFrame) {
     if (hidePackageFrame) {
       Frames.hideAllPackagesFrame();
     }

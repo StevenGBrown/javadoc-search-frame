@@ -43,14 +43,14 @@ Storage = {};
  * @return {boolean} Whether storage is supported by this browser.
  */
 Storage.isSupported = function() {
-  return Storage.canGet() && Storage.canSet();
+  return Storage._canGet() && Storage.canSet();
 };
 
 
 /**
  * @return {boolean} Whether retrieval of stored data is supported.
  */
-Storage.canGet = function() {
+Storage._canGet = function() {
   try {
     return Boolean(GM_getValue) &&
         GM_getValue('test', 'defaultValue') === 'defaultValue';
@@ -61,13 +61,25 @@ Storage.canGet = function() {
 
 
 /**
- * Retrieve a value based on a key.
- * @param {string} key The key.
+ * Retrieve the current value of an option.
+ * @param {Option} option the Option to retrieve.
  * @param {function(*)} callback Callback function that is provided with the
- *     retrieved value.
+ *     value of this option. If the option cannot be retrieved, or has not yet
+ *     been configured, then the default value will be returned.
  */
-Storage.get = function(key, callback) {
-  callback(GM_getValue(key));
+Storage.get = function(option, callback) {
+  var value = undefined;
+  if (Storage._canGet()) {
+    value = GM_getValue(option.key);
+    if (option.type === Boolean) {
+      value = '' + value;
+      value = (option.defaultValue ? value !== 'false' : value === 'true');
+    }
+  }
+  if (value === undefined || value === null) {
+    value = option.defaultValue;
+  }
+  callback(value);
 };
 
 
