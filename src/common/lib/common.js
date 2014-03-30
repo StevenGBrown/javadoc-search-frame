@@ -1199,8 +1199,8 @@ Search._performSearch = function(entireSearchString) {
         Search._collapseMenu();
       }
 
-    }, Search);
-  }, Search);
+    });
+  });
 };
 
 

@@ -60,18 +60,9 @@ Option.canGetAndSet = function() {
  * @param {function(*)} callback Callback function that is provided with the
  *     value of this option. If the option cannot be retrieved, has not yet
  *     been configured, or is invalid, the default value will be returned.
- * @param {Object=} opt_thisObject Used as the "this" for each invocation of
- *     the callback. If it is not provided, or is null, the global object
- *     associated with callback is used instead.
  * @see Option.canGetAndSet
  */
-Option.prototype.getValue = function(callback, opt_thisObject) {
-  if (opt_thisObject) {
-    var providedCallback = callback;
-    callback = function(value) {
-      providedCallback.apply(opt_thisObject, [value]);
-    };
-  }
+Option.prototype.getValue = function(callback) {
   var defaultValue = this.defaultValue;
   var type = this.type;
   if (Storage.canGet()) {
