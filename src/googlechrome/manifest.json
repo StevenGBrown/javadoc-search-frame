@@ -63,6 +63,8 @@
           "file://*/*"
       ],
       "js": [
+          "lib/Storage.js",
+          "lib/Option.js",
           "all-frames.js"
       ],
       "all_frames": true

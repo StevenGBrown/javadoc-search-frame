@@ -38,8 +38,8 @@ if (framesets) {
         framesetChildren[0].name === 'packageListFrame' &&
         framesetChildren[1].name === 'packageFrame') {
       var message = {operation: 'get', key: 'hide_package_frame'};
-      chrome.runtime.sendMessage(message, function(hidePackageFrame) {
-        if (hidePackageFrame !== 'false') {
+      Storage.get(Option.HIDE_PACKAGE_FRAME, function(hidePackageFrame) {
+        if (hidePackageFrame) {
           frameset.setAttribute('rows', '0,*');
           frameset.setAttribute('border', 0);
           frameset.setAttribute('frameborder', 0);
