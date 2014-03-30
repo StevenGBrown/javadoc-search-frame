@@ -85,7 +85,7 @@ Option.HIDE_PACKAGE_FRAME = new Option({
 Option.PACKAGE_MENU = new Option({
   key: 'package_menu',
   defaultValue:
-      '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##\n' +
+      '@1:search(Ohloh) -> http://code.ohloh.net/?s=##PACKAGE_NAME##\n' +
       '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##',
   type: String,
   upgrade: function(value, lastSavedVersion) {
@@ -100,7 +100,7 @@ Option.PACKAGE_MENU = new Option({
 Option.CLASS_MENU = new Option({
   key: 'class_menu',
   defaultValue:
-      '@1:search(koders) -> http://www.koders.com/' +
+      '@1:search(Ohloh) -> http://code.ohloh.net/' +
       '?s=##PACKAGE_NAME##+##CLASS_NAME##+##MEMBER_NAME##\n' +
       '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
       '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
@@ -124,8 +124,13 @@ Option.CLASS_MENU = new Option({
  * @return {string} The new value.
  */
 Option.prototype._upgradeMenuOption = function(value, lastSavedVersion) {
-  if (lastSavedVersion === '1.4.6' && value.indexOf('->') === -1) {
-    value = this.defaultValue;
+  if (lastSavedVersion === '1.4.6') {
+    if (value.indexOf('->') === -1) {
+      value = this.defaultValue;
+    } else {
+      value = value.replace('search(koders)', 'search(Ohloh)');
+      value = value.replace('//www.koders.com/', '//code.ohloh.net/');
+    }
   }
   return value;
 };
