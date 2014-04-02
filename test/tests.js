@@ -163,10 +163,8 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
 
   assertThatSearchResultFor('java.io',
       is([javaIoPackage, javaIoCloseableClass]));
-  assertThatSearchResultFor('JI',
+  assertThatSearchResultFor('j.i',
       is([javaIoPackage, javaIoCloseableClass]));
-  assertThatSearchResultFor('JW',
-      is([]));
   assertThatSearchResultFor('j',
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass,
           javaIoPackage, javaLangPackage, javaIoCloseableClass,
@@ -184,7 +182,7 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
         testOuterAppleBananaClass]));
   assertThatSearchResultFor('java.lang.Object',
       is([javaLangObjectClass]));
-  assertThatSearchResultFor('JLO',
+  assertThatSearchResultFor('j.l.O',
       is([javaLangObjectClass]));
   assertThatSearchResultFor('JAVA.LANG.OBJECT',
       is([javaLangObjectClass]));
@@ -196,10 +194,12 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
       is([javaLangObjectClass]));
   assertThatSearchResultFor('java.*.*o*e',
       is([javaAwtGeomPoint2DDoubleClass, javaIoCloseableClass,
-          javaLangObjectClass]));
+          javaLangObjectClass, javaxSwingBorderFactoryClass,
+          javaxSwingBorderAbstractBorderClass]));
   assertThatSearchResultFor('java.**.***o**e*',
       is([javaAwtGeomPoint2DDoubleClass, javaIoCloseableClass,
-          javaLangObjectClass]));
+          javaLangObjectClass, javaxSwingBorderFactoryClass,
+          javaxSwingBorderAbstractBorderClass]));
   assertThatSearchResultFor('javax.swing.border.A',
       is([javaxSwingBorderAbstractBorderClass]));
   assertThatSearchResultFor('PoiD',
@@ -218,7 +218,7 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
       is([javaAwtGeomPoint2DDoubleClass]));
   assertThatSearchResultFor('java.awt.geom.PD',
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
-  assertThatSearchResultFor('JAGPD',
+  assertThatSearchResultFor('j.a.g.PD',
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
   assertThatSearchResultFor('java.awt.geom.P2D',
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
@@ -246,7 +246,7 @@ UnitTestSuite.testFunctionFor('RegexLibrary.createCondition', function() {
       is([testOuterAppleBananaClass]));
   assertThatSearchResultFor('test.Banana',
       is([]));
-  assertThatSearchResultFor('Ja.Aw.',
+  assertThatSearchResultFor('ja.aw.',
       is([javaAwtGeomPoint2DClass, javaAwtGeomPoint2DDoubleClass]));
 });
 
