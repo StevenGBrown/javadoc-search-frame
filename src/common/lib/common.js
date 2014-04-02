@@ -957,90 +957,62 @@ RegexLibrary._createExactMatchCondition = function(
  * @return {RegExp} The regular expression for the search string.
  */
 RegexLibrary._getRegex = function(searchString) {
-  var pattern = '^';
 
-  var remainingSearchString = searchString.replace(/\*{2,}/g, '*');
-  var token;
-  var previousToken;
-  while (remainingSearchString.length > 0) {
-    var previousToken = token;
+  // Replace repeated wildcards with a single wildcard character.
+  searchString = searchString.replace(/\*{2,}/g, '*');
+  // If the search string ends with a wildcard, remove it.
+  searchString = searchString.replace(/\*$/, '');
 
-    var camelCaseTokenMatch = /^[A-Z][a-z\\d]*/.exec(remainingSearchString);
-    if (camelCaseTokenMatch) {
-      token = camelCaseTokenMatch[0];
-
-      // A Camel Case expression, consisting of a leading character (uppercase)
-      // and one or more trailing characters (consisting of lowercase
-      // characters and digit characters).
-
-      var leadingCharacter = token.charAt(0);
-      var trailingCharacters = token.substring(1);
-      var trailingCharactersPattern = '[a-z\\d]*' + trailingCharacters +
-          '[a-z\\d]*';
-
-      if (remainingSearchString === searchString) {
-        // The Camel Case expression is at the start of the search string.
-        // Perform a case-insensitive match of the leading character, then
-        // match the trailing characters along with other lowercase characters
-        // or digit characters.
-        pattern += '(' + leadingCharacter + '|' +
-            leadingCharacter.toLowerCase() + ')' + trailingCharactersPattern;
-      } else {
-        // The Camel Case expression is NOT at the start of the search string.
-        pattern += '(' +
-            // Optionally match a period character, then match the leading
-            // character, then match the trailing characters along with other
-            // lowercase characters or digit characters. The optional period
-            // character allows inner classes to be matched by this Camel Case
-            // expression.
-            '(\\.?' + leadingCharacter + trailingCharactersPattern + ')' +
-            // OR
-            '|' +
-            // Match a period character, then match the leading character in
-            // lowercase, then match the trailing characters along with other
-            // lowercase characters or digit characters. This clause allows
-            // package names to be matched by this Camel Case expression.
-            '(' + (endsWith(previousToken, '.') ? '' : '\\.') +
-                leadingCharacter.toLowerCase() + trailingCharactersPattern +
-                ')' +
-            // OR
-            '|' +
-            // Match the Camel Case expression in lowercase. This clause
-            // performs a direct case-sensitive match of the characters.
-            leadingCharacter.toLowerCase() + trailingCharacters +
-            ')';
-      }
+  // Construct the camel case regular expression.
+  var camelCasePattern = '';
+  var i = 0;
+  while (i < searchString.length) {
+    if (searchString[i] === '*') {
+      // The '*' character is a wildcard.
+      i++;
+      camelCasePattern += '.*';
+    } else if (searchString[i] === '.') {
+      // The '.' character is matched directly. The next character (unless it
+      // is a wildcard) starts a new camel case expression. This allows, e.g.
+      // "j.l.O" to match "java.lang.Object".
+      i++;
+      camelCasePattern += '\\' + '.';
     } else {
-      token = remainingSearchString.charAt(0);
-
-      if (/[a-z]/.test(token)) {
-        // A lowercase character that is not part of a Camel Case expression.
-        // Perform a case-insensitive match of this character.
-
-        pattern += '(' + token.toUpperCase() + '|' + token + ')';
-      } else if (token === '*') {
-        // Replace '*' with '.*' to allow the asterisk to be used as a
-        // wildcard.
-
-        pattern += '.*';
-      } else if (RegexLibrary._isSpecialRegularExpressionCharacter(token)) {
-        // A special regular expression character, but not an asterisk.
-        // Escape this character.
-
-        pattern += '\\' + token;
+      // A camel case expression, which continues until an uppercase or digit
+      // character starts the next camel case expression, or a '*' or '.'
+      // character is found. Digits can start a new camel case expression, so
+      // that e.g. "P2D" will match "Point2D".
+      var endOfCamelCase = searchString.substring(i + 1).search(
+          /[A-Z\d\*\.]/);
+      var expression;
+      if (endOfCamelCase === -1) {
+        expression = searchString.substring(i);
       } else {
-        // Otherwise, add the character directly to the regular expression.
+        expression = searchString.substring(i, i + endOfCamelCase + 1);
+      }
+      i += expression.length;
 
-        pattern += token;
+      camelCasePattern += RegexLibrary._escape(expression[0]) +
+          RegexLibrary._caseInsensitivePattern(expression.substring(1));
+      // The camel case regular expression will match any number of lowercase
+      // or digit characters following the search term. Digits are accepted so
+      // that, e.g. "PD" will match "Point2D".
+      camelCasePattern += '[a-z\\d]*';
+      if (/[A-Z]/.test(expression[0])) {
+        // This camel case expression starts with an uppercase character, so
+        // it will match classes. Accept an optional trailing '.' character to
+        // make it easier to search for inner classes, e.g. "CUB" will match
+        // "Character.UnicodeBlock".
+        camelCasePattern += '\\.?';
       }
     }
-    remainingSearchString = remainingSearchString.substring(token.length);
   }
 
-  if (!endsWith(pattern, '.*')) {
-    pattern += '.*';
-  }
-  pattern += '$';
+  // The search term can also be matched without camel case.
+  var textPattern = RegexLibrary._caseInsensitivePattern(searchString, '*');
+  textPattern = textPattern.replace(/\*/g, '.*');
+
+  var pattern = '^((' + camelCasePattern + ')|(' + textPattern + ')).*$';
   return new RegExp(pattern);
 };
 
@@ -1052,33 +1024,45 @@ RegexLibrary._getRegex = function(searchString) {
  * @return {RegExp} The exact match regular expression for the search string.
  */
 RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
-  var pattern = '^';
-
-  for (i = 0; i < searchString.length; i++) {
-    var character = searchString.charAt(i);
-    if (RegexLibrary._isSpecialRegularExpressionCharacter(character)) {
-      pattern += '\\' + character;
-    } else {
-      pattern += character;
-    }
-  }
-
-  pattern += '$';
+  var pattern = '^' + RegexLibrary._escape(searchString) + '$';
   return caseSensitive ? new RegExp(pattern) : new RegExp(pattern, 'i');
 };
 
 
 /**
- * @param {string} character The character to inspect.
- * @return {boolean} Whether the character has a special meaning within regular
- *                   expressions.
+ * Return a regular expression pattern that will perform a case-insensitive
+ * match of the given string.
+ * @param {string} str The input string.
+ * @param {string} charactersToIgnore These characters will be left in the
+ *                 string without being replaced.
+ * @return {string} The regular expression pattern.
  */
-RegexLibrary._isSpecialRegularExpressionCharacter = function(character) {
-  var special =
-      ['\\', '^', '$', '+', '?', '.', '(', ':', '!', '|', '{', ',', '[', '*'];
-  return special.some(function(specialCharacter) {
-    return character === specialCharacter;
-  });
+RegexLibrary._caseInsensitivePattern = function(str, charactersToIgnore) {
+  var result = [];
+  for (var i = 0; i < str.length; i++) {
+    var c = str[i];
+    if (charactersToIgnore && charactersToIgnore.indexOf(c) !== -1) {
+      result.push(c);
+    } else {
+      if (/[A-Za-z]/.test(c)) {
+        result.push('[' + c.toUpperCase() + c.toLowerCase() + ']');
+      } else {
+        result.push(RegexLibrary._escape(c));
+      }
+    }
+  }
+  return result.join('');
+};
+
+
+/**
+ * Escape the given string so that it will be treated as a literal within a
+ * regular expression.
+ * @param {string} str The input string.
+ * @return {string} The escaped string.
+ */
+RegexLibrary._escape = function(str) {
+  return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
 };
 
 
