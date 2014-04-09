@@ -11,6 +11,10 @@
     "message": "Options",
     "description": "Label used for the options page anchor."
   },
+  "helpAnchor": {
+    "message": "Help",
+    "description": "Label used for the help anchor."
+  },
   "optionsTitle": {
     "message": "Options: Javadoc Search Frame",
     "description": "Title of the options page."

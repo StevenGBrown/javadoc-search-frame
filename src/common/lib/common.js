@@ -638,6 +638,7 @@ View._create = function(eventHandlers) {
     var eraseButton = View._createEraseButton(eventHandlers);
   }
   var optionsLink = View._createOptionsLink(eventHandlers);
+  var helpLink = View._createHelpLink(eventHandlers);
   View.contentNodeParent = tableRowElementTwo;
   View.contentNode = tableDataCellElementTwo;
 
@@ -649,6 +650,9 @@ View._create = function(eventHandlers) {
   }
   tableDataCellElementOne.appendChild(document.createElement('br'));
   tableDataCellElementOne.appendChild(optionsLink);
+  var nbsp = '\u00A0';
+  tableDataCellElementOne.appendChild(document.createTextNode(nbsp + nbsp));
+  tableDataCellElementOne.appendChild(helpLink);
   tableElement.appendChild(tableRowElementTwo);
   tableRowElementTwo.appendChild(tableDataCellElementTwo);
 
@@ -717,6 +721,23 @@ View._createOptionsLink = function(eventHandlers) {
   anchorElement.textContent = Messages.get('optionsAnchor');
   anchorElement.addEventListener(
       'click', eventHandlers.optionsLinkClicked, false);
+  var fontElement = document.createElement('font');
+  fontElement.setAttribute('size', '-2');
+  fontElement.appendChild(anchorElement);
+  return fontElement;
+};
+
+
+/**
+ * @param {EventHandlers} eventHandlers The event handlers.
+ * @return {Element} The help link element.
+ */
+View._createHelpLink = function(eventHandlers) {
+  var anchorElement = document.createElement('a');
+  anchorElement.setAttribute('href', 'javascript:void(0);');
+  anchorElement.textContent = Messages.get('helpAnchor');
+  anchorElement.addEventListener(
+      'click', eventHandlers.helpLinkClicked, false);
   var fontElement = document.createElement('font');
   fontElement.setAttribute('size', '-2');
   fontElement.appendChild(anchorElement);
@@ -2007,6 +2028,17 @@ EventHandlers.eraseButtonClick = function() {
  */
 EventHandlers.optionsLinkClicked = function(evt) {
   OptionsPage.open();
+  evt.preventDefault();
+};
+
+
+/**
+ * Called when the help link has been clicked.
+ * @param {Event} evt The event.
+ */
+EventHandlers.helpLinkClicked = function(evt) {
+  var url = 'https://code.google.com/p/javadoc-search-frame/wiki/Features';
+  Frames.openLinkInNewTab(url);
   evt.preventDefault();
 };
 
