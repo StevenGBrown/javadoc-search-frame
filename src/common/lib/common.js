@@ -1704,8 +1704,8 @@ Search._Menu._getMenuReplacement = function() {
 
 
 /**
- * @param {{Array.<{mnemonic: string, label: string, url: string}>}} The menu
- *     items.
+ * @param {{Array.<{mnemonic: string, label: string, url: string}>}} menu The
+ *     menu items.
  * @return {string} An HTML representation of the menu items.
  */
 Search._Menu._constructMenuHtml = function(menu) {
