@@ -85,7 +85,7 @@ Option.HIDE_PACKAGE_FRAME = new Option({
 Option.PACKAGE_MENU = new Option({
   key: 'package_menu',
   defaultValue:
-      '@1:search(Ohloh) -> http://code.ohloh.net/?s=##PACKAGE_NAME##\n' +
+      '@1:search(Open HUB) -> http://code.openhub.net/?s=##PACKAGE_NAME##\n' +
       '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##',
   type: String,
   upgrade: function(value, lastSavedVersion) {
@@ -100,7 +100,7 @@ Option.PACKAGE_MENU = new Option({
 Option.CLASS_MENU = new Option({
   key: 'class_menu',
   defaultValue:
-      '@1:search(Ohloh) -> http://code.ohloh.net/' +
+      '@1:search(Open HUB) -> http://code.openhub.net/' +
       '?s=##PACKAGE_NAME##+##CLASS_NAME##+##MEMBER_NAME##\n' +
       '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
       '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
@@ -144,6 +144,10 @@ Option.prototype._upgradeMenuOption = function(value, lastSavedVersion) {
       value = value.replace('search(koders)', 'search(Ohloh)');
       value = value.replace('//www.koders.com/', '//code.ohloh.net/');
     }
+  }
+  if (lastSavedVersion === '1.4.6' || lastSavedVersion === '1.5') {
+    value = value.replace('search(Ohloh)', 'search(Open HUB)');
+    value = value.replace('//code.ohloh.net/', '//code.openhub.net/');
   }
   return value;
 };
