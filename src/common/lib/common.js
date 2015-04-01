@@ -2037,7 +2037,8 @@ EventHandlers.optionsLinkClicked = function(evt) {
  * @param {Event} evt The event.
  */
 EventHandlers.helpLinkClicked = function(evt) {
-  var url = 'https://code.google.com/p/javadoc-search-frame/wiki/Features';
+  var url =
+      'https://github.com/StevenGBrown/javadoc-search-frame/wiki/Features';
   Frames.openLinkInNewTab(url);
   evt.preventDefault();
 };

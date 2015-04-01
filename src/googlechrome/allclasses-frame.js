@@ -36,7 +36,7 @@ function main() {
 
   var startupLogMessage =
       'Javadoc Search Frame ' + version + ' (Google Chrome Extension)\n' +
-      'http://code.google.com/p/javadoc-search-frame\n' +
+      'https://github.com/StevenGBrown/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
   console.log(startupLogMessage);
