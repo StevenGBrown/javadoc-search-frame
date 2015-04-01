@@ -8,7 +8,7 @@ This is achieved with client-side Javascript, so it will work on any local or re
 
 ## Features
 
-[Features](/StevenGBrown/javadoc-search-frame/wiki/Features)
+[Features](https://github.com/StevenGBrown/javadoc-search-frame/wiki/Features)
 
 ## Downloads
 
