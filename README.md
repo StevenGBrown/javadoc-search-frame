@@ -6,6 +6,10 @@ When viewing Javadocs, this script replaces the package and class frames with a 
 
 This is achieved with client-side Javascript, so it will work on any local or remote Javadoc page.
 
+## Features
+
+[Features](/StevenGBrown/javadoc-search-frame/wiki/Features)
+
 ## Downloads
 
 ### Mozilla Firefox
