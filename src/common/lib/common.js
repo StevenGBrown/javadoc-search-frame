@@ -1314,6 +1314,10 @@ Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
  * @return {PackageLink|ClassLink=} The best match.
  */
 Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
+  if (links.length < 2) {
+    // No need to display a best match.
+    return null;
+  }
   // Get the case-insensitive exact matches.
   var caseInsensitiveExactMatchCondition =
       RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString);
@@ -1364,7 +1368,7 @@ Search._PackagesAndClasses._constructHtml = function() {
     return 'No search results.';
   }
   var html = '';
-  if (module.bestMatch && module.currentLinks.length > 1) {
+  if (module.bestMatch) {
     html += '<br/><b><i>Best Match</i></b><br/>';
     html += module.bestMatch.getType().getSingularName().toLowerCase();
     html += '<br/>';

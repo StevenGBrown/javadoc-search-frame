@@ -327,9 +327,9 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch',
       assertThatBestMatchFor('J', is(null));
       assertThatBestMatchFor('Object', is(javaLangObject));
       assertThatBestMatchFor('O', is(null));
-      assertThatBestMatchFor('java.lang.Object', is(javaLangObject));
-      assertThatBestMatchFor('JAVA.LANG.OBJECT', is(javaLangObject));
-      assertThatBestMatchFor('org.omg.CORBA.Object', is(orgOmgCorbaObject));
+      assertThatBestMatchFor('java.lang.Object', is(null));
+      assertThatBestMatchFor('JAVA.LANG.OBJECT', is(null));
+      assertThatBestMatchFor('org.omg.CORBA.Object', is(null));
       assertThatBestMatchFor('java.lang', is(javaLangPackage));
       assertThatBestMatchFor('java.lang.', is(null));
       assertThatBestMatchFor('java.*.o*e', is(null));
