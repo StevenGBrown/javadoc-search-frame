@@ -55,19 +55,6 @@
           "allclasses-frame.js"
       ],
       "all_frames": true
-    },
-    {
-      "matches": [
-          "http://*/*",
-          "https://*/*",
-          "file://*/*"
-      ],
-      "js": [
-          "lib/Storage.js",
-          "lib/Option.js",
-          "all-frames.js"
-      ],
-      "all_frames": true
     }
   ],
   "minimum_chrome_version": "25",

@@ -41,9 +41,11 @@ function main() {
 
   console.log(startupLogMessage);
 
-  Storage.get(Option.HIDE_PACKAGE_FRAME, function(packageFrameHidden) {
-    // The packages frame is hidden by a different content script.
-    init(packageFrameHidden);
+  Storage.get(Option.HIDE_PACKAGE_FRAME, function(hidePackageFrame) {
+    if (hidePackageFrame) {
+      Frames.hideAllPackagesFrame();
+    }
+    init(hidePackageFrame);
 
     chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {

@@ -45,14 +45,28 @@ Frames = {};
  */
 Frames.hideAllPackagesFrame = function() {
   var framesets = parent.document.getElementsByTagName('frameset');
-  if (framesets) {
+  if (framesets.length > 1) {
+    // Javadoc created with Java 8 or earlier
     var frameset = framesets[1];
     var framesetChildren = frameset.children;
-    if (framesetChildren && framesetChildren[0].name === 'packageListFrame') {
+    if (framesetChildren.length &&
+        framesetChildren[0].name === 'packageListFrame') {
       frameset.setAttribute('rows', '0,*');
-      frameset.setAttribute('border', 0);
-      frameset.setAttribute('frameborder', 0);
-      frameset.setAttribute('framespacing', 0);
+      frameset.setAttribute('border', '0');
+      frameset.setAttribute('frameborder', '0');
+      frameset.setAttribute('framespacing', '0');
+    }
+  } else {
+    // Javadoc created with Java 9
+    var divs = parent.document.getElementsByTagName('div');
+    for (var i = 0; i < divs.length; i++) {
+      var div = divs[i];
+      if (div.className === 'leftTop') {
+        div.style.display = 'none';
+      }
+      if (div.className === 'leftBottom') {
+        div.style.height = '100%';
+      }
     }
   }
 };
