@@ -281,51 +281,65 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch',
       var hudsonPackage = new PackageLink('hudson');
       var javaIoPackage = new PackageLink('java.io');
       var javaLangPackage = new PackageLink('java.lang');
-      var javaUtilListClass = new ClassLink(LinkType.INTERFACE,
-          'java.util', 'List');
-      var hudsonModelHudsonClass = new ClassLink(LinkType.CLASS,
-          'hudson.model', 'Hudson');
-      var javaAwtListClass = new ClassLink(LinkType.CLASS,
-          'java.awt', 'List');
-      var javaIoCloseableClass = new ClassLink(LinkType.CLASS,
+      var javaIoCloseable = new ClassLink(LinkType.INTERFACE,
           'java.io', 'Closeable');
-      var javaLangObjectClass = new ClassLink(LinkType.CLASS,
-          'java.lang', 'Object');
-      var javaxSwingBorderFactoryClass = new ClassLink(LinkType.CLASS,
-          'javax.swing', 'BorderFactory');
-      var javaxSwingBorderAbstractBorderClass = new ClassLink(LinkType.CLASS,
-          'javax.swing.border', 'AbstractBorder');
-      var orgOmgCorbaObjectClass = new ClassLink(LinkType.CLASS,
+      var orgOmgCorbaDataInputStream = new ClassLink(LinkType.INTERFACE,
+          'org.omg.CORBA', 'DataInputStream');
+      var javaUtilList = new ClassLink(LinkType.INTERFACE,
+          'java.util', 'List');
+      var orgOmgCorbaObject = new ClassLink(LinkType.INTERFACE,
           'org.omg.CORBA', 'Object');
+      var javaxSwingBorderAbstractBorder = new ClassLink(LinkType.CLASS,
+          'javax.swing.border', 'AbstractBorder');
+      var javaxSwingBorderFactory = new ClassLink(LinkType.CLASS,
+          'javax.swing', 'BorderFactory');
+      var javaIoDataInputStream = new ClassLink(LinkType.CLASS,
+          'java.io', 'DataInputStream');
+      var javaxPrintDocFlavorReader = new ClassLink(LinkType.CLASS,
+          'javax.print', 'DocFlavor.READER');
+      var hudsonModelHudson = new ClassLink(LinkType.CLASS,
+          'hudson.model', 'Hudson');
+      var javaAwtList = new ClassLink(LinkType.CLASS,
+          'java.awt', 'List');
+      var javaLangObject = new ClassLink(LinkType.CLASS,
+          'java.lang', 'Object');
+      var javaIoReader = new ClassLink(LinkType.CLASS,
+          'java.io', 'Reader');
 
-      var allLinks = [hudsonPackage, javaIoPackage, javaLangPackage,
-        javaUtilListClass, hudsonModelHudsonClass, javaAwtListClass,
-        javaIoCloseableClass, javaLangObjectClass, javaxSwingBorderFactoryClass,
-        javaxSwingBorderAbstractBorderClass, orgOmgCorbaObjectClass];
+      var allLinks = [
+        hudsonPackage, javaIoPackage, javaLangPackage, javaIoCloseable,
+        orgOmgCorbaDataInputStream, javaUtilList, orgOmgCorbaObject,
+        javaxSwingBorderAbstractBorder, javaxSwingBorderFactory,
+        javaIoDataInputStream, javaxPrintDocFlavorReader, hudsonModelHudson,
+        javaAwtList, javaLangObject, javaIoReader
+      ];
 
       var assertThatBestMatchFor = function(searchString, searchResult) {
+        var condition = RegexLibrary.createCondition(searchString);
+        var links = allLinks.filter(condition);
         assertThat(UnitTestSuite.quote(searchString),
-            Search._PackagesAndClasses._getBestMatch(searchString, allLinks),
+            Search._PackagesAndClasses._getBestMatch(searchString, links),
             is(searchResult));
       };
 
       assertThatBestMatchFor('java.io', is(javaIoPackage));
       assertThatBestMatchFor('j', is(null));
       assertThatBestMatchFor('J', is(null));
-      assertThatBestMatchFor('Object', is(javaLangObjectClass));
+      assertThatBestMatchFor('Object', is(javaLangObject));
       assertThatBestMatchFor('O', is(null));
-      assertThatBestMatchFor('java.lang.Object', is(javaLangObjectClass));
-      assertThatBestMatchFor('JAVA.LANG.OBJECT', is(javaLangObjectClass));
-      assertThatBestMatchFor('org.omg.CORBA.Object', is(
-          orgOmgCorbaObjectClass));
+      assertThatBestMatchFor('java.lang.Object', is(javaLangObject));
+      assertThatBestMatchFor('JAVA.LANG.OBJECT', is(javaLangObject));
+      assertThatBestMatchFor('org.omg.CORBA.Object', is(orgOmgCorbaObject));
       assertThatBestMatchFor('java.lang', is(javaLangPackage));
       assertThatBestMatchFor('java.lang.', is(null));
       assertThatBestMatchFor('java.*.o*e', is(null));
       assertThatBestMatchFor('java.*.*o*e', is(null));
       assertThatBestMatchFor('javax.swing.border.A', is(null));
       assertThatBestMatchFor('hudson', is(hudsonPackage));
-      assertThatBestMatchFor('Hudson', is(hudsonModelHudsonClass));
-      assertThatBestMatchFor('list', is(javaUtilListClass));
+      assertThatBestMatchFor('Hudson', is(hudsonModelHudson));
+      assertThatBestMatchFor('list', is(javaUtilList));
+      assertThatBestMatchFor('Reader', is(javaIoReader));
+      assertThatBestMatchFor('DataInputStream', is(javaIoDataInputStream));
     });
 
 

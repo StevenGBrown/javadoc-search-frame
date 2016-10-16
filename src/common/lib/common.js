@@ -1314,15 +1314,11 @@ Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
  * @return {PackageLink|ClassLink=} The best match.
  */
 Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
+  // Get the case-insensitive exact matches.
   var caseInsensitiveExactMatchCondition =
       RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString);
   var exactMatchLinks = links.filter(caseInsensitiveExactMatchCondition);
-  // If all of the links displayed in the search list are exact matches, do
-  // not display a best match.
-  if (exactMatchLinks.length === links.length) {
-    return null;
-  }
-  // Attempt to reduce the matches further by performing a case-sensitive match.
+  // Attempt to reduce the list further by finding a case-sensitive match.
   var caseSensitiveExactMatchCondition =
       RegexLibrary.createCaseSensitiveExactMatchCondition(searchString);
   var caseSensitiveExactMatchLinks =
