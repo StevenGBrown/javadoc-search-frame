@@ -1507,7 +1507,15 @@ Search._ClassMembersAndKeywords._getAnchorNames = function(
   var matches;
   var names = [];
   while ((matches = anchorRegex.exec(packageOrClassPageHtml)) !== null) {
-    names.push(matches[1]);
+    var name = matches[1];
+    if ((name.match(/-/g) || []).length >= 2) {
+      // Starting with Java 8, the method anchors contain dashes in place of
+      // brackets and between the method arguments.
+      name = name.replace('-', '(');
+      name = name.replace(/-$/, ')');
+      name = name.replace(/-/g, ', ');
+    }
+    names.push(name);
   }
   return names;
 };
