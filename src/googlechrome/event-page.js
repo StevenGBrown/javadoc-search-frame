@@ -72,12 +72,16 @@ chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
       var response = {};
       if (request.operation === 'open-options-page') {
-        var tabProperties = {
-          windowId: sender.tab.windowId,
-          index: sender.tab.index + 1,
-          url: chrome.extension.getURL('options.html')
-        };
-        chrome.tabs.create(tabProperties);
+        if (chrome.runtime.openOptionsPage) {
+          chrome.runtime.openOptionsPage();
+        } else {
+          var tabProperties = {
+            windowId: sender.tab.windowId,
+            index: sender.tab.index + 1,
+            url: chrome.extension.getURL('options.html')
+          };
+          chrome.tabs.create(tabProperties);
+        }
       }
       sendResponse(response);
     }
