@@ -160,10 +160,15 @@ OptionsPageGenerator._booleanOption = function(
       pageDocument, option, name, true);
   var trueLabelElement = OptionsPageGenerator._text(
       pageDocument, 'label', '   ' + trueText);
+  trueLabelElement.insertBefore(
+      trueRadioButtonElement, trueLabelElement.firstChild);
+
   var falseRadioButtonElement = OptionsPageGenerator._radioButton(
       pageDocument, option, name, false);
   var falseLabelElement = OptionsPageGenerator._text(
       pageDocument, 'label', '   ' + falseText);
+  falseLabelElement.insertBefore(
+      falseRadioButtonElement, falseLabelElement.firstChild);
 
   Storage.get(option, function(value) {
     var radioButtonToCheck =
@@ -183,16 +188,12 @@ OptionsPageGenerator._booleanOption = function(
   var blockElement = pageDocument.createElement('div');
   blockElement.setAttribute('style', 'margin-left:20px');
   if (option.defaultValue) {
-    blockElement.appendChild(trueRadioButtonElement);
     blockElement.appendChild(trueLabelElement);
     blockElement.appendChild(pageDocument.createElement('p'));
-    blockElement.appendChild(falseRadioButtonElement);
     blockElement.appendChild(falseLabelElement);
   } else {
-    blockElement.appendChild(falseRadioButtonElement);
     blockElement.appendChild(falseLabelElement);
     blockElement.appendChild(pageDocument.createElement('p'));
-    blockElement.appendChild(trueRadioButtonElement);
     blockElement.appendChild(trueLabelElement);
   }
   return blockElement;
