@@ -1342,9 +1342,16 @@ Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
       bestMatchLinks.push(link);
     }
   });
-  // Finally, select the first link from the remaining matches to be the best
-  // match.
-  return bestMatchLinks.length > 0 ? bestMatchLinks[0] : null;
+  // When searching for "List", select java.util.List instead of java.awt.List.
+  var javaUtilList = new ClassLink(LinkType.INTERFACE, 'java.util', 'List');
+  var javaAwtList = new ClassLink(LinkType.CLASS, 'java.awt', 'List');
+  if (bestMatchLinks.length === 2 &&
+      bestMatchLinks[0].equals(javaUtilList) &&
+      bestMatchLinks[1].equals(javaAwtList)) {
+    return javaUtilList;
+  }
+  // If the list has been reduced to one item, then that is the best match.
+  return bestMatchLinks.length == 1 ? bestMatchLinks[0] : null;
 };
 
 
