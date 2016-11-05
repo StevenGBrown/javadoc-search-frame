@@ -113,7 +113,10 @@ UnitTestSuite.is = function(value) {
  */
 UnitTestSuite.quote = function(stringValue) {
   if (stringValue || stringValue === '') {
-    return '\'' + stringValue + '\'';
+    stringValue = '\'' + stringValue + '\'';
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(stringValue));
+    return div.innerHTML;
   }
   return stringValue;
 };
@@ -245,8 +248,10 @@ UnitTestAssertionFailure.prototype.toString = function() {
   if (this.description) {
     failureString += this.description + '<br>';
   }
-  failureString += 'Expected<br>"' + this.expected + '"<br>' +
-                   'but was<br>"' + this.actual + '"';
+  failureString += 'Expected<br>"' +
+                   UnitTestSuite.quote(this.expected) + '"<br>' +
+                   'but was<br>"' +
+                   UnitTestSuite.quote(this.actual) + '"';
   return failureString;
 };
 

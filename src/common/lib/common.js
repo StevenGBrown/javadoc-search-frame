@@ -276,7 +276,7 @@ PackageLink.prototype.equals = function(obj) {
  * @return {string} A string representation of this link.
  */
 PackageLink.prototype.toString = function() {
-  return this.packageName;
+  return 'PackageLink: ' + this.packageName;
 };
 
 
@@ -404,7 +404,7 @@ ClassLink.prototype.equals = function(obj) {
  * @return {string} A string representation of this link.
  */
 ClassLink.prototype.toString = function() {
-  return this.canonicalName;
+  return 'ClassLink(' + this.type + '): ' + this.canonicalName;
 };
 
 
@@ -412,14 +412,16 @@ ClassLink.prototype.toString = function() {
 /**
  * Link to a method or field of a class.
  * @param {string} baseUrl The base URL of this link.
- * @param {string} name The method or field name.
+ * @param {string} anchorName The method or field anchor name.
+ * @param {string} displayName The method or field display name.
  * @constructor
  */
-MemberLink = function(baseUrl, name) {
-  this.name = name;
-  this.html = '<A HREF="' + baseUrl + '#' + name +
+MemberLink = function(baseUrl, anchorName, displayName) {
+  this.anchorName = anchorName;
+  this.displayName = displayName;
+  this.html = '<A HREF="' + baseUrl + '#' + anchorName +
       '" target="classFrame" class="anchorLink">' +
-      name.replace(/ /g, '&nbsp;') + '</A><BR/>';
+      displayName.replace(/ /g, '&nbsp;') + '</A><BR/>';
 };
 
 
@@ -429,7 +431,7 @@ MemberLink = function(baseUrl, name) {
  * @return {boolean} Whether this link is a match.
  */
 MemberLink.prototype.matches = function(regex) {
-  return regex.test(this.name);
+  return regex.test(this.displayName);
 };
 
 
@@ -461,11 +463,30 @@ MemberLink.prototype.getUrl = function() {
  * @return {string} The name of this class member.
  */
 MemberLink.prototype.getName = function() {
-  if (this.name.indexOf('(') !== -1) {
-    return this.name.substring(0, this.name.indexOf('('));
+  if (this.displayName.indexOf('(') !== -1) {
+    return this.displayName.substring(0, this.displayName.indexOf('('));
   } else {
-    return this.name;
+    return this.displayName;
   }
+};
+
+
+/**
+ * Equals function.
+ * @param {*} obj The object with which to compare.
+ * @return {boolean} Whether this link is equal to the given object.
+ */
+MemberLink.prototype.equals = function(obj) {
+  return obj instanceof MemberLink &&
+      this.html === obj.html;
+};
+
+
+/**
+ * @return {string} A string representation of this link.
+ */
+MemberLink.prototype.toString = function() {
+  return 'MemberLink: ' + this.displayName + ' -> #' + this.anchorName;
 };
 
 
@@ -473,14 +494,16 @@ MemberLink.prototype.getName = function() {
 /**
  * Keyword link found on a package or class page.
  * @param {string} baseUrl The base URL of this link.
- * @param {string} name The keyword name.
+ * @param {string} anchorName The keyword anchor name.
+ * @param {string} displayName The keyword display name.
  * @constructor
  */
-KeywordLink = function(baseUrl, name) {
-  this.name = name;
-  this.html = '<A HREF="' + baseUrl + '#' + name +
+KeywordLink = function(baseUrl, anchorName, displayName) {
+  this.anchorName = anchorName;
+  this.displayName = displayName;
+  this.html = '<A HREF="' + baseUrl + '#' + anchorName +
       '" target="classFrame" class="anchorLink" style="color:#666">' +
-      name.replace(/ /g, '&nbsp;') + '</A><BR/>';
+      displayName.replace(/ /g, '&nbsp;') + '</A><BR/>';
 };
 
 
@@ -490,7 +513,7 @@ KeywordLink = function(baseUrl, name) {
  * @return {boolean} Whether this link is a match.
  */
 KeywordLink.prototype.matches = function(regex) {
-  return regex.test(this.name);
+  return regex.test(this.displayName);
 };
 
 
@@ -516,6 +539,26 @@ KeywordLink.prototype.getType = function() {
 KeywordLink.prototype.getUrl = function() {
   return extractUrl(this);
 };
+
+
+/**
+ * Equals function.
+ * @param {*} obj The object with which to compare.
+ * @return {boolean} Whether this link is equal to the given object.
+ */
+KeywordLink.prototype.equals = function(obj) {
+  return obj instanceof KeywordLink &&
+      this.html === obj.html;
+};
+
+
+/**
+ * @return {string} A string representation of this link.
+ */
+KeywordLink.prototype.toString = function() {
+  return 'KeywordLink: ' + this.displayName + ' -> #' + this.anchorName;
+};
+
 
 
 /*
@@ -1405,25 +1448,25 @@ Search._ClassMembersAndKeywords = {
   httpRequest: new HttpRequest(),
 
   keywords: {
-    'navbar_top': 1,
-    'navbar_top_firstrow': 1,
-    'skip-navbar_top': 1,
-    'field_summary': 1,
-    'nested_class_summary': 1,
-    'constructor_summary': 1,
-    'constructor_detail': 1,
-    'method_summary': 1,
-    'method_detail': 1,
-    'field_detail': 1,
-    'navbar_bottom': 1,
-    'navbar_bottom_firstrow': 1,
-    'skip-navbar_bottom': 1
+    'navbar top': 1,
+    'navbar top firstrow': 1,
+    'skip navbar top': 1,
+    'field summary': 1,
+    'nested class summary': 1,
+    'constructor summary': 1,
+    'constructor detail': 1,
+    'method summary': 1,
+    'method detail': 1,
+    'field detail': 1,
+    'navbar bottom': 1,
+    'navbar bottom firstrow': 1,
+    'skip navbar bottom': 1
   },
 
   keywordPrefixes: [
-    'methods_inherited_from_',
-    'fields_inherited_from_',
-    'nested_classes_inherited_from_'
+    'methods inherited from class ',
+    'fields inherited from class ',
+    'nested classes inherited from class '
   ]
 };
 
@@ -1489,76 +1532,70 @@ Search._ClassMembersAndKeywords._perform = function(
  */
 Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
     baseUrl, packageOrClassPageHtml) {
-  var names = Search._ClassMembersAndKeywords._getAnchorNames(
-      packageOrClassPageHtml);
-  return Search._ClassMembersAndKeywords._createMemberAndKeywordLinks(
-      baseUrl, names);
-};
-
-
-/**
- * Retrieve the anchor names from the given package or class page.
- * @param {string} packageOrClassPageHtml The contents of the page.
- * @return {Array.<string>} The anchor names.
- */
-Search._ClassMembersAndKeywords._getAnchorNames = function(
-    packageOrClassPageHtml) {
   var anchorRegex = /<a name=\"([^\"]+)\"/gi;
   var matches;
-  var names = [];
+  var links = [];
   while ((matches = anchorRegex.exec(packageOrClassPageHtml)) !== null) {
     var name = matches[1];
-    if ((name.match(/-/g) || []).length >= 2) {
-      // Starting with Java 8, the method anchors contain dashes in place of
-      // brackets and between the method arguments.
-      name = name.replace('-', '(');
-      name = name.replace(/-$/, ')');
-      name = name.replace(/-/g, ', ');
-    }
-    names.push(name);
+    var link = Search._ClassMembersAndKeywords._createLink(baseUrl, name);
+    links.push(link);
   }
-  return names;
+  return Search._ClassMembersAndKeywords._sortLinks(links);
 };
 
 
 /**
- * Create member and keyword links from the given anchor names.
+ * Create a class member or keyword link from the given anchor name.
  * @param {string} baseUrl The URL of the package or class page.
- * @param {names} names The anchor names.
- * @return {Array.<MemberLink|KeywordLink>} The links.
+ * @param {string} anchorName The anchor name.
+ * @return {MemberLink|KeywordLink} The created link.
  */
-Search._ClassMembersAndKeywords._createMemberAndKeywordLinks = function(
-    baseUrl, names) {
-  var links = [];
+Search._ClassMembersAndKeywords._createLink = function(baseUrl, anchorName) {
+  // Starting with Java 8, the keyword anchors use '.' to delimit words. Prior
+  // to that, a combination of '-' and '_' was used. Replace all with spaces.
+  var keywordDisplayName = anchorName.replace(/[-_.]/g, ' ');
+  if (Search._ClassMembersAndKeywords.keywords[keywordDisplayName] === 1) {
+    return new KeywordLink(baseUrl, anchorName, keywordDisplayName);
+  }
+  var prefixes = Search._ClassMembersAndKeywords.keywordPrefixes;
+  for (var i = 0; i < prefixes.length; i++) {
+    var prefix = prefixes[i];
+    if (keywordDisplayName.indexOf(prefix) === 0) {
+      // Retain the original anchor name after the prefix which contains the
+      // class name, e.g. 'java.awt.Window'.
+      keywordDisplayName = prefix + anchorName.substring(prefix.length);
+      return new KeywordLink(baseUrl, anchorName, keywordDisplayName);
+    }
+  }
+  var displayName = anchorName;
+  if ((anchorName.match(/-/g) || []).length >= 2) {
+    // Starting with Java 8, the method anchors contain dashes in place of
+    // brackets and between the method arguments.
+    displayName = displayName.replace('-', '(');
+    displayName = displayName.replace(/-$/, ')');
+    displayName = displayName.replace(/-/g, ', ');
+  }
+  return new MemberLink(baseUrl, anchorName, displayName);
+};
+
+
+/**
+ * Sort class member and keyword links such that the keyword links appear at
+ * the end.
+ * @param {Array.<MemberLink|KeywordLink>} links The links to sort.
+ * @return {Array.<MemberLink|KeywordLink>} The sorted links.
+ */
+Search._ClassMembersAndKeywords._sortLinks = function(links) {
+  var memberLinks = [];
   var keywordLinks = [];
-  names.forEach(function(name) {
-    if (Search._ClassMembersAndKeywords._isKeywordName(name)) {
-      keywordLinks.push(new KeywordLink(baseUrl, name));
+  links.forEach(function(link) {
+    if (link.getType() === LinkType.CLASS_MEMBER) {
+      memberLinks.push(link);
     } else {
-      links.push(new MemberLink(baseUrl, name));
+      keywordLinks.push(link);
     }
   }, Search._ClassMembersAndKeywords);
-  keywordLinks.forEach(function(keywordLink) {
-    links.push(keywordLink);
-  });
-  return links;
-};
-
-
-/**
- * @param {string} name The anchor name.
- * @return {boolean} Whether the anchor is a keyword.
- */
-Search._ClassMembersAndKeywords._isKeywordName = function(name) {
-  if (Search._ClassMembersAndKeywords.keywords[name] === 1) {
-    return true;
-  }
-  return Search._ClassMembersAndKeywords.keywordPrefixes.some(
-      function(keywordPrefix) {
-        if (name.indexOf(keywordPrefix) === 0) {
-          return true;
-        }
-      });
+  return memberLinks.concat(keywordLinks);
 };
 
 
