@@ -1448,16 +1448,19 @@ Search._ClassMembersAndKeywords = {
   httpRequest: new HttpRequest(),
 
   keywords: {
-    'navbar top': 1,
-    'navbar top firstrow': 1,
-    'skip navbar top': 1,
     'field summary': 1,
     'nested class summary': 1,
     'constructor summary': 1,
     'constructor detail': 1,
     'method summary': 1,
     'method detail': 1,
-    'field detail': 1,
+    'field detail': 1
+  },
+
+  keywordsToIgnore: {
+    'navbar top': 1,
+    'navbar top firstrow': 1,
+    'skip navbar top': 1,
     'navbar bottom': 1,
     'navbar bottom firstrow': 1,
     'skip navbar bottom': 1
@@ -1538,7 +1541,9 @@ Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
   while ((matches = anchorRegex.exec(packageOrClassPageHtml)) !== null) {
     var name = matches[1];
     var link = Search._ClassMembersAndKeywords._createLink(baseUrl, name);
-    links.push(link);
+    if (link) {
+      links.push(link);
+    }
   }
   return Search._ClassMembersAndKeywords._sortLinks(links);
 };
@@ -1548,18 +1553,21 @@ Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
  * Create a class member or keyword link from the given anchor name.
  * @param {string} baseUrl The URL of the package or class page.
  * @param {string} anchorName The anchor name.
- * @return {MemberLink|KeywordLink} The created link.
+ * @return {MemberLink|KeywordLink|null} The created link.
  */
 Search._ClassMembersAndKeywords._createLink = function(baseUrl, anchorName) {
+  var module = Search._ClassMembersAndKeywords;
   // Starting with Java 8, the keyword anchors use '.' to delimit words. Prior
   // to that, a combination of '-' and '_' was used. Replace all with spaces.
   var keywordDisplayName = anchorName.replace(/[-_.]/g, ' ');
-  if (Search._ClassMembersAndKeywords.keywords[keywordDisplayName] === 1) {
+  if (module.keywordsToIgnore[keywordDisplayName] === 1) {
+    return null;
+  }
+  if (module.keywords[keywordDisplayName] === 1) {
     return new KeywordLink(baseUrl, anchorName, keywordDisplayName);
   }
-  var prefixes = Search._ClassMembersAndKeywords.keywordPrefixes;
-  for (var i = 0; i < prefixes.length; i++) {
-    var prefix = prefixes[i];
+  for (var i = 0; i < module.keywordPrefixes.length; i++) {
+    var prefix = module.keywordPrefixes[i];
     if (keywordDisplayName.indexOf(prefix) === 0) {
       // Retain the original anchor name after the prefix which contains the
       // class name, e.g. 'java.awt.Window'.
