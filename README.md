@@ -15,5 +15,9 @@ This is achieved with client-side Javascript, so it will work on any local or re
 ### Mozilla Firefox
 [Download from Greasy Fork](https://greasyfork.org/scripts/3758-javadoc-search-frame)
 
+To have this extension apply to file:// URLs, open the about:config page and set greasemonkey.fileIsGreaseable to true.
+
 ### Google Chrome
 [Install Google Chrome extension](https://chrome.google.com/webstore/detail/mfgkihmpcjjnijmkchojlbccbmhcdfcd)
+
+To have this extension apply to file:// URLs, configure it from the chrome://extensions/ page.
