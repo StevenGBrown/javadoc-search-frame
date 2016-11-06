@@ -612,6 +612,69 @@ UnitTestSuite.testFunctionFor('splitOnFirst', function() {
 });
 
 
+UnitTestSuite.testFunctionFor('Option.upgrade (PACKAGE_MENU)', function() {
+  var default_1_4_6 =
+      '@1:search(koders) -> http://www.koders.com/?s=##PACKAGE_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##';
+  var default_1_5 =
+      '@1:search(Ohloh) -> http://code.ohloh.net/?s=##PACKAGE_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##';
+  var default_1_5_1 =
+      '@1:search(Open HUB) -> http://code.openhub.net/?s=##PACKAGE_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##';
+  var default_1_6 =
+      '@1:search(krugle) -> http://opensearch.krugle.org/document/search/' +
+          '#language=java&query=%20path%3A##PACKAGE_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##PACKAGE_NAME##';
+
+  var upgrade = Option.PACKAGE_MENU.upgrade;
+  assertThat('1.4.6', upgrade(default_1_4_6, '1.4.6'), is(default_1_6));
+  assertThat('1.5', upgrade(default_1_5, '1.5'), is(default_1_6));
+  assertThat('1.5.1', upgrade(default_1_5_1, '1.5.1'), is(default_1_6));
+  assertThat('1.6', upgrade(default_1_6, '1.6'), is(default_1_6));
+});
+
+
+UnitTestSuite.testFunctionFor('Option.upgrade (CLASS_MENU)', function() {
+  var default_1_4_6 =
+      '@1:search(koders) -> http://www.koders.com/' +
+          '?s=##PACKAGE_NAME##+##CLASS_NAME##+##MEMBER_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
+      '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
+          '##PACKAGE_PATH##/##CLASS_NAME##.java.html';
+  var default_1_5 =
+      '@1:search(Ohloh) -> http://code.ohloh.net/' +
+          '?s=##PACKAGE_NAME##+##CLASS_NAME##+##MEMBER_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
+      '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
+          '##PACKAGE_PATH##/##CLASS_NAME##.java.html\n' +
+      '@4:search(grepcode) -> http://grepcode.com/' +
+          'search/?query=##PACKAGE_NAME##.##CLASS_NAME##.##MEMBER_NAME##';
+  var default_1_5_1 =
+      '@1:search(Open HUB) -> http://code.openhub.net/' +
+          '?s=##PACKAGE_NAME##+##CLASS_NAME##+##MEMBER_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
+      '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
+          '##PACKAGE_PATH##/##CLASS_NAME##.java.html\n' +
+      '@4:search(grepcode) -> http://grepcode.com/' +
+          'search/?query=##PACKAGE_NAME##.##CLASS_NAME##.##MEMBER_NAME##';
+  var default_1_6 =
+      '@1:search(krugle) -> http://opensearch.krugle.org/document/search/' +
+          '#language=java&query=##CLASS_NAME##%20##MEMBER_NAME##\n' +
+      '@2:search(Docjar) -> http://www.docjar.com/s.jsp?q=##CLASS_NAME##\n' +
+      '@3:source(Docjar) -> http://www.docjar.com/html/api/' +
+          '##PACKAGE_PATH##/##CLASS_NAME##.java.html\n' +
+      '@4:search(grepcode) -> http://grepcode.com/' +
+          'search/?query=##PACKAGE_NAME##.##CLASS_NAME##.##MEMBER_NAME##';
+
+  var upgrade = Option.CLASS_MENU.upgrade;
+  assertThat('1.4.6', upgrade(default_1_4_6, '1.4.6'), is(default_1_6));
+  assertThat('1.5', upgrade(default_1_5, '1.5'), is(default_1_6));
+  assertThat('1.5.1', upgrade(default_1_5_1, '1.5.1'), is(default_1_6));
+  assertThat('1.6', upgrade(default_1_6, '1.6'), is(default_1_6));
+});
+
+
 // Run the tests
 var unitTestResult = UnitTestSuite.run();
 document.write(new Date() + '<p>');
