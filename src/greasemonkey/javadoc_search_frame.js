@@ -2,7 +2,7 @@
 // @name          Javadoc Search Frame
 // @namespace     http://userscripts.org/users/46156
 // @description   Javadoc incremental search for packages and classes
-// @copyright     2012, Steven G. Brown (https://github.com/StevenGBrown/javadoc-search-frame)
+// @copyright     2008, Steven G. Brown (https://github.com/StevenGBrown/javadoc-search-frame)
 // @copyright     2006, KOSEKI Kengo (http://www.teria.com/~koseki/tools/gm/javadoc_isearch/index.html)
 // @license       MIT License; http://www.opensource.org/licenses/mit-license.php
 // @version       #VERSION#
