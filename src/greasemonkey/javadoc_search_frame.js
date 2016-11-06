@@ -73,9 +73,6 @@ function main() {
   }
 
   Storage.get(Option.HIDE_PACKAGE_FRAME, function(hidePackageFrame) {
-    if (hidePackageFrame) {
-      Frames.hideAllPackagesFrame();
-    }
     init(hidePackageFrame);
   });
 }

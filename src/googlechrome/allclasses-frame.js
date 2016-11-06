@@ -42,9 +42,6 @@ function main() {
   console.log(startupLogMessage);
 
   Storage.get(Option.HIDE_PACKAGE_FRAME, function(hidePackageFrame) {
-    if (hidePackageFrame) {
-      Frames.hideAllPackagesFrame();
-    }
     init(hidePackageFrame);
 
     chrome.runtime.onMessage.addListener(
