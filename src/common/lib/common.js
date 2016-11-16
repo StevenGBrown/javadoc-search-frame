@@ -1269,8 +1269,7 @@ Search._autoOpen = function() {
   if (url) {
     Storage.get(Option.AUTO_OPEN, function(autoOpen) {
       if (autoOpen) {
-        Frames.openLinkInSummaryFrame(url);
-        self.focus();
+        Frames.openLinkInSummaryFrame(url, self);
       }
     });
   }
