@@ -1175,7 +1175,8 @@ Callback.prototype.invoke = function(opt_argsArray) {
 Search = {
   previousEntireSearchString: null,
   timeoutId: null,
-  topLink: null
+  topLink: null,
+  autoOpenLink: null
 };
 
 
@@ -1266,10 +1267,11 @@ Search._collapseMenu = function() {
  */
 Search._autoOpen = function() {
   var url = Search.getTopLinkUrl();
-  if (url) {
+  if (url && url !== Search.autoOpenLink) {
     Storage.get(Option.AUTO_OPEN, function(autoOpen) {
       if (autoOpen) {
         Frames.openLinkInSummaryFrame(url, self);
+        Search.autoOpenLink = url;
       }
     });
   }
