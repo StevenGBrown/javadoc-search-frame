@@ -1822,11 +1822,11 @@ function init(hidePackageFrame) {
   // entire list of packages and classes.
   Search.perform();
 
-  // If the autofocus attribute is not supported, manually give focus to the
-  // search field.
-  if (!('autofocus' in document.createElement('input'))) {
+  // Give focus to the search field.
+  View.focusOnSearchField();
+  Frames.onSummaryFrameLoad(function() {
     View.focusOnSearchField();
-  }
+  });
 }
 
 

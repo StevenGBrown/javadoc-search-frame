@@ -76,11 +76,18 @@ Frames.hideAllPackagesFrame = function() {
  * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will not be opened.
  * @param {string} url The URL to open.
+ * @return {boolean} Whether the URL was opened.
  */
 Frames.openLinkInSummaryFrame = function(url) {
   if (window.top !== window) {
+    Frames.onSummaryFrameLoad(function(iframe) {
+      iframe.contentDocument.getElementById('search').blur();
+      iframe.focus();
+    });
     window.open(url, 'classFrame');
+    return true;
   }
+  return false;
 };
 
 
@@ -90,9 +97,7 @@ Frames.openLinkInSummaryFrame = function(url) {
  * @param {string} url The URL to open.
  */
 Frames.openLinkInSummaryFrameOrNewTab = function(url) {
-  if (window.top !== window) {
-    window.open(url, 'classFrame');
-  } else {
+  if (!Frames.openLinkInSummaryFrame(url)) {
     Frames.openLinkInNewTab(url);
   }
 };
@@ -104,4 +109,24 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
  */
 Frames.openLinkInNewTab = function(url) {
   window.open(url);
+};
+
+
+/**
+ * Call the provided function once the summary frame has been loaded. If the
+ * page was generated with Java 8 or earlier, the function will not be called.
+ * @param {function(*): void} onLoad Function which is called with the iframe
+ * once it has loaded.
+ */
+Frames.onSummaryFrameLoad = function(onLoad) {
+  var iframes = parent.document.getElementsByTagName('iframe');
+  for (var i = 0; i < iframes.length; i++) {
+    var iframe = iframes[i];
+    if (iframe.name === 'classFrame') {
+      iframe.addEventListener('load', function() {
+        onLoad(iframe);
+      }, false);
+      return;
+    }
+  }
 };
