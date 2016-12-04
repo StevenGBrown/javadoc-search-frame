@@ -1358,48 +1358,51 @@ Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
  * @return {PackageLink|ClassLink=} The best match.
  */
 Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
-  if (links.length < 2) {
+  if (links.length <= 1 || searchString === '') {
     // No need to display a best match.
     return null;
   }
-  // Get the case-insensitive exact matches.
-  var caseInsensitiveExactMatchCondition =
-      RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString);
-  var exactMatchLinks = links.filter(caseInsensitiveExactMatchCondition);
-  // Attempt to reduce the list further by finding a case-sensitive match.
-  var caseSensitiveExactMatchCondition =
-      RegexLibrary.createCaseSensitiveExactMatchCondition(searchString);
-  var caseSensitiveExactMatchLinks =
-      exactMatchLinks.filter(caseSensitiveExactMatchCondition);
-  if (caseSensitiveExactMatchLinks.length > 0) {
-    exactMatchLinks = caseSensitiveExactMatchLinks;
-  }
-  // Keep only the links with the lowest package depth.
-  var bestMatchLinks = [];
-  var bestMatchPackageDepth;
-  var name;
-  var packageDepth;
-  exactMatchLinks.forEach(function(link) {
-    name = (link.getType() === LinkType.PACKAGE ?
-        link.getPackageName() : link.getCanonicalName());
-    packageDepth = name.split('.').length;
-    if (!bestMatchPackageDepth || packageDepth < bestMatchPackageDepth) {
-      bestMatchLinks = [link];
-      bestMatchPackageDepth = packageDepth;
-    } else if (packageDepth === bestMatchPackageDepth) {
-      bestMatchLinks.push(link);
+
+  function filterBestMatches(condition) {
+    var result = links.filter(condition);
+    if (result.length > 0) {
+      links = result;
     }
+  }
+
+  // Look for a case-insensitive exact match.
+  filterBestMatches(
+      RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString));
+
+  // Look for a case-sensitive exact match.
+  filterBestMatches(
+      RegexLibrary.createCaseSensitiveExactMatchCondition(searchString));
+
+  // Keep only the links with the lowest package depth.
+  var lowestPackageDepth = 1000000;
+  function getDepth(link) {
+    var name = (link.getType() === LinkType.PACKAGE ?
+        link.getPackageName() : link.getCanonicalName());
+    return name.split('.').length;
+  }
+  links.forEach(function(link) {
+    lowestPackageDepth = Math.min(lowestPackageDepth, getDepth(link));
   });
+  filterBestMatches(function(link) {
+    return getDepth(link) === lowestPackageDepth;
+  });
+
   // When searching for "List", select java.util.List instead of java.awt.List.
   var javaUtilList = new ClassLink(LinkType.INTERFACE, 'java.util', 'List');
   var javaAwtList = new ClassLink(LinkType.CLASS, 'java.awt', 'List');
-  if (bestMatchLinks.length === 2 &&
-      bestMatchLinks[0].equals(javaUtilList) &&
-      bestMatchLinks[1].equals(javaAwtList)) {
+  if (links.length === 2 &&
+      links[0].equals(javaUtilList) &&
+      links[1].equals(javaAwtList)) {
     return javaUtilList;
   }
+
   // If the list has been reduced to one item, then that is the best match.
-  return bestMatchLinks.length == 1 ? bestMatchLinks[0] : null;
+  return links.length == 1 ? links[0] : null;
 };
 
 

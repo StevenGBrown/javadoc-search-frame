@@ -326,7 +326,6 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch',
       assertThatBestMatchFor('j', is(null));
       assertThatBestMatchFor('J', is(null));
       assertThatBestMatchFor('Object', is(javaLangObject));
-      assertThatBestMatchFor('O', is(null));
       assertThatBestMatchFor('java.lang.Object', is(null));
       assertThatBestMatchFor('JAVA.LANG.OBJECT', is(null));
       assertThatBestMatchFor('org.omg.CORBA.Object', is(null));
@@ -339,6 +338,7 @@ UnitTestSuite.testFunctionFor('Search._PackagesAndClasses._getBestMatch',
       assertThatBestMatchFor('Hudson', is(hudsonModelHudson));
       assertThatBestMatchFor('list', is(javaUtilList));
       assertThatBestMatchFor('Reader', is(javaIoReader));
+      assertThatBestMatchFor('Reade', is(javaIoReader));
       assertThatBestMatchFor('DataInputStream', is(javaIoDataInputStream));
     });
 
