@@ -1176,7 +1176,7 @@ Search = {
   previousEntireSearchString: null,
   timeoutId: null,
   topLink: null,
-  autoOpenLink: null
+  autoOpenUrl: 'overview-summary.html'
 };
 
 
@@ -1242,7 +1242,7 @@ Search._performSearch = function(entireSearchString) {
 
       Search.topLink = searchContext.topMemberOrKeywordLink ||
           searchContext.topPackageOrClassLink;
-      Search._autoOpen();
+      Search._autoOpen(entireSearchString);
 
       if (searchContext.menuPageOpened) {
         Search._collapseMenu();
@@ -1264,14 +1264,18 @@ Search._collapseMenu = function() {
 
 /**
  * If the option is configured, automatically open the top link.
+ * @param {string} searchString The search string.
  */
-Search._autoOpen = function() {
+Search._autoOpen = function(searchString) {
   var url = Search.getTopLinkUrl();
-  if (url && url !== Search.autoOpenLink) {
+  if (searchString === '') {
+    url = 'overview-summary.html';
+  }
+  if (url && url !== Search.autoOpenUrl) {
     Storage.get(Option.AUTO_OPEN, function(autoOpen) {
       if (autoOpen) {
         Frames.openLinkInSummaryFrame(url, self);
-        Search.autoOpenLink = url;
+        Search.autoOpenUrl = url;
       }
     });
   }
