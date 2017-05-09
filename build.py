@@ -26,15 +26,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 '''
 
 import io
-import optparse
 import os
 import os.path
 import re
 import shutil
 import sys
-import traceback
 import zipfile
-from subprocess import Popen, PIPE, STDOUT
 
 
 # Read version number.
@@ -42,13 +39,8 @@ with io.open(os.path.join(sys.path[0], 'version.txt')) as f:
   version = f.read().strip()
 
 
-def main(linterPath=None):
+def main():
   '''Package the sources into a user script and a Google Chrome extension.'''
-
-  linter(
-    paths=[source(), test()],
-    exclude=source('greasemonkey/javadoc_search_frame.js'),
-    linterPath=linterPath)
 
   rmDirectoryContents(target())
 
@@ -95,29 +87,6 @@ def target(path=''):
   '''Return a path under the target directory.'''
 
   return os.path.abspath(os.path.join(sys.path[0], 'target', path))
-
-
-def linter(paths, exclude, linterPath):
-  '''
-  Inspect the given paths with Closure Linter and log any warnings to the
-  console. http://code.google.com/p/closure-linter/
-  '''
-
-  gjslint = 'gjslint'
-  if linterPath:
-    gjslint = os.path.join(linterPath, gjslint)
-  args = [gjslint, '--strict', '--check_html']
-  for path in paths:
-    args += ['--recurse', path]
-  if exclude:
-    args += ['--exclude_files', exclude]
-  try:
-    proc = Popen(args, stdout=PIPE, stderr=STDOUT)
-    output = proc.communicate()[0]
-    if proc.returncode != 0:
-      print(output.decode())
-  except:
-    traceback.print_exc(file=sys.stdout)
 
 
 def rmDirectoryContents(dir):
@@ -197,9 +166,4 @@ def mkzip(newZipFile, contentsDir):
 
 
 if __name__ == '__main__':
-  parser = optparse.OptionParser()
-  parser.add_option('--linter',
-      help='directory containing the Closure Linter executable ' +
-           '(default: use the system path)')
-  (options, args) = parser.parse_args()
-  main(linterPath=options.linter)
+  main()
