@@ -42,9 +42,11 @@ Frames = {};
 /**
  * Hide the packages frame. If the packages frame does not exist, calling this
  * function will have no effect.
+ * 
+ * @param {Document} parentDocument The document containing the Javadoc frames or iframes.
  */
-Frames.hideAllPackagesFrame = function() {
-  var framesets = parent.document.getElementsByTagName('frameset');
+Frames.hideAllPackagesFrame = function(parentDocument) {
+  var framesets = parentDocument.getElementsByTagName('frameset');
   if (framesets.length > 1) {
     // Javadoc created with Java 8 or earlier
     var frameset = framesets[1];
@@ -58,7 +60,7 @@ Frames.hideAllPackagesFrame = function() {
     }
   } else {
     // Javadoc created with Java 9
-    var divs = parent.document.getElementsByTagName('div');
+    var divs = parentDocument.getElementsByTagName('div');
     for (var i = 0; i < divs.length; i++) {
       var div = divs[i];
       if (div.className === 'leftTop') {

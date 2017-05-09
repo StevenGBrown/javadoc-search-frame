@@ -42,6 +42,16 @@ function main() {
   console.log(startupLogMessage);
 
   Storage.get(Option.HIDE_PACKAGE_FRAME, function(hidePackageFrame) {
+    if (hidePackageFrame && window.top !== window) {
+      if (document.location.protocol === 'file:') {
+        // Content scripts on local pages cannot access the parent document.
+        chrome.runtime.sendMessage({operation: 'hide-allpackages-frame'});
+      } else {
+        // This way seems to load faster. Do it if possible.
+        Frames.hideAllPackagesFrame(parent.document);
+      }
+    }
+
     init(hidePackageFrame);
 
     chrome.runtime.onMessage.addListener(

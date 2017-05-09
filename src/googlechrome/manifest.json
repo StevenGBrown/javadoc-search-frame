@@ -57,7 +57,7 @@
       "all_frames": true
     }
   ],
-  "minimum_chrome_version": "25",
+  "minimum_chrome_version": "39",
   "options_ui": {
     "page": "options.html",
     "chrome_style": true
@@ -67,6 +67,8 @@
   "permissions": [
     "http://*/*",
     "https://*/*",
-    "storage"
+    "file://*/*",
+    "storage",
+    "webNavigation"
   ]
 }

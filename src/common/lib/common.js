@@ -1795,14 +1795,9 @@ Search._Menu._constructMenuHtml = function(menu) {
 
 /**
  * Initialise this script.
- * @param {boolean} hidePackageFrame Whether to hide the package frame.
+ * @param {boolean} packageFrameHidden Whether the package frame has been hidden.
  */
-function init(hidePackageFrame) {
-
-  // Hide the package frame if that option is enabled.
-  if (hidePackageFrame) {
-    Frames.hideAllPackagesFrame();
-  }
+function init(packageFrameHidden) {
 
   // Retrieve the inner HTML of the class frame.
   var classesInnerHtml = getClassesInnerHtml();
@@ -1810,7 +1805,7 @@ function init(hidePackageFrame) {
   // Initialise stored package and class links.
   var classLinks = getClassLinks(classesInnerHtml);
   var packageAndClassLinks;
-  if (hidePackageFrame) {
+  if (packageFrameHidden) {
     var packageLinks = getPackageLinks(classLinks);
     packageAndClassLinks = packageLinks.concat(classLinks);
   } else {

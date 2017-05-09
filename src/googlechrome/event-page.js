@@ -68,22 +68,48 @@ chrome.runtime.onInstalled.addListener(function(details) {
   });
 });
 
+function openOptionsPage(sender) {
+  if (chrome.runtime.openOptionsPage) {
+    chrome.runtime.openOptionsPage();
+  } else {
+    var tabProperties = {
+      windowId: sender.tab.windowId,
+      index: sender.tab.index + 1,
+      url: chrome.extension.getURL('options.html')
+    };
+    chrome.tabs.create(tabProperties);
+  }
+}
+
+function hideAllPackagesFrame(sender) {
+  chrome.webNavigation.getFrame({
+    tabId: sender.tab.id,
+    frameId: sender.frameId
+  }, function (details) {
+    chrome.tabs.executeScript(sender.tab.id, {
+      file: 'lib/Frames.js',
+      frameId: details.parentFrameId
+    }, function() {
+      chrome.tabs.executeScript(sender.tab.id, {
+        code: 'Frames.hideAllPackagesFrame(document)',
+        frameId: details.parentFrameId
+      });
+    });
+  });
+}
+
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
-      var response = {};
       if (request.operation === 'open-options-page') {
-        if (chrome.runtime.openOptionsPage) {
-          chrome.runtime.openOptionsPage();
-        } else {
-          var tabProperties = {
-            windowId: sender.tab.windowId,
-            index: sender.tab.index + 1,
-            url: chrome.extension.getURL('options.html')
-          };
-          chrome.tabs.create(tabProperties);
-        }
+        openOptionsPage(sender);
+        sendResponse();
+        return false;
       }
-      sendResponse(response);
+      if (request.operation === 'hide-allpackages-frame') {
+        hideAllPackagesFrame(sender);
+        sendResponse();
+        return false;
+      }
     }
 );
 
