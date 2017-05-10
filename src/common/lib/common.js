@@ -1521,11 +1521,12 @@ Search._ClassMembersAndKeywords._perform = function(
  */
 Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
     baseUrl, packageOrClassPageHtml) {
-  var anchorRegex = /<a name=\"([^\"]+)\"/gi;
+  // Starting with Java 9, the "id" attribute is used instead of "name".
+  var anchorRegex = /<a (name|id)=\"([^\"]+)\"/gi;
   var matches;
   var links = [];
   while ((matches = anchorRegex.exec(packageOrClassPageHtml)) !== null) {
-    var name = matches[1];
+    var name = matches[2];
     var link = Search._ClassMembersAndKeywords._createLink(baseUrl, name);
     if (link) {
       links.push(link);
