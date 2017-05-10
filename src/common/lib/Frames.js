@@ -76,40 +76,18 @@ Frames.hideAllPackagesFrame = function(parentDocument) {
 
 /**
  * Open the given URL in the summary frame. If the summary frame is not
- * displayed, the URL will not be opened.
- * @param {string} url The URL to open.
- * @param {*=} opt_focusElement Element to focus on once the link has been
- *     opened (optional).
- * @return {boolean} Whether the URL was opened.
- */
-Frames.openLinkInSummaryFrame = function(url, opt_focusElement) {
-  if (window.top !== window) {
-    Frames.onSummaryFrameLoad(function(iframe) {
-      if (opt_focusElement) {
-        opt_focusElement.focus();
-      } else {
-        iframe.contentDocument.getElementById('search').blur();
-        iframe.focus();
-      }
-    });
-    window.open(url, 'classFrame');
-    if (opt_focusElement) {
-      opt_focusElement.focus();
-    }
-    return true;
-  }
-  return false;
-};
-
-
-/**
- * Open the given URL in the summary frame. If the summary frame is not
  * displayed, the URL will be opened in a new tab or window.
  * @param {string} url The URL to open.
  */
 Frames.openLinkInSummaryFrameOrNewTab = function(url) {
-  if (!Frames.openLinkInSummaryFrame(url)) {
+  if (window.top === window) {
     Frames.openLinkInNewTab(url);
+  } else {
+    Frames.onSummaryFrameLoad(function(iframe) {
+      iframe.contentDocument.getElementById('search').blur();
+      iframe.focus();
+    });
+    window.open(url, 'classFrame');
   }
 };
 

@@ -77,14 +77,6 @@ OptionsPageGenerator._createContents = function(pageDocument) {
     contents.push(pageDocument.createElement('p'));
   }
   contents.push(OptionsPageGenerator._title(
-      pageDocument, Messages.get('autoOpenOptionTitle')));
-  contents.push(OptionsPageGenerator._booleanOption(
-      pageDocument, Option.AUTO_OPEN,
-      'autoOpen',
-      Messages.get('autoOpenOptionOn'),
-      Messages.get('autoOpenOptionOff')));
-  contents.push(pageDocument.createElement('p'));
-  contents.push(OptionsPageGenerator._title(
       pageDocument, Messages.get('mergeFramesOptionTitle')));
   contents.push(OptionsPageGenerator._booleanOption(
       pageDocument, Option.HIDE_PACKAGE_FRAME,

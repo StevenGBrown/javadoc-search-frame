@@ -56,19 +56,6 @@ Option = function(properties) {
 /**
  * @type {Option}
  */
-Option.AUTO_OPEN = new Option({
-  key: 'auto_open',
-  defaultValue: false,
-  type: Boolean,
-  upgrade: function(value, lastSavedVersion) {
-    return value;
-  }
-});
-
-
-/**
- * @type {Option}
- */
 Option.HIDE_PACKAGE_FRAME = new Option({
   key: 'hide_package_frame',
   defaultValue: true,

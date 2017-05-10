@@ -19,18 +19,6 @@
     "message": "Options: Javadoc Search Frame",
     "description": "Title of the options page."
   },
-  "autoOpenOptionTitle": {
-    "message": "Open the top search result",
-    "description": "Title of the options page section used to configure the auto-open option."
-  },
-  "autoOpenOptionOn": {
-    "message": "Automatically after each search",
-    "description": "Label displayed for the button to turn on the auto-open option."
-  },
-  "autoOpenOptionOff": {
-    "message": "When the Enter key is pressed",
-    "description": "Label displayed for the button to turn off the auto-open option."
-  },
   "mergeFramesOptionTitle": {
     "message": "Page layout",
     "description": "Title of the options page section used to configure the merge frames option."
