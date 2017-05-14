@@ -83,10 +83,6 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
   if (window.top === window) {
     Frames.openLinkInNewTab(url);
   } else {
-    Frames.onSummaryFrameLoad(function(iframe) {
-      iframe.contentDocument.getElementById('search').blur();
-      iframe.focus();
-    });
     window.open(url, 'classFrame');
   }
 };
@@ -98,24 +94,4 @@ Frames.openLinkInSummaryFrameOrNewTab = function(url) {
  */
 Frames.openLinkInNewTab = function(url) {
   window.open(url);
-};
-
-
-/**
- * Call the provided function once the summary frame has been loaded. If the
- * page was generated with Java 8 or earlier, the function will not be called.
- * @param {function(*): void} onLoad Function which is called with the iframe
- * once it has loaded.
- */
-Frames.onSummaryFrameLoad = function(onLoad) {
-  var iframes = parent.document.getElementsByTagName('iframe');
-  for (var i = 0; i < iframes.length; i++) {
-    var iframe = iframes[i];
-    if (iframe.name === 'classFrame') {
-      iframe.addEventListener('load', function() {
-        onLoad(iframe);
-      }, false);
-      return;
-    }
-  }
 };

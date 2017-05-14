@@ -1806,9 +1806,6 @@ function init(packageFrameHidden) {
 
   // Give focus to the search field.
   View.focusOnSearchField();
-  Frames.onSummaryFrameLoad(function() {
-    View.focusOnSearchField();
-  });
 }
 
 
