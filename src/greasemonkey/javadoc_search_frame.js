@@ -10,6 +10,8 @@
 // @include       */allclasses-frame.html#JavadocSearchFrameOptions
 // @include       */package-frame.html
 // @include       */package-frame.html#JavadocSearchFrameOptions
+// @grant         GM.getValue
+// @grant         GM.setValue
 // @grant         GM_getValue
 // @grant         GM_setValue
 // ==/UserScript==

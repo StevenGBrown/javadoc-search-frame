@@ -71,7 +71,6 @@ Storage.get = function(option, callback) {
  * Set an option to a new value.
  * @param {Option} option The option to configure.
  * @param {*} value The new value.
- * @throws An exception if this option cannot be set.
  */
 Storage.set = function(option, value) {
   var items = {};

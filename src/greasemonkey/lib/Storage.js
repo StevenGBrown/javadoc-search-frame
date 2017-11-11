@@ -43,20 +43,10 @@ Storage = {};
  * @return {boolean} Whether storage is supported by this browser.
  */
 Storage.isSupported = function() {
-  return Storage._canGet() && Storage._canSet();
-};
-
-
-/**
- * @return {boolean} Whether retrieval of stored data is supported.
- */
-Storage._canGet = function() {
-  try {
-    return Boolean(GM_getValue) &&
-        GM_getValue('test', 'defaultValue') === 'defaultValue';
-  } catch (ex) {
-    return false;
+  if (typeof GM !== 'undefined') {
+    return GM.getValue && GM.setValue;
   }
+  return typeof GM_getValue !== 'undefined' && typeof GM_setValue !== 'undefined';
 };
 
 
@@ -68,45 +58,48 @@ Storage._canGet = function() {
  *     been configured, then the default value will be returned.
  */
 Storage.get = function(option, callback) {
-  var value = undefined;
-  if (Storage._canGet()) {
-    value = GM_getValue(option.key);
-    if (option.type === Boolean) {
-      value = '' + value;
-      value = (option.defaultValue ? value !== 'false' : value === 'true');
+  Storage._getValue(option.key, function(value) {
+    if (value === undefined || value === null) {
+      callback(option.defaultValue);
+    } else {
+      if (option.type === Boolean) {
+        value = '' + value;
+        value = (option.defaultValue ? value !== 'false' : value === 'true');
+      }
+      Storage._getValue(option.key + '_version', function(version) {
+        value = option.upgrade(value, version || '1.4.6');
+        callback(value);
+      });
     }
-  }
-  if (value === undefined || value === null) {
-    value = option.defaultValue;
+  });
+};
+
+Storage._getValue = function(key, callback) {
+  if (typeof GM !== 'undefined' && GM.getValue) {
+    GM.getValue(key).then(callback);
+  } else if (typeof GM_getValue !== 'undefined') {
+    callback(GM_getValue(key));
   } else {
-    var version = GM_getValue(option.key + '_version', '1.4.6');
-    value = option.upgrade(value, version);
+    callback(undefined);
   }
-  callback(value);
-};
-
-
-/**
- * @return {boolean} Whether modification of stored data is supported.
- */
-Storage._canSet = function() {
-  try {
-    return Boolean(GM_setValue);
-  } catch (ex) {
-    return false;
-  }
-};
+}
 
 
 /**
  * Set an option to a new value.
  * @param {Option} option The option to configure.
  * @param {*} value The new value.
- * @throws An exception if this option cannot be set.
  */
 Storage.set = function(option, value) {
-  GM_setValue(option.key, value);
+  Storage._setValue(option.key, value);
   var version = '#VERSION#'; // The version number is set by the build script.
-  GM_setValue(option.key + '_version', version);
+  Storage._setValue(option.key + '_version', version);
 };
 
+Storage._setValue = function(key, value) {
+  if (typeof GM !== 'undefined' && GM.setValue) {
+    GM.setValue(key, value);
+  } else {
+    GM_setValue(key, value);
+  }
+}
