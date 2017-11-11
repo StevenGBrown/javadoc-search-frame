@@ -12,7 +12,6 @@
 // @include       */package-frame.html#JavadocSearchFrameOptions
 // @grant         GM_getValue
 // @grant         GM_setValue
-// @grant         GM_log
 // ==/UserScript==
 
 /**
@@ -66,9 +65,7 @@ function main() {
       'https://github.com/StevenGBrown/javadoc-search-frame\n' +
       navigator.userAgent + '\n';
 
-  try {
-    GM_log(startupLogMessage);
-  } catch (ex) {
+  if (window.console) {
     console.log(startupLogMessage);
   }
 
