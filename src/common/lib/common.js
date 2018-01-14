@@ -703,7 +703,15 @@ View._create = function(eventHandlers) {
    tableRowElementTwo, tableDataCellElementTwo].forEach(function(element) {
     element.style.border = '0';
     element.style.width = '100%';
+    element.style.padding = '4px';
   });
+
+  tableElement.style['border-collapse'] = 'collapse';
+
+  tableDataCellElementOne.style['position'] = 'fixed';
+  tableDataCellElementOne.style['background-color'] = 'white';
+
+  tableDataCellElementTwo.style['padding-top'] = '4em';
 
   while (document.body.firstChild) {
     document.body.removeChild(document.body.firstChild);
