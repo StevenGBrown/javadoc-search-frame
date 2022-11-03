@@ -16,12 +16,10 @@
 // @grant         GM_setValue
 // ==/UserScript==
 
-
 /**
  * Entry point of this script; called when the script has loaded.
  */
 function main() {
-
   if (document.location.hash === '#JavadocSearchFrameOptions') {
     OptionsPageGenerator.generate();
     return;
@@ -31,15 +29,18 @@ function main() {
   var version = '#VERSION#';
 
   var startupLogMessage =
-      '\nJavadoc Search Frame ' + version + ' (Greasemonkey User Script)\n' +
-      'https://github.com/StevenGBrown/javadoc-search-frame\n' +
-      navigator.userAgent + '\n';
+    '\nJavadoc Search Frame ' +
+    version +
+    ' (Greasemonkey User Script)\n' +
+    'https://github.com/StevenGBrown/javadoc-search-frame\n' +
+    navigator.userAgent +
+    '\n';
 
   if (window.console) {
     console.log(startupLogMessage);
   }
 
-  Storage.get(Option.HIDE_PACKAGE_FRAME, function(hidePackageFrame) {
+  Storage.get(Option.HIDE_PACKAGE_FRAME, function (hidePackageFrame) {
     if (hidePackageFrame) {
       Frames.hideAllPackagesFrame(parent.document);
     }
@@ -47,10 +48,7 @@ function main() {
   });
 }
 
-
 // Call the main method once the rest of the script has executed.
 window.setTimeout(main, 0);
 
-var messages =
-    // remainder of file added by the build script
-
+// remainder of file added by the build script

@@ -4,13 +4,11 @@
  * ----------------------------------------------------------------------------
  */
 
-
 /**
  * Array of all package and class links.
  * @type {Array.<PackageLink|ClassLink>}
  */
 var ALL_PACKAGE_AND_CLASS_LINKS = [];
-
 
 /**
  * The window URL (cached).
@@ -18,15 +16,11 @@ var ALL_PACKAGE_AND_CLASS_LINKS = [];
  */
 var LOCATION_HREF = location.href;
 
-
-
 /*
  * ----------------------------------------------------------------------------
  * LinkType
  * ----------------------------------------------------------------------------
  */
-
-
 
 /**
  * Package, class, class member and keyword link types.
@@ -34,106 +28,91 @@ var LOCATION_HREF = location.href;
  * @param {string} pluralName The plural name of the link type.
  * @constructor
  */
-LinkType = function(singularName, pluralName) {
+LinkType = function (singularName, pluralName) {
   this.singularName = singularName;
   this.pluralName = pluralName;
 };
 
-
 /**
  * @return {string} The singular name of this type.
  */
-LinkType.prototype.getSingularName = function() {
+LinkType.prototype.getSingularName = function () {
   return this.singularName;
 };
-
 
 /**
  * @return {string} The plural name of this type.
  */
-LinkType.prototype.getPluralName = function() {
+LinkType.prototype.getPluralName = function () {
   return this.pluralName;
 };
-
 
 /**
  * @return {string} A string representation of this type.
  */
-LinkType.prototype.toString = function() {
+LinkType.prototype.toString = function () {
   return this.singularName;
 };
-
 
 /**
  * Package link type.
  */
 LinkType.PACKAGE = new LinkType('Package', 'Packages');
 
-
 /**
  * Interface link type.
  */
 LinkType.INTERFACE = new LinkType('Interface', 'Interfaces');
-
 
 /**
  * Class link type.
  */
 LinkType.CLASS = new LinkType('Class', 'Classes');
 
-
 /**
  * Enum link type.
  */
 LinkType.ENUM = new LinkType('Enum', 'Enums');
-
 
 /**
  * Exception link type.
  */
 LinkType.EXCEPTION = new LinkType('Exception', 'Exceptions');
 
-
 /**
  * Error link type.
  */
 LinkType.ERROR = new LinkType('Error', 'Errors');
-
 
 /**
  * Annotation link type.
  */
 LinkType.ANNOTATION = new LinkType('Annotation', 'Annotation Types');
 
-
 /**
  * Class member link type.
  */
 LinkType.CLASS_MEMBER = new LinkType('Method or Field', 'Methods and Fields');
-
 
 /**
  * Keyword link type.
  */
 LinkType.KEYWORD = new LinkType('Keyword', 'Keywords');
 
-
 /**
  * Get the link type with the given singular name.
  * @param {string} singularName The singular name.
  * @return {LinkType} The link type.
  */
-LinkType.getByName = function(singularName) {
+LinkType.getByName = function (singularName) {
   return LinkType[singularName.toUpperCase()];
 };
-
 
 /*
  * ----------------------------------------------------------------------------
  * PackageLink, ClassLink, MemberLink and KeywordLink
  * ----------------------------------------------------------------------------
  */
-
 
 /**
  * Extract a URL from the given link.
@@ -147,7 +126,6 @@ function extractUrl(link) {
   var secondQuoteIndex = html.indexOf('"', firstQuoteIndex + 1);
   return html.substring(firstQuoteIndex + 1, secondQuoteIndex);
 }
-
 
 /**
  * Convert the given relative URL to an absolute URL.
@@ -166,91 +144,89 @@ function toAbsoluteUrl(relativeUrl, opt_documentUrl) {
     opt_documentUrl = LOCATION_HREF;
   }
   var documentUrlPath = opt_documentUrl.substring(
-      0, opt_documentUrl.lastIndexOf('/') + 1);
+    0,
+    opt_documentUrl.lastIndexOf('/') + 1
+  );
   var relativeUrlPath = relativeUrl.substring(
-      0, relativeUrl.lastIndexOf('/') + 1);
+    0,
+    relativeUrl.lastIndexOf('/') + 1
+  );
   if (endsWith(documentUrlPath, relativeUrlPath)) {
     documentUrlPath = documentUrlPath.substring(
-        0, documentUrlPath.length - relativeUrlPath.length);
+      0,
+      documentUrlPath.length - relativeUrlPath.length
+    );
   }
   return documentUrlPath + relativeUrl;
 }
-
-
 
 /**
  * Link to a package. These links are of type {LinkType.PACKAGE}.
  * @param {string} packageName The package name.
  * @constructor
  */
-PackageLink = function(packageName) {
+PackageLink = function (packageName) {
   this.packageName = packageName;
-  this.html = '<A HREF="' + packageName.replace(/\./g, '/') +
-      '/package-summary.html" target="classFrame">' + packageName + '</A>';
+  this.html =
+    '<A HREF="' +
+    packageName.replace(/\./g, '/') +
+    '/package-summary.html" target="classFrame">' +
+    packageName +
+    '</A>';
 };
-
 
 /**
  * Determine whether this link matches the given regular expression.
  * @param {RegExp} regex The regular expression.
  * @return {boolean} Whether this link is a match.
  */
-PackageLink.prototype.matches = function(regex) {
+PackageLink.prototype.matches = function (regex) {
   return regex.test(this.packageName);
 };
-
 
 /**
  * @return {string} This link in HTML format.
  */
-PackageLink.prototype.getHtml = function() {
+PackageLink.prototype.getHtml = function () {
   return this.html;
 };
-
 
 /**
  * @return {LinkType} The type of this link.
  */
-PackageLink.prototype.getType = function() {
+PackageLink.prototype.getType = function () {
   return LinkType.PACKAGE;
 };
-
 
 /**
  * @return {string} The name of this package.
  */
-PackageLink.prototype.getPackageName = function() {
+PackageLink.prototype.getPackageName = function () {
   return this.packageName;
 };
-
 
 /**
  * @return {string} The URL of this link.
  */
-PackageLink.prototype.getUrl = function() {
+PackageLink.prototype.getUrl = function () {
   return toAbsoluteUrl(extractUrl(this));
 };
-
 
 /**
  * Equals function.
  * @param {*} obj The object with which to compare.
  * @return {boolean} Whether this link is equal to the given object.
  */
-PackageLink.prototype.equals = function(obj) {
-  return obj instanceof PackageLink &&
-      this.packageName === obj.packageName;
+PackageLink.prototype.equals = function (obj) {
+  return obj instanceof PackageLink && this.packageName === obj.packageName;
 };
-
 
 /**
  * @return {string} A string representation of this link.
  */
-PackageLink.prototype.toString = function() {
+PackageLink.prototype.toString = function () {
   return 'PackageLink: ' + this.packageName;
 };
-
-
 
 /**
  * Link to a class. These links are of type {LinkType.INTERFACE},
@@ -261,7 +237,7 @@ PackageLink.prototype.toString = function() {
  * @param {string} className The class name.
  * @constructor
  */
-ClassLink = function(type, packageName, className) {
+ClassLink = function (type, packageName, className) {
   this.type = type;
   this.className = className;
   this.canonicalName = packageName + '.' + className;
@@ -277,8 +253,9 @@ ClassLink = function(type, packageName, className) {
     this.innerClassNames.push(name);
   }
 
-  var url = toAbsoluteUrl(packageName.replace(/\./g, '/') + '/' + className +
-      '.html');
+  var url = toAbsoluteUrl(
+    packageName.replace(/\./g, '/') + '/' + className + '.html'
+  );
   var typeInHtml = type;
   if (type === LinkType.EXCEPTION || type === LinkType.ERROR) {
     typeInHtml = LinkType.CLASS;
@@ -289,96 +266,102 @@ ClassLink = function(type, packageName, className) {
     openingTag = '<I>';
     closingTag = '</I>';
   }
-  this.html = '<A HREF="' + url + '" title="' +
-      typeInHtml.getSingularName().toLowerCase() + ' in ' + packageName +
-      '" target="classFrame">' + openingTag + className + closingTag +
-      '</A>&nbsp;[&nbsp;' + packageName + '&nbsp;]';
+  this.html =
+    '<A HREF="' +
+    url +
+    '" title="' +
+    typeInHtml.getSingularName().toLowerCase() +
+    ' in ' +
+    packageName +
+    '" target="classFrame">' +
+    openingTag +
+    className +
+    closingTag +
+    '</A>&nbsp;[&nbsp;' +
+    packageName +
+    '&nbsp;]';
 };
-
 
 /**
  * Determine whether this link matches the given regular expression.
  * @param {RegExp} regex The regular expression.
  * @return {boolean} Whether this link is a match.
  */
-ClassLink.prototype.matches = function(regex) {
-  return regex.test(this.className) || regex.test(this.canonicalName) ||
-      this.innerClassNames.some(function(innerClassName) {
-        return regex.test(innerClassName);
-      });
+ClassLink.prototype.matches = function (regex) {
+  return (
+    regex.test(this.className) ||
+    regex.test(this.canonicalName) ||
+    this.innerClassNames.some(function (innerClassName) {
+      return regex.test(innerClassName);
+    })
+  );
 };
-
 
 /**
  * @return {string} This link in HTML format.
  */
-ClassLink.prototype.getHtml = function() {
+ClassLink.prototype.getHtml = function () {
   return this.html;
 };
-
 
 /**
  * @return {LinkType} The type of this link.
  */
-ClassLink.prototype.getType = function() {
+ClassLink.prototype.getType = function () {
   return this.type;
 };
-
 
 /**
  * @return {string} The simple name of this class.
  */
-ClassLink.prototype.getClassName = function() {
+ClassLink.prototype.getClassName = function () {
   return this.className;
 };
-
 
 /**
  * @return {string} The name of the package that contains this class.
  */
-ClassLink.prototype.getPackageName = function() {
+ClassLink.prototype.getPackageName = function () {
   return this.canonicalName.substring(
-      0, this.canonicalName.length - this.className.length - 1);
+    0,
+    this.canonicalName.length - this.className.length - 1
+  );
 };
-
 
 /**
  * @return {string} The canonical name of this class.
  */
-ClassLink.prototype.getCanonicalName = function() {
+ClassLink.prototype.getCanonicalName = function () {
   return this.canonicalName;
 };
-
 
 /**
  * @return {string} The URL of this link.
  */
-ClassLink.prototype.getUrl = function() {
+ClassLink.prototype.getUrl = function () {
   return toAbsoluteUrl(extractUrl(this));
 };
-
 
 /**
  * Equals function.
  * @param {*} obj The object with which to compare.
  * @return {boolean} Whether this link is equal to the given object.
  */
-ClassLink.prototype.equals = function(obj) {
-  return obj instanceof ClassLink &&
-      this.type === obj.type &&
-      this.className === obj.className &&
-      this.canonicalName === obj.canonicalName;
+ClassLink.prototype.equals = function (obj) {
+  return (
+    obj instanceof ClassLink &&
+    this.type === obj.type &&
+    this.className === obj.className &&
+    this.canonicalName === obj.canonicalName
+  );
 };
-
 
 /**
  * @return {string} A string representation of this link.
  */
-ClassLink.prototype.toString = function() {
+ClassLink.prototype.toString = function () {
   return 'ClassLink(' + this.type + '): ' + this.canonicalName;
 };
-
-
 
 /**
  * Link to a method or field of a class.
@@ -387,53 +370,53 @@ ClassLink.prototype.toString = function() {
  * @param {string} displayName The method or field display name.
  * @constructor
  */
-MemberLink = function(baseUrl, anchorName, displayName) {
+MemberLink = function (baseUrl, anchorName, displayName) {
   this.anchorName = anchorName;
   this.displayName = displayName;
-  this.html = '<A HREF="' + baseUrl + '#' + anchorName +
-      '" target="classFrame" class="anchorLink">' +
-      displayName.replace(/ /g, '&nbsp;') + '</A><BR/>';
+  this.html =
+    '<A HREF="' +
+    baseUrl +
+    '#' +
+    anchorName +
+    '" target="classFrame" class="anchorLink">' +
+    displayName.replace(/ /g, '&nbsp;') +
+    '</A><BR/>';
 };
-
 
 /**
  * Determine whether this link matches the given regular expression.
  * @param {RegExp} regex The regular expression.
  * @return {boolean} Whether this link is a match.
  */
-MemberLink.prototype.matches = function(regex) {
+MemberLink.prototype.matches = function (regex) {
   return regex.test(this.displayName);
 };
-
 
 /**
  * @return {string} This link in HTML format.
  */
-MemberLink.prototype.getHtml = function() {
+MemberLink.prototype.getHtml = function () {
   return this.html;
 };
-
 
 /**
  * @return {LinkType} The type of this link.
  */
-MemberLink.prototype.getType = function() {
+MemberLink.prototype.getType = function () {
   return LinkType.CLASS_MEMBER;
 };
-
 
 /**
  * @return {string} The URL of this link.
  */
-MemberLink.prototype.getUrl = function() {
+MemberLink.prototype.getUrl = function () {
   return extractUrl(this);
 };
-
 
 /**
  * @return {string} The name of this class member.
  */
-MemberLink.prototype.getName = function() {
+MemberLink.prototype.getName = function () {
   if (this.displayName.indexOf('(') !== -1) {
     return this.displayName.substring(0, this.displayName.indexOf('('));
   } else {
@@ -441,26 +424,21 @@ MemberLink.prototype.getName = function() {
   }
 };
 
-
 /**
  * Equals function.
  * @param {*} obj The object with which to compare.
  * @return {boolean} Whether this link is equal to the given object.
  */
-MemberLink.prototype.equals = function(obj) {
-  return obj instanceof MemberLink &&
-      this.html === obj.html;
+MemberLink.prototype.equals = function (obj) {
+  return obj instanceof MemberLink && this.html === obj.html;
 };
-
 
 /**
  * @return {string} A string representation of this link.
  */
-MemberLink.prototype.toString = function() {
+MemberLink.prototype.toString = function () {
   return 'MemberLink: ' + this.displayName + ' -> #' + this.anchorName;
 };
-
-
 
 /**
  * Keyword link found on a package or class page.
@@ -469,75 +447,70 @@ MemberLink.prototype.toString = function() {
  * @param {string} displayName The keyword display name.
  * @constructor
  */
-KeywordLink = function(baseUrl, anchorName, displayName) {
+KeywordLink = function (baseUrl, anchorName, displayName) {
   this.anchorName = anchorName;
   this.displayName = displayName;
-  this.html = '<A HREF="' + baseUrl + '#' + anchorName +
-      '" target="classFrame" class="anchorLink" style="color:#666">' +
-      displayName.replace(/ /g, '&nbsp;') + '</A><BR/>';
+  this.html =
+    '<A HREF="' +
+    baseUrl +
+    '#' +
+    anchorName +
+    '" target="classFrame" class="anchorLink" style="color:#666">' +
+    displayName.replace(/ /g, '&nbsp;') +
+    '</A><BR/>';
 };
-
 
 /**
  * Determine whether this link matches the given regular expression.
  * @param {RegExp} regex The regular expression.
  * @return {boolean} Whether this link is a match.
  */
-KeywordLink.prototype.matches = function(regex) {
+KeywordLink.prototype.matches = function (regex) {
   return regex.test(this.displayName);
 };
-
 
 /**
  * @return {string} This link in HTML format.
  */
-KeywordLink.prototype.getHtml = function() {
+KeywordLink.prototype.getHtml = function () {
   return this.html;
 };
-
 
 /**
  * @return {LinkType} The type of this link.
  */
-KeywordLink.prototype.getType = function() {
+KeywordLink.prototype.getType = function () {
   return LinkType.KEYWORD;
 };
-
 
 /**
  * @return {string} The URL of this link.
  */
-KeywordLink.prototype.getUrl = function() {
+KeywordLink.prototype.getUrl = function () {
   return extractUrl(this);
 };
-
 
 /**
  * Equals function.
  * @param {*} obj The object with which to compare.
  * @return {boolean} Whether this link is equal to the given object.
  */
-KeywordLink.prototype.equals = function(obj) {
-  return obj instanceof KeywordLink &&
-      this.html === obj.html;
+KeywordLink.prototype.equals = function (obj) {
+  return obj instanceof KeywordLink && this.html === obj.html;
 };
-
 
 /**
  * @return {string} A string representation of this link.
  */
-KeywordLink.prototype.toString = function() {
+KeywordLink.prototype.toString = function () {
   return 'KeywordLink: ' + this.displayName + ' -> #' + this.anchorName;
 };
-
-
 
 /*
  * ----------------------------------------------------------------------------
  * View
  * ----------------------------------------------------------------------------
  */
-
 
 /**
  * @class View Provides access to the UI elements of the frame containing the
@@ -546,9 +519,8 @@ KeywordLink.prototype.toString = function() {
 View = {
   searchField: null,
   contentNodeParent: null,
-  contentNode: null
+  contentNode: null,
 };
-
 
 /**
  * Access key that will focus on the search field when activated ('s').
@@ -558,7 +530,6 @@ View = {
  */
 View.searchAccessKey = 's';
 
-
 /**
  * Access key that will clear the search field when activated ('a').
  * This access key can be activated by pressing either Alt+a or Alt+Shift+a,
@@ -567,70 +538,63 @@ View.searchAccessKey = 's';
  */
 View.eraseAccessKey = 'a';
 
-
 /**
  * Initialise the search field frame.
  * @param {EventHandlers} eventHandlers The event handlers.
  */
-View.initialise = function(eventHandlers) {
+View.initialise = function (eventHandlers) {
   View._create(eventHandlers);
 };
-
 
 /**
  * Set the HTML contents of the area below the search field.
  * @param {string} contents The HTML contents.
  */
-View.setContentsHtml = function(contents) {
+View.setContentsHtml = function (contents) {
   var newNode = View.contentNode.cloneNode(false);
   newNode.innerHTML = contents;
   View.contentNodeParent.replaceChild(newNode, View.contentNode);
   View.contentNode = newNode;
 };
 
-
 /**
  * Set the value displayed in the search field.
  * @param {string} value The value to display.
  */
-View.setSearchFieldValue = function(value) {
+View.setSearchFieldValue = function (value) {
   if (View.searchField.value !== value) {
     View.searchField.value = value;
   }
 };
 
-
 /**
  * @return {string} The current value displayed in the search field.
  */
-View.getSearchFieldValue = function() {
+View.getSearchFieldValue = function () {
   return View.searchField.value;
 };
-
 
 /**
  * Give focus to the search field.
  */
-View.focusOnSearchField = function() {
+View.focusOnSearchField = function () {
   View.searchField.focus();
 };
-
 
 /**
  * Clear the search field.
  */
-View.clearSearchField = function() {
+View.clearSearchField = function () {
   Query.update('');
   View.focusOnSearchField();
   Search.performIfSearchStringHasChanged();
 };
 
-
 /**
  * Create the view elements and add them to the current document.
  * @param {EventHandlers} eventHandlers The event handlers.
  */
-View._create = function(eventHandlers) {
+View._create = function (eventHandlers) {
   var tableElement = document.createElement('table');
   var tableRowElementOne = document.createElement('tr');
   var tableDataCellElementOne = document.createElement('td');
@@ -670,8 +634,13 @@ View._create = function(eventHandlers) {
   tableElement.appendChild(tableRowElementTwo);
   tableRowElementTwo.appendChild(tableDataCellElementTwo);
 
-  [tableElement, tableRowElementOne, tableDataCellElementOne,
-   tableRowElementTwo, tableDataCellElementTwo].forEach(function(element) {
+  [
+    tableElement,
+    tableRowElementOne,
+    tableDataCellElementOne,
+    tableRowElementTwo,
+    tableDataCellElementTwo,
+  ].forEach(function (element) {
     element.style.border = '0';
     element.style.width = '100%';
     element.style.padding = '4px';
@@ -690,21 +659,26 @@ View._create = function(eventHandlers) {
   document.body.appendChild(tableElement);
 };
 
-
 /**
  * @param {EventHandlers} eventHandlers The event handlers.
  * @return {Element} The search field element.
  */
-View._createSearchField = function(eventHandlers) {
+View._createSearchField = function (eventHandlers) {
   var searchField = document.createElement('input');
   searchField.setAttribute('type', 'search');
   searchField.setAttribute('spellcheck', 'false');
   searchField.setAttribute('autofocus', 'true');
   searchField.addEventListener('keyup', eventHandlers.searchFieldKeyup, false);
   searchField.addEventListener(
-      'keydown', eventHandlers.searchFieldKeydown, false);
+    'keydown',
+    eventHandlers.searchFieldKeydown,
+    false
+  );
   searchField.addEventListener(
-      'input', eventHandlers.searchFieldChanged, false);
+    'input',
+    eventHandlers.searchFieldChanged,
+    false
+  );
   searchField.addEventListener('focus', eventHandlers.searchFieldFocus, false);
   if (View.searchAccessKey) {
     searchField.setAttribute('accesskey', View.searchAccessKey);
@@ -712,18 +686,20 @@ View._createSearchField = function(eventHandlers) {
   return searchField;
 };
 
-
 /**
  * @param {EventHandlers} eventHandlers The event handlers.
  * @return {Element} The erase button element.
  */
-View._createEraseButton = function(eventHandlers) {
+View._createEraseButton = function (eventHandlers) {
   var eraseButton = document.createElement('input');
   eraseButton.setAttribute('type', 'image');
-  eraseButton.setAttribute('src', 'data:image/gif;base64,' +
+  eraseButton.setAttribute(
+    'src',
+    'data:image/gif;base64,' +
       'R0lGODlhDQANAJEDAM%2FPz%2F%2F%2F%2F93d3UpihSH5BAEAAAMALAAAAAANAA0AAAI' +
       'wnCegcpcg4nIw2sRGDZYnBAWiIHJQRZbec5XXEqnrmXIupMWdZGCXlAGhJg0h7lAAADs%' +
-      '3D');
+      '3D'
+  );
   eraseButton.setAttribute('style', 'margin-left: 2px');
   eraseButton.addEventListener('click', eventHandlers.eraseButtonClick, false);
   if (View.eraseAccessKey) {
@@ -732,47 +708,45 @@ View._createEraseButton = function(eventHandlers) {
   return eraseButton;
 };
 
-
 /**
  * @param {EventHandlers} eventHandlers The event handlers.
  * @return {Element} The options page link element.
  */
-View._createOptionsLink = function(eventHandlers) {
+View._createOptionsLink = function (eventHandlers) {
   var anchorElement = document.createElement('a');
   anchorElement.setAttribute('href', 'javascript:void(0);');
   anchorElement.textContent = Messages.get('optionsAnchor');
   anchorElement.addEventListener(
-      'click', eventHandlers.optionsLinkClicked, false);
+    'click',
+    eventHandlers.optionsLinkClicked,
+    false
+  );
   var fontElement = document.createElement('font');
   fontElement.setAttribute('size', '-2');
   fontElement.appendChild(anchorElement);
   return fontElement;
 };
-
 
 /**
  * @param {EventHandlers} eventHandlers The event handlers.
  * @return {Element} The help link element.
  */
-View._createHelpLink = function(eventHandlers) {
+View._createHelpLink = function (eventHandlers) {
   var anchorElement = document.createElement('a');
   anchorElement.setAttribute('href', 'javascript:void(0);');
   anchorElement.textContent = Messages.get('helpAnchor');
-  anchorElement.addEventListener(
-      'click', eventHandlers.helpLinkClicked, false);
+  anchorElement.addEventListener('click', eventHandlers.helpLinkClicked, false);
   var fontElement = document.createElement('font');
   fontElement.setAttribute('size', '-2');
   fontElement.appendChild(anchorElement);
   return fontElement;
 };
-
 
 /*
  * ----------------------------------------------------------------------------
  * Query
  * ----------------------------------------------------------------------------
  */
-
 
 /**
  * @class Query Constructs the text entered into the search field into a search
@@ -782,41 +756,37 @@ Query = {
   packageOrClassSearchString: '',
   memberOrKeywordSearchString: null,
   menuSearchString: null,
-  timeoutId: null
+  timeoutId: null,
 };
-
 
 /**
  * @return {string} The portion of the search query that relates to the
  *     packages and classes search.
  */
-Query.getPackageOrClassSearchString = function() {
+Query.getPackageOrClassSearchString = function () {
   return Query.packageOrClassSearchString;
 };
-
 
 /**
  * @return {string} The portion of the search query that relates to the class
  *     members and keywords search.
  */
-Query.getMemberOrKeywordSearchString = function() {
+Query.getMemberOrKeywordSearchString = function () {
   return Query.memberOrKeywordSearchString;
 };
-
 
 /**
  * @return {string} The portion of the search query that relates to the
  *     package menu or class menu.
  */
-Query.getMenuSearchString = function() {
+Query.getMenuSearchString = function () {
   return Query.menuSearchString;
 };
-
 
 /**
  * @return {string} The entire search query.
  */
-Query.getEntireSearchString = function() {
+Query.getEntireSearchString = function () {
   var searchString = Query.packageOrClassSearchString;
   if (Query.memberOrKeywordSearchString !== null) {
     searchString += '#';
@@ -829,12 +799,11 @@ Query.getEntireSearchString = function() {
   return searchString;
 };
 
-
 /**
  * Update this query based on the contents of the search field.
  * @param {string} searchFieldContents The contents of the search field.
  */
-Query.update = function(searchFieldContents) {
+Query.update = function (searchFieldContents) {
   Query._processInput(searchFieldContents);
 
   /*
@@ -851,17 +820,16 @@ Query.update = function(searchFieldContents) {
   if (Query.timeoutId !== null) {
     window.clearTimeout(Query.timeoutId);
   }
-  Query.timeoutId = window.setTimeout(function() {
+  Query.timeoutId = window.setTimeout(function () {
     Query._updateView.apply(Query);
   }, 0);
 };
-
 
 /**
  * Process the search field input.
  * @param {string} searchFieldContents The contents of the search field.
  */
-Query._processInput = function(searchFieldContents) {
+Query._processInput = function (searchFieldContents) {
   var searchString;
   if (Query.menuSearchString !== null) {
     searchString = Query.packageOrClassSearchString;
@@ -879,7 +847,7 @@ Query._processInput = function(searchFieldContents) {
 
   var tokens = [];
   var splitOnPrefix;
-  ['@', '#'].forEach(function(prefix) {
+  ['@', '#'].forEach(function (prefix) {
     if (searchString.indexOf(prefix) !== -1) {
       splitOnPrefix = searchString.split(prefix, 2);
       tokens.push(splitOnPrefix[1]);
@@ -894,13 +862,12 @@ Query._processInput = function(searchFieldContents) {
   Query.menuSearchString = tokens[0];
 };
 
-
 /**
  * Update the view.
  */
-Query._updateView = function() {
+Query._updateView = function () {
   var fieldValue = Query.getEntireSearchString();
-  ['#', '@'].forEach(function(prefix) {
+  ['#', '@'].forEach(function (prefix) {
     if (fieldValue.indexOf(prefix) !== -1) {
       fieldValue = prefix + fieldValue.split(prefix, 2)[1];
     }
@@ -909,19 +876,16 @@ Query._updateView = function() {
   View.setSearchFieldValue(fieldValue);
 };
 
-
 /*
  * ----------------------------------------------------------------------------
  * RegexLibrary
  * ----------------------------------------------------------------------------
  */
 
-
 /**
  * @class RegexLibrary Library of regular expressions used by this script.
  */
 RegexLibrary = {};
-
 
 /**
  * Create and return a function that will take a {PackageLink}, {ClassLink},
@@ -931,21 +895,20 @@ RegexLibrary = {};
  * @return {function(PackageLink|ClassLink|MemberLink|KeywordLink): boolean}
  *     The condition function.
  */
-RegexLibrary.createCondition = function(searchString) {
+RegexLibrary.createCondition = function (searchString) {
   if (searchString.length === 0 || searchString === '*') {
-    return function(link) {
+    return function (link) {
       return true;
     };
   }
 
   var pattern = RegexLibrary._getRegex(searchString);
 
-  return function(link) {
+  return function (link) {
     return link.matches(pattern);
   };
 };
 
-
 /**
  * Create and return a function that will take a {PackageLink}, {ClassLink},
  * {MemberLink} or {KeywordLink} as an argument and return whether that link
@@ -954,11 +917,12 @@ RegexLibrary.createCondition = function(searchString) {
  * @return {function(PackageLink|ClassLink|MemberLink|KeywordLink): boolean}
  *     The condition function.
  */
-RegexLibrary.createCaseInsensitiveExactMatchCondition = function(searchString) {
+RegexLibrary.createCaseInsensitiveExactMatchCondition = function (
+  searchString
+) {
   return RegexLibrary._createExactMatchCondition(searchString, false);
 };
 
-
 /**
  * Create and return a function that will take a {PackageLink}, {ClassLink},
  * {MemberLink} or {KeywordLink} as an argument and return whether that link
@@ -967,10 +931,9 @@ RegexLibrary.createCaseInsensitiveExactMatchCondition = function(searchString) {
  * @return {function(PackageLink|ClassLink|MemberLink|KeywordLink): boolean}
  *     The condition function.
  */
-RegexLibrary.createCaseSensitiveExactMatchCondition = function(searchString) {
+RegexLibrary.createCaseSensitiveExactMatchCondition = function (searchString) {
   return RegexLibrary._createExactMatchCondition(searchString, true);
 };
-
 
 /**
  * @param {string} searchString The search string.
@@ -979,28 +942,28 @@ RegexLibrary.createCaseSensitiveExactMatchCondition = function(searchString) {
  * @return {function(PackageLink|ClassLink|MemberLink|KeywordLink): boolean}
  *     The condition function.
  */
-RegexLibrary._createExactMatchCondition = function(
-    searchString, caseSensitive) {
+RegexLibrary._createExactMatchCondition = function (
+  searchString,
+  caseSensitive
+) {
   if (searchString.length === 0 || searchString.indexOf('*') !== -1) {
-    return function(link) {
+    return function (link) {
       return false;
     };
   }
 
   var pattern = RegexLibrary._getExactMatchRegex(searchString, caseSensitive);
 
-  return function(link) {
+  return function (link) {
     return link.matches(pattern);
   };
 };
-
 
 /**
  * @param {string} searchString The search string.
  * @return {RegExp} The regular expression for the search string.
  */
-RegexLibrary._getRegex = function(searchString) {
-
+RegexLibrary._getRegex = function (searchString) {
   // Replace repeated wildcards with a single wildcard character.
   searchString = searchString.replace(/\*{2,}/g, '*');
   // If the search string ends with a wildcard, remove it.
@@ -1025,8 +988,7 @@ RegexLibrary._getRegex = function(searchString) {
       // character starts the next camel case expression, or a '*' or '.'
       // character is found. Digits can start a new camel case expression, so
       // that e.g. "P2D" will match "Point2D".
-      var endOfCamelCase = searchString.substring(i + 1).search(
-          /[A-Z\d\*\.]/);
+      var endOfCamelCase = searchString.substring(i + 1).search(/[A-Z\d\*\.]/);
       var expression;
       if (endOfCamelCase === -1) {
         expression = searchString.substring(i);
@@ -1035,8 +997,9 @@ RegexLibrary._getRegex = function(searchString) {
       }
       i += expression.length;
 
-      camelCasePattern += RegexLibrary._escape(expression[0]) +
-          RegexLibrary._caseInsensitivePattern(expression.substring(1));
+      camelCasePattern +=
+        RegexLibrary._escape(expression[0]) +
+        RegexLibrary._caseInsensitivePattern(expression.substring(1));
       // The camel case regular expression will match any number of lowercase
       // or digit characters following the search term. Digits are accepted so
       // that, e.g. "PD" will match "Point2D".
@@ -1059,18 +1022,16 @@ RegexLibrary._getRegex = function(searchString) {
   return new RegExp(pattern);
 };
 
-
 /**
  * @param {string} searchString The search string.
  * @param {boolean} caseSensitive True for a case-sensitive match, false for
  *                  case-insensitive.
  * @return {RegExp} The exact match regular expression for the search string.
  */
-RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
+RegexLibrary._getExactMatchRegex = function (searchString, caseSensitive) {
   var pattern = '^' + RegexLibrary._escape(searchString) + '$';
   return caseSensitive ? new RegExp(pattern) : new RegExp(pattern, 'i');
 };
-
 
 /**
  * Return a regular expression pattern that will perform a case-insensitive
@@ -1080,7 +1041,7 @@ RegexLibrary._getExactMatchRegex = function(searchString, caseSensitive) {
  *                 string without being replaced.
  * @return {string} The regular expression pattern.
  */
-RegexLibrary._caseInsensitivePattern = function(str, charactersToIgnore) {
+RegexLibrary._caseInsensitivePattern = function (str, charactersToIgnore) {
   var result = [];
   for (var i = 0; i < str.length; i++) {
     var c = str[i];
@@ -1097,17 +1058,15 @@ RegexLibrary._caseInsensitivePattern = function(str, charactersToIgnore) {
   return result.join('');
 };
 
-
 /**
  * Escape the given string so that it will be treated as a literal within a
  * regular expression.
  * @param {string} str The input string.
  * @return {string} The escaped string.
  */
-RegexLibrary._escape = function(str) {
+RegexLibrary._escape = function (str) {
   return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
 };
-
 
 /*
  * ----------------------------------------------------------------------------
@@ -1115,19 +1074,16 @@ RegexLibrary._escape = function(str) {
  * ----------------------------------------------------------------------------
  */
 
-
-
 /**
  * A callback function in the context of a specified object.
  * @param {function(*): *} callbackFunction The callback function.
  * @param {*} thisObject The "this" object used when calling the function.
  * @constructor
  */
-Callback = function(callbackFunction, thisObject) {
+Callback = function (callbackFunction, thisObject) {
   this.callbackFunction = callbackFunction;
   this.thisObject = thisObject;
 };
-
 
 /**
  * Invoke this callback function with the given arguments.
@@ -1136,17 +1092,15 @@ Callback = function(callbackFunction, thisObject) {
  *     callback function.
  * @return {*} The function result.
  */
-Callback.prototype.invoke = function(opt_argsArray) {
+Callback.prototype.invoke = function (opt_argsArray) {
   return this.callbackFunction.apply(this.thisObject, opt_argsArray);
 };
-
 
 /*
  * ----------------------------------------------------------------------------
  * Search
  * ----------------------------------------------------------------------------
  */
-
 
 /**
  * @class Search The searching functionality.
@@ -1157,60 +1111,60 @@ Search = {
   topLink: null,
 };
 
-
 /**
  * Perform a search.
  */
-Search.perform = function() {
+Search.perform = function () {
   var entireSearchString = Query.getEntireSearchString();
   Search._performSearch(entireSearchString);
   Search.previousEntireSearchString = entireSearchString;
 };
 
-
 /**
  * Perform a search after a short delay only if the search string has changed.
  */
-Search.performIfSearchStringHasChanged = function() {
+Search.performIfSearchStringHasChanged = function () {
   var entireSearchString = Query.getEntireSearchString();
   if (entireSearchString !== Search.previousEntireSearchString) {
     if (Search.timeoutId !== null) {
       window.clearTimeout(Search.timeoutId);
     }
-    Search.timeoutId = window.setTimeout(function() {
+    Search.timeoutId = window.setTimeout(function () {
       Search.perform.apply(Search);
     }, 100);
   }
   Search.previousEntireSearchString = entireSearchString;
 };
 
-
 /**
  * @return {string} The URL of the link currently displayed at the top of the
  *     list, or null if no links are currently displayed.
  */
-Search.getTopLinkUrl = function() {
+Search.getTopLinkUrl = function () {
   if (Search.topLink) {
     return Search.topLink.getUrl();
   }
   return null;
 };
 
-
 /**
  * @param {string} entireSearchString The search string.
  */
-Search._performSearch = function(entireSearchString) {
-  Storage.get(Option.CLASS_MENU, function(classMenu) {
-    Storage.get(Option.PACKAGE_MENU, function(packageMenu) {
+Search._performSearch = function (entireSearchString) {
+  Storage.get(Option.CLASS_MENU, function (classMenu) {
+    Storage.get(Option.PACKAGE_MENU, function (packageMenu) {
       var searchContext = {};
       searchContext.classMenu = classMenu;
       searchContext.packageMenu = packageMenu;
 
       Search._PackagesAndClasses._perform(
-          searchContext, Query.getPackageOrClassSearchString());
+        searchContext,
+        Query.getPackageOrClassSearchString()
+      );
       Search._ClassMembersAndKeywords._perform(
-          searchContext, Query.getMemberOrKeywordSearchString());
+        searchContext,
+        Query.getMemberOrKeywordSearchString()
+      );
       Search._Menu._perform(searchContext, Query.getMenuSearchString());
 
       if (searchContext.getContentsHtmlCallback) {
@@ -1218,33 +1172,30 @@ Search._performSearch = function(entireSearchString) {
         View.setContentsHtml(contentsHtml);
       }
 
-      Search.topLink = searchContext.topMemberOrKeywordLink ||
-          searchContext.topPackageOrClassLink;
+      Search.topLink =
+        searchContext.topMemberOrKeywordLink ||
+        searchContext.topPackageOrClassLink;
 
       if (searchContext.menuPageOpened) {
         Search._collapseMenu();
       }
-
     });
   });
 };
 
-
 /**
  * Collapse the menu after an external page has been opened.
  */
-Search._collapseMenu = function() {
+Search._collapseMenu = function () {
   Query.update('');
   Search.perform();
 };
-
 
 /*
  * ----------------------------------------------------------------------------
  * Search._PackagesAndClasses
  * ----------------------------------------------------------------------------
  */
-
 
 /**
  * @class Search._PackagesAndClasses Component of the search functionality that
@@ -1254,9 +1205,8 @@ Search._PackagesAndClasses = {
   previousQuery: null,
   currentLinks: null,
   bestMatch: null,
-  topLink: null
+  topLink: null,
 };
-
 
 /**
  * Perform this portion of the search.
@@ -1265,13 +1215,14 @@ Search._PackagesAndClasses = {
  *     components.
  * @param {string} searchString The search string.
  */
-Search._PackagesAndClasses._perform = function(searchContext, searchString) {
+Search._PackagesAndClasses._perform = function (searchContext, searchString) {
   var module = Search._PackagesAndClasses;
 
   if (module.previousQuery === null || module.previousQuery !== searchString) {
-
-    if (module.previousQuery !== null &&
-        searchString.indexOf(module.previousQuery) === 0) {
+    if (
+      module.previousQuery !== null &&
+      searchString.indexOf(module.previousQuery) === 0
+    ) {
       // Characters have been added to the end of the previous query. Start
       // with the current search list and filter out any links that do not
       // match.
@@ -1290,9 +1241,10 @@ Search._PackagesAndClasses._perform = function(searchContext, searchString) {
 
   searchContext.topPackageOrClassLink = module.topLink;
   searchContext.getContentsHtmlCallback = new Callback(
-      module._constructHtml, module);
+    module._constructHtml,
+    module
+  );
 };
-
 
 /**
  * @param {Array.<PackageLink|ClassLink>} links The package and class links
@@ -1300,7 +1252,7 @@ Search._PackagesAndClasses._perform = function(searchContext, searchString) {
  * @param {PackageLink|ClassLink} bestMatch The best match link.
  * @return {PackageLink|ClassLink} The top link.
  */
-Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
+Search._PackagesAndClasses._getTopLink = function (links, bestMatch) {
   if (bestMatch) {
     return bestMatch;
   }
@@ -1310,7 +1262,6 @@ Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
   return null;
 };
 
-
 /**
  * Get the best match (if any) from the given array of links.
  * @param {string} searchString The search string.
@@ -1318,7 +1269,7 @@ Search._PackagesAndClasses._getTopLink = function(links, bestMatch) {
  *     matched by the current search.
  * @return {PackageLink|ClassLink=} The best match.
  */
-Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
+Search._PackagesAndClasses._getBestMatch = function (searchString, links) {
   if (links.length <= 1 || searchString === '') {
     // No need to display a best match.
     return null;
@@ -1333,32 +1284,38 @@ Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
 
   // Look for a case-insensitive exact match.
   filterBestMatches(
-      RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString));
+    RegexLibrary.createCaseInsensitiveExactMatchCondition(searchString)
+  );
 
   // Look for a case-sensitive exact match.
   filterBestMatches(
-      RegexLibrary.createCaseSensitiveExactMatchCondition(searchString));
+    RegexLibrary.createCaseSensitiveExactMatchCondition(searchString)
+  );
 
   // Keep only the links with the lowest package depth.
   var lowestPackageDepth = 1000000;
   function getDepth(link) {
-    var name = (link.getType() === LinkType.PACKAGE ?
-        link.getPackageName() : link.getCanonicalName());
+    var name =
+      link.getType() === LinkType.PACKAGE
+        ? link.getPackageName()
+        : link.getCanonicalName();
     return name.split('.').length;
   }
-  links.forEach(function(link) {
+  links.forEach(function (link) {
     lowestPackageDepth = Math.min(lowestPackageDepth, getDepth(link));
   });
-  filterBestMatches(function(link) {
+  filterBestMatches(function (link) {
     return getDepth(link) === lowestPackageDepth;
   });
 
   // When searching for "List", select java.util.List instead of java.awt.List.
   var javaUtilList = new ClassLink(LinkType.INTERFACE, 'java.util', 'List');
   var javaAwtList = new ClassLink(LinkType.CLASS, 'java.awt', 'List');
-  if (links.length === 2 &&
-      links[0].equals(javaUtilList) &&
-      links[1].equals(javaAwtList)) {
+  if (
+    links.length === 2 &&
+    links[0].equals(javaUtilList) &&
+    links[1].equals(javaAwtList)
+  ) {
     return javaUtilList;
   }
 
@@ -1366,11 +1323,10 @@ Search._PackagesAndClasses._getBestMatch = function(searchString, links) {
   return links.length == 1 ? links[0] : null;
 };
 
-
 /**
  * @return {string} The HTML to display the search results.
  */
-Search._PackagesAndClasses._constructHtml = function() {
+Search._PackagesAndClasses._constructHtml = function () {
   var module = Search._PackagesAndClasses;
   if (module.currentLinks.length === 0) {
     return 'No search results.';
@@ -1385,7 +1341,7 @@ Search._PackagesAndClasses._constructHtml = function() {
   }
   var type;
   var newType;
-  module.currentLinks.forEach(function(link) {
+  module.currentLinks.forEach(function (link) {
     newType = link.getType();
     if (type !== newType) {
       html += '<br/><b>' + newType.getPluralName() + '</b><br/>';
@@ -1397,13 +1353,11 @@ Search._PackagesAndClasses._constructHtml = function() {
   return html;
 };
 
-
 /*
  * ----------------------------------------------------------------------------
  * Search._ClassMembersAndKeywords
  * ----------------------------------------------------------------------------
  */
-
 
 /**
  * @class Search._ClassMembersAndKeywords Component of the search functionality
@@ -1419,7 +1373,7 @@ Search._ClassMembersAndKeywords = {
     'constructor detail': 1,
     'method summary': 1,
     'method detail': 1,
-    'field detail': 1
+    'field detail': 1,
   },
 
   keywordsToIgnore: {
@@ -1428,16 +1382,15 @@ Search._ClassMembersAndKeywords = {
     'skip navbar top': 1,
     'navbar bottom': 1,
     'navbar bottom firstrow': 1,
-    'skip navbar bottom': 1
+    'skip navbar bottom': 1,
   },
 
   keywordPrefixes: [
     'methods inherited from class ',
     'fields inherited from class ',
-    'nested classes inherited from class '
-  ]
+    'nested classes inherited from class ',
+  ],
 };
-
 
 /**
  * Perform this portion of the search.
@@ -1446,8 +1399,10 @@ Search._ClassMembersAndKeywords = {
  *     components.
  * @param {string} searchString The search string.
  */
-Search._ClassMembersAndKeywords._perform = function(
-    searchContext, searchString) {
+Search._ClassMembersAndKeywords._perform = function (
+  searchContext,
+  searchString
+) {
   var module = Search._ClassMembersAndKeywords;
   var topPackageOrClassLink = searchContext.topPackageOrClassLink;
   if (searchString === null || !topPackageOrClassLink) {
@@ -1455,7 +1410,7 @@ Search._ClassMembersAndKeywords._perform = function(
     return;
   }
 
-  var progressCallback = function() {
+  var progressCallback = function () {
     Search.perform.apply(Search);
   };
 
@@ -1463,34 +1418,40 @@ Search._ClassMembersAndKeywords._perform = function(
   if (module.httpRequest.isComplete()) {
     var packageOrClassPageHtml = module.httpRequest.getResource();
     var memberAndKeywordLinks = module._getMemberAndKeywordLinks(
-        topPackageOrClassLink.getUrl(), packageOrClassPageHtml);
+      topPackageOrClassLink.getUrl(),
+      packageOrClassPageHtml
+    );
     var condition = RegexLibrary.createCondition(searchString);
 
     var matchingMemberAndKeywordLinks = memberAndKeywordLinks.filter(condition);
     searchContext.topMemberOrKeywordLink =
-        matchingMemberAndKeywordLinks.length > 0 ?
-        matchingMemberAndKeywordLinks[0] : null;
+      matchingMemberAndKeywordLinks.length > 0
+        ? matchingMemberAndKeywordLinks[0]
+        : null;
 
-    searchContext.getContentsHtmlCallback = new Callback(function() {
+    searchContext.getContentsHtmlCallback = new Callback(function () {
       var html = '';
       if (matchingMemberAndKeywordLinks.length === 0) {
         html += 'No search results.';
       } else {
-        matchingMemberAndKeywordLinks.forEach(function(memberOrKeywordLink) {
+        matchingMemberAndKeywordLinks.forEach(function (memberOrKeywordLink) {
           html += memberOrKeywordLink.getHtml();
         });
       }
       return topPackageOrClassLink.getHtml() + '<p>' + html + '</p>';
     }, module);
   } else {
-    searchContext.getContentsHtmlCallback = new Callback(function() {
-      return topPackageOrClassLink.getHtml() + '<p>' +
-          module.httpRequest.getStatusMessage() + '</p>';
+    searchContext.getContentsHtmlCallback = new Callback(function () {
+      return (
+        topPackageOrClassLink.getHtml() +
+        '<p>' +
+        module.httpRequest.getStatusMessage() +
+        '</p>'
+      );
     }, module);
     searchContext.memberAndKeywordLinksLoading = true;
   }
 };
-
 
 /**
  * Retrieve the member and keyword links from the given package or class page.
@@ -1498,8 +1459,10 @@ Search._ClassMembersAndKeywords._perform = function(
  * @param {string} packageOrClassPageHtml The contents of the page.
  * @return {Array.<MemberLink|KeywordLink>} The links.
  */
-Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
-    baseUrl, packageOrClassPageHtml) {
+Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function (
+  baseUrl,
+  packageOrClassPageHtml
+) {
   // Starting with Java 9, the "id" attribute is used instead of "name".
   var anchorRegex = /<a (name|id)=\"([^\"]+)\"/gi;
   var matches;
@@ -1514,14 +1477,13 @@ Search._ClassMembersAndKeywords._getMemberAndKeywordLinks = function(
   return Search._ClassMembersAndKeywords._sortLinks(links);
 };
 
-
 /**
  * Create a class member or keyword link from the given anchor name.
  * @param {string} baseUrl The URL of the package or class page.
  * @param {string} anchorName The anchor name.
  * @return {MemberLink|KeywordLink|null} The created link.
  */
-Search._ClassMembersAndKeywords._createLink = function(baseUrl, anchorName) {
+Search._ClassMembersAndKeywords._createLink = function (baseUrl, anchorName) {
   var module = Search._ClassMembersAndKeywords;
   // Starting with Java 8, the keyword anchors use '.' to delimit words. Prior
   // to that, a combination of '-' and '_' was used. Replace all with spaces.
@@ -1552,17 +1514,16 @@ Search._ClassMembersAndKeywords._createLink = function(baseUrl, anchorName) {
   return new MemberLink(baseUrl, anchorName, displayName);
 };
 
-
 /**
  * Sort class member and keyword links such that the keyword links appear at
  * the end.
  * @param {Array.<MemberLink|KeywordLink>} links The links to sort.
  * @return {Array.<MemberLink|KeywordLink>} The sorted links.
  */
-Search._ClassMembersAndKeywords._sortLinks = function(links) {
+Search._ClassMembersAndKeywords._sortLinks = function (links) {
   var memberLinks = [];
   var keywordLinks = [];
-  links.forEach(function(link) {
+  links.forEach(function (link) {
     if (link.getType() === LinkType.CLASS_MEMBER) {
       memberLinks.push(link);
     } else {
@@ -1572,22 +1533,19 @@ Search._ClassMembersAndKeywords._sortLinks = function(links) {
   return memberLinks.concat(keywordLinks);
 };
 
-
 /*
  * ----------------------------------------------------------------------------
  * Search._Menu
  * ----------------------------------------------------------------------------
  */
 
-
 /**
  * @class Search._Menu Component of the search functionality that deals with
  *     the package menu and class menu.
  */
 Search._Menu = {
-  menuReplacement: null
+  menuReplacement: null,
 };
-
 
 /**
  * Perform this portion of the search.
@@ -1596,23 +1554,29 @@ Search._Menu = {
  *     components.
  * @param {string} searchString The search string.
  */
-Search._Menu._perform = function(searchContext, searchString) {
+Search._Menu._perform = function (searchContext, searchString) {
   var module = Search._Menu;
   var topPackageOrClassLink = searchContext.topPackageOrClassLink;
   var topMemberOrKeywordLink = searchContext.topMemberOrKeywordLink;
 
-  var performMenuSearch = searchString !== null && topPackageOrClassLink &&
-      !searchContext.memberAndKeywordLinksLoading &&
-      topMemberOrKeywordLink !== null;
+  var performMenuSearch =
+    searchString !== null &&
+    topPackageOrClassLink &&
+    !searchContext.memberAndKeywordLinksLoading &&
+    topMemberOrKeywordLink !== null;
   if (!performMenuSearch) {
     return;
   }
 
   var menuReplacement = module._getMenuReplacement();
-  var menu = module._constructMenu(searchContext, menuReplacement,
-      topPackageOrClassLink, topMemberOrKeywordLink);
+  var menu = module._constructMenu(
+    searchContext,
+    menuReplacement,
+    topPackageOrClassLink,
+    topMemberOrKeywordLink
+  );
 
-  searchContext.getContentsHtmlCallback = new Callback(function() {
+  searchContext.getContentsHtmlCallback = new Callback(function () {
     var html = topPackageOrClassLink.getHtml();
     if (topMemberOrKeywordLink) {
       html += '<br/>' + topMemberOrKeywordLink.getHtml();
@@ -1635,7 +1599,6 @@ Search._Menu._perform = function(searchContext, searchString) {
   searchContext.menuPageOpened = true;
 };
 
-
 /**
  * Construct the menu.
  * @param {Object} searchContext The search context.
@@ -1649,24 +1612,29 @@ Search._Menu._perform = function(searchContext, searchString) {
  * @return {Array.<{mnemonic: string, label: string, url: string}>} The menu
  *     items.
  */
-Search._Menu._constructMenu = function(searchContext, menuReplacement,
-    classOrPackageLink, memberOrKeywordLink) {
+Search._Menu._constructMenu = function (
+  searchContext,
+  menuReplacement,
+  classOrPackageLink,
+  memberOrKeywordLink
+) {
   var classMemberLink;
-  if (memberOrKeywordLink &&
-      memberOrKeywordLink.getType() === LinkType.CLASS_MEMBER) {
+  if (
+    memberOrKeywordLink &&
+    memberOrKeywordLink.getType() === LinkType.CLASS_MEMBER
+  ) {
     classMemberLink = memberOrKeywordLink;
   }
 
   var menuDefinition;
-  if (classOrPackageLink &&
-      classOrPackageLink.getType() === LinkType.PACKAGE) {
+  if (classOrPackageLink && classOrPackageLink.getType() === LinkType.PACKAGE) {
     menuDefinition = searchContext.packageMenu;
   } else {
     menuDefinition = searchContext.classMenu;
   }
 
   var menu = [];
-  menuDefinition.split('\n').forEach(function(menuAnchorDefinition) {
+  menuDefinition.split('\n').forEach(function (menuAnchorDefinition) {
     var splitOnArrow = splitOnFirst(menuAnchorDefinition, '->');
     if (splitOnArrow.length === 2) {
       var mnemonicAndLabel = splitOnFirst(splitOnArrow[0], ':');
@@ -1686,14 +1654,13 @@ Search._Menu._constructMenu = function(searchContext, menuReplacement,
           }
         }
 
-        menu.push({mnemonic: mnemonic, label: label, url: url});
+        menu.push({ mnemonic: mnemonic, label: label, url: url });
       }
     }
   });
 
   return menu;
 };
-
 
 /**
  * Placeholder values that can be entered into the class_menu or package_menu
@@ -1703,46 +1670,51 @@ Search._Menu._constructMenu = function(searchContext, menuReplacement,
  *     containing, for each placeholder value, a function to resolve that
  *     value.
  */
-Search._Menu._getMenuReplacement = function() {
+Search._Menu._getMenuReplacement = function () {
   if (!Search._Menu.menuReplacement) {
-    var memberNameFunction = function(classOrPackageLink, classMemberLink) {
+    var memberNameFunction = function (classOrPackageLink, classMemberLink) {
       return classMemberLink ? classMemberLink.getName() : '';
     };
     Search._Menu.menuReplacement = {
-      CLASS_NAME: function(classLink) {
+      CLASS_NAME: function (classLink) {
         return classLink ? classLink.getClassName() : '';
       },
-      PACKAGE_NAME: function(classOrPackageLink) {
+      PACKAGE_NAME: function (classOrPackageLink) {
         return classOrPackageLink ? classOrPackageLink.getPackageName() : '';
       },
-      PACKAGE_PATH: function(classOrPackageLink) {
-        return classOrPackageLink ?
-            classOrPackageLink.getPackageName().replace(/\./g, '/') : '';
+      PACKAGE_PATH: function (classOrPackageLink) {
+        return classOrPackageLink
+          ? classOrPackageLink.getPackageName().replace(/\./g, '/')
+          : '';
       },
       MEMBER_NAME: memberNameFunction,
       METHOD_NAME: memberNameFunction, // Synonym for MEMBER_NAME.
-      FIELD_NAME: memberNameFunction,  // Synonym for MEMBER_NAME.
-      ANCHOR_NAME: memberNameFunction  // Deprecated synonym for MEMBER_NAME.
+      FIELD_NAME: memberNameFunction, // Synonym for MEMBER_NAME.
+      ANCHOR_NAME: memberNameFunction, // Deprecated synonym for MEMBER_NAME.
     };
   }
   return Search._Menu.menuReplacement;
 };
-
 
 /**
  * @param {{Array.<{mnemonic: string, label: string, url: string}>}} menu The
  *     menu items.
  * @return {string} An HTML representation of the menu items.
  */
-Search._Menu._constructMenuHtml = function(menu) {
+Search._Menu._constructMenuHtml = function (menu) {
   var menuHtml = '';
-  menu.forEach(function(menuElement) {
-    menuHtml += '<A HREF="' + menuElement.url + '">' + menuElement.mnemonic +
-        ':' + menuElement.label + '</A><BR/>';
+  menu.forEach(function (menuElement) {
+    menuHtml +=
+      '<A HREF="' +
+      menuElement.url +
+      '">' +
+      menuElement.mnemonic +
+      ':' +
+      menuElement.label +
+      '</A><BR/>';
   });
   return menuHtml;
 };
-
 
 /*
  * ----------------------------------------------------------------------------
@@ -1750,13 +1722,11 @@ Search._Menu._constructMenuHtml = function(menu) {
  * ----------------------------------------------------------------------------
  */
 
-
 /**
  * Initialise this script.
  * @param {boolean} packageFrameHidden Whether the package frame has been hidden.
  */
 function init(packageFrameHidden) {
-
   // Retrieve the inner HTML of the class frame.
   var classesInnerHtml = getClassesInnerHtml();
 
@@ -1787,7 +1757,6 @@ function init(packageFrameHidden) {
   View.focusOnSearchField();
 }
 
-
 /**
  * Parse packages from the given array of {ClassLink} objects.
  * @param {Array.<ClassLink>} classLinks The class links.
@@ -1798,7 +1767,7 @@ function getPackageLinks(classLinks) {
   var packageLinksAdded = {};
   var packageName;
 
-  classLinks.forEach(function(classLink) {
+  classLinks.forEach(function (classLink) {
     packageName = classLink.getPackageName();
     if (!packageLinksAdded[packageName]) {
       packageLinks.push(new PackageLink(packageName));
@@ -1806,11 +1775,13 @@ function getPackageLinks(classLinks) {
     }
   });
 
-  packageLinks.sort(function(packageLinkOne, packageLinkTwo) {
+  packageLinks.sort(function (packageLinkOne, packageLinkTwo) {
     var packageNameOneComponents = packageLinkOne.getPackageName().split(/\./);
     var packageNameTwoComponents = packageLinkTwo.getPackageName().split(/\./);
     var smallerLength = Math.min(
-        packageNameOneComponents.length, packageNameTwoComponents.length);
+      packageNameOneComponents.length,
+      packageNameTwoComponents.length
+    );
     for (i = 0; i < smallerLength; i++) {
       if (packageNameOneComponents[i] < packageNameTwoComponents[i]) {
         return -1;
@@ -1825,7 +1796,6 @@ function getPackageLinks(classLinks) {
   return packageLinks;
 }
 
-
 /**
  * @return {string} The inner HTML of the body element of the classes list
  *    frame, or undefined if the element does not exist.
@@ -1837,7 +1807,6 @@ function getClassesInnerHtml() {
   }
   return classesInnerHtml;
 }
-
 
 /**
  * Parse interfaces, classes, enumerations, and annotations from the inner HTML
@@ -1854,10 +1823,15 @@ function getClassLinks(classesInnerHtml) {
   var matches;
   var classLinksMap = {};
   var classLinkTypes = [
-    LinkType.PACKAGE, LinkType.INTERFACE, LinkType.CLASS, LinkType.ENUM,
-    LinkType.EXCEPTION, LinkType.ERROR, LinkType.ANNOTATION
+    LinkType.PACKAGE,
+    LinkType.INTERFACE,
+    LinkType.CLASS,
+    LinkType.ENUM,
+    LinkType.EXCEPTION,
+    LinkType.ERROR,
+    LinkType.ANNOTATION,
   ];
-  classLinkTypes.forEach(function(type) {
+  classLinkTypes.forEach(function (type) {
     classLinksMap[type] = [];
   });
 
@@ -1873,7 +1847,7 @@ function getClassLinks(classesInnerHtml) {
   }
 
   var classesRegexWithTitle =
-      /<a\s+href\s*=\s*\"([^\"]+)\.html?\"\s*title\s*=\s*\"\s*([^\s]+)\s/gi;
+    /<a\s+href\s*=\s*\"([^\"]+)\.html?\"\s*title\s*=\s*\"\s*([^\s]+)\s/gi;
   var anchorWithTitleFound = false;
   while ((matches = classesRegexWithTitle.exec(classesInnerHtml)) !== null) {
     var hrefTokens = matches[1].split('/');
@@ -1894,9 +1868,10 @@ function getClassLinks(classesInnerHtml) {
     // attributes, but the interfaces can be identified by looking for a
     // surrounding italic element. There are no enumerations or annotations.
     var classesWithoutTitleRegex =
-        /<a\s+href\s*=\s*\"([^\"]+)\.html?\"\s*[^>]*>(\s*<i\s*>)?\s*(?:[^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
-    while ((matches = classesWithoutTitleRegex.exec(classesInnerHtml)) !==
-        null) {
+      /<a\s+href\s*=\s*\"([^\"]+)\.html?\"\s*[^>]*>(\s*<i\s*>)?\s*(?:[^<]+)(?:<\/i\s*>\s*)?<\/a\s*>/gi;
+    while (
+      (matches = classesWithoutTitleRegex.exec(classesInnerHtml)) !== null
+    ) {
       var hrefTokens = matches[1].split('/');
       if (hrefTokens.length >= 2) {
         var packageName = hrefTokens.slice(0, -1).join('.');
@@ -1912,12 +1887,11 @@ function getClassLinks(classesInnerHtml) {
   }
 
   var classLinks = [];
-  classLinkTypes.forEach(function(type) {
+  classLinkTypes.forEach(function (type) {
     classLinks = classLinks.concat(classLinksMap[type]);
   });
   return classLinks;
 }
-
 
 /**
  * Determine whether stringOne ends with stringTwo.
@@ -1933,7 +1907,6 @@ function endsWith(stringOne, stringTwo) {
   return strIndex >= 0 && stringOne.substring(strIndex) === stringTwo;
 }
 
-
 /**
  * Trim whitespace from the start of the given string.
  * @param {string} stringToTrim The string to trim.
@@ -1943,7 +1916,6 @@ function trimFromStart(stringToTrim) {
   return stringToTrim.replace(/^\s+/, '');
 }
 
-
 /**
  * Trim whitespace from the end of the given string.
  * @param {string} stringToTrim The string to trim.
@@ -1952,7 +1924,6 @@ function trimFromStart(stringToTrim) {
 function trimFromEnd(stringToTrim) {
   return stringToTrim.replace(/\s+$/, '');
 }
-
 
 /**
  * Split the given string on the first occurence of the given separator string.
@@ -1971,11 +1942,14 @@ function splitOnFirst(stringToSplit, separator) {
   }
   return [
     trimFromEnd(stringToSplit.substring(0, firstOccurrence)),
-    trimFromStart(stringToSplit.substring(
-          firstOccurrence + separator.length, stringToSplit.length))
+    trimFromStart(
+      stringToSplit.substring(
+        firstOccurrence + separator.length,
+        stringToSplit.length
+      )
+    ),
   ];
 }
-
 
 /*
  * ----------------------------------------------------------------------------
@@ -1983,18 +1957,16 @@ function splitOnFirst(stringToSplit, separator) {
  * ----------------------------------------------------------------------------
  */
 
-
 /**
  * @class EventHandlers Called by the view to handle UI events.
  */
 EventHandlers = {};
 
-
 /**
  * Called on a 'keyup' event while the search field has focus.
  * @param {Event} evt The event.
  */
-EventHandlers.searchFieldKeyup = function(evt) {
+EventHandlers.searchFieldKeyup = function (evt) {
   var code = evt.keyCode;
   if (code === 13) {
     EventHandlers._returnKeyPressed(evt.ctrlKey);
@@ -2003,12 +1975,11 @@ EventHandlers.searchFieldKeyup = function(evt) {
   }
 };
 
-
 /**
  * Called on a 'keydown' event while the search field has focus.
  * @param {Event} evt The event.
  */
-EventHandlers.searchFieldKeydown = function(evt) {
+EventHandlers.searchFieldKeydown = function (evt) {
   // Disable the default behaviour of completely clearing the search field when
   // the ESCAPE key is pressed. Instead, the ESCAPE key will clear only the
   // currently displayed portion of the search query.
@@ -2017,54 +1988,48 @@ EventHandlers.searchFieldKeydown = function(evt) {
   }
 };
 
-
 /**
  * Called when the contents of the search field has changed.
  */
-EventHandlers.searchFieldChanged = function() {
+EventHandlers.searchFieldChanged = function () {
   var searchFieldContents = View.getSearchFieldValue();
   Query.update(searchFieldContents);
   Search.performIfSearchStringHasChanged();
 };
 
-
 /**
  * Called when the search field has gained focus.
  */
-EventHandlers.searchFieldFocus = function() {
+EventHandlers.searchFieldFocus = function () {
   document.body.scrollLeft = 0;
 };
-
 
 /**
  * Caled when the erase button has been clicked.
  */
-EventHandlers.eraseButtonClick = function() {
+EventHandlers.eraseButtonClick = function () {
   View.clearSearchField();
 };
-
 
 /**
  * Called when the Options link has been clicked.
  * @param {Event} evt The event.
  */
-EventHandlers.optionsLinkClicked = function(evt) {
+EventHandlers.optionsLinkClicked = function (evt) {
   OptionsPage.open();
   evt.preventDefault();
 };
-
 
 /**
  * Called when the help link has been clicked.
  * @param {Event} evt The event.
  */
-EventHandlers.helpLinkClicked = function(evt) {
+EventHandlers.helpLinkClicked = function (evt) {
   var url =
-      'https://github.com/StevenGBrown/javadoc-search-frame/wiki/Features';
+    'https://github.com/StevenGBrown/javadoc-search-frame/wiki/Features';
   Frames.openLinkInNewTab(url);
   evt.preventDefault();
 };
-
 
 /**
  * Called when the return key has been pressed while the search field has
@@ -2072,7 +2037,7 @@ EventHandlers.helpLinkClicked = function(evt) {
  * @param {boolean} ctrlModifier Whether the CTRL key was held down when the
  *     return key was pressed.
  */
-EventHandlers._returnKeyPressed = function(ctrlModifier) {
+EventHandlers._returnKeyPressed = function (ctrlModifier) {
   var searchFieldValue = View.getSearchFieldValue();
   Query.update(searchFieldValue);
   Search.performIfSearchStringHasChanged();
@@ -2087,11 +2052,10 @@ EventHandlers._returnKeyPressed = function(ctrlModifier) {
   }
 };
 
-
 /**
  * Called when the escape key has been pressed while the search field has
  * focus.
  */
-EventHandlers._escapeKeyPressed = function() {
+EventHandlers._escapeKeyPressed = function () {
   View.clearSearchField();
 };

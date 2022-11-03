@@ -4,16 +4,14 @@
  * ----------------------------------------------------------------------------
  */
 
-
 /**
  * @class Options page.
  */
 OptionsPage = {};
 
-
 /**
  * Open the options page.
  */
-OptionsPage.open = function() {
+OptionsPage.open = function () {
   window.open(location + '#JavadocSearchFrameOptions');
 };

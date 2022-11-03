@@ -1,2 +1,1 @@
 OptionsPageGenerator.generate();
-

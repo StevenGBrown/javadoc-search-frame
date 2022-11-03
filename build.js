@@ -20,15 +20,15 @@ async function main() {
     `dist/greasemonkey/${distFileName}.user.js`,
     {
       append: [
-        'src/common/_locales/en/messages.json',
-        'src/greasemonkey/lib/Messages.js',
-        'src/greasemonkey/lib/Storage.js',
-        'src/common/lib/Option.js',
-        'src/common/lib/Frames.js',
-        'src/greasemonkey/lib/OptionsPage.js',
-        'src/common/lib/HttpRequest.js',
-        'src/common/lib/OptionsPageGenerator.js',
-        'src/common/lib/common.js',
+        `var messages = ${readFile('src/common/_locales/en/messages.json')}`,
+        readFile('src/greasemonkey/lib/Messages.js'),
+        readFile('src/greasemonkey/lib/Storage.js'),
+        readFile('src/common/lib/Option.js'),
+        readFile('src/common/lib/Frames.js'),
+        readFile('src/greasemonkey/lib/OptionsPage.js'),
+        readFile('src/common/lib/HttpRequest.js'),
+        readFile('src/common/lib/OptionsPageGenerator.js'),
+        readFile('src/common/lib/common.js'),
       ],
     }
   );
@@ -63,12 +63,21 @@ function version() {
 }
 
 /**
+ * Read a file to a string.
+ *
+ * @param {string} filePath
+ */
+function readFile(filePath) {
+  return fs.readFileSync(filePath, { encoding: 'utf-8' });
+}
+
+/**
  * Copy a single file, replacing #VERSION# placeholders in text files and
  * optionally appending other files to the copy.
  *
  * @param {string} from
  * @param {string} to
- * @param {{append?: string[]}} [options]
+ * @param {{ append?: string[] }} [options]
  */
 function copyFile(from, to, options) {
   fs.mkdirSync(path.dirname(to), { recursive: true });
@@ -83,15 +92,11 @@ function copyFile(from, to, options) {
   }
 
   if (textFileExtensions.includes(extension)) {
-    let fileContents =
-      fs.readFileSync(from, { encoding: 'utf-8' }).trim() + '\n';
+    let fileContents = readFile(from);
 
-    // Append files to the end.
-    for (const appendPath of options?.append || []) {
-      fileContents +=
-        '\n\n' +
-        fs.readFileSync(appendPath, { encoding: 'utf-8' }).trim() +
-        '\n';
+    // Append to the end of the file.
+    if (options?.append?.length) {
+      fileContents += '\n' + options.append.join('\n');
     }
 
     // Replace #VERSION# placeholders.

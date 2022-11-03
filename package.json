@@ -14,12 +14,15 @@
   },
   "private": true,
   "scripts": {
-    "build": "vitest run && node build.js",
+    "build": "vitest run && npm run format-check && node build.js",
+    "format": "prettier --write .",
+    "format-check": "prettier --check .",
     "test": "vitest"
   },
   "devDependencies": {
     "@types/node": "18.11.9",
     "es-main": "1.2.0",
+    "prettier": "2.7.1",
     "vitest": "0.24.5",
     "zip-lib": "0.7.3"
   }
