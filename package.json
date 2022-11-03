@@ -1,0 +1,24 @@
+{
+  "name": "javadoc-search-frame",
+  "version": "1.6.4",
+  "description": "Javadoc incremental search for Mozilla Firefox and Google Chrome",
+  "license": "MIT",
+  "author": {
+    "name": "Steven Brown",
+    "email": "StevenGBrown@gmail.com"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StevenGBrown/javadoc-search-frame.git"
+  },
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "@types/node": "18.11.9",
+    "es-main": "1.2.0",
+    "zip-lib": "0.7.3"
+  }
+}
