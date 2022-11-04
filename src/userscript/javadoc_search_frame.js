@@ -33,7 +33,7 @@ function main() {
   var startupLogMessage =
     '\nJavadoc Search Frame ' +
     version +
-    ' (Greasemonkey User Script)\n' +
+    ' (User Script)\n' +
     'https://github.com/StevenGBrown/javadoc-search-frame\n' +
     navigator.userAgent +
     '\n';

@@ -14,25 +14,25 @@ async function main() {
 
   const distFileName = `javadoc_search_frame_${version().replaceAll('.', '_')}`;
 
-  // Greasemonkey user script
+  // Userscript
   copyFile(
-    'src/greasemonkey/javadoc_search_frame.js',
-    `dist/greasemonkey/${distFileName}.user.js`,
+    'src/userscript/javadoc_search_frame.js',
+    `dist/userscript/${distFileName}.user.js`,
     {
       append: [
         `var messages = ${readFile('src/common/_locales/en/messages.json')}`,
-        readFile('src/greasemonkey/lib/Messages.js'),
-        readFile('src/greasemonkey/lib/Storage.js'),
+        readFile('src/userscript/lib/Messages.js'),
+        readFile('src/userscript/lib/Storage.js'),
         readFile('src/common/lib/Option.js'),
         readFile('src/common/lib/Frames.js'),
-        readFile('src/greasemonkey/lib/OptionsPage.js'),
+        readFile('src/userscript/lib/OptionsPage.js'),
         readFile('src/common/lib/HttpRequest.js'),
         readFile('src/common/lib/OptionsPageGenerator.js'),
         readFile('src/common/lib/common.js'),
       ],
     }
   );
-  console.log(`Built dist/greasemonkey/${distFileName}.user.js`);
+  console.log(`Built dist/userscript/${distFileName}.user.js`);
 
   // Google Chrome extension
   copyDir('src/googlechrome', 'dist/googlechrome');
