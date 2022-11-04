@@ -1861,11 +1861,13 @@ function getClassLinks(classesInnerHtml) {
       var packageName = hrefTokens.slice(0, -1).join('.');
       var className = hrefTokens[hrefTokens.length - 1];
       var type = LinkType.getByName(matches[2]);
-      type = checkForExceptionOrErrorType(type, className);
+      if (type) {
+        type = checkForExceptionOrErrorType(type, className);
 
-      var classLink = new ClassLink(type, packageName, className);
-      classLinksMap[type].push(classLink);
-      anchorWithTitleFound = true;
+        var classLink = new ClassLink(type, packageName, className);
+        classLinksMap[type].push(classLink);
+        anchorWithTitleFound = true;
+      }
     }
   }
 
