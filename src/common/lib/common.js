@@ -90,6 +90,11 @@ LinkType.ERROR = new LinkType('Error', 'Errors');
 LinkType.ANNOTATION = new LinkType('Annotation', 'Annotation Types');
 
 /**
+ * Script link type (GroovyDoc only).
+ */
+LinkType.SCRIPT = new LinkType('Script', 'Scripts');
+
+/**
  * Class member link type.
  */
 LinkType.CLASS_MEMBER = new LinkType('Method or Field', 'Methods and Fields');
@@ -230,8 +235,8 @@ PackageLink.prototype.toString = function () {
 
 /**
  * Link to a class. These links are of type {LinkType.INTERFACE},
- * {LinkType.CLASS}, {LinkType.ENUM}, {LinkType.EXCEPTION}, {LinkType.ERROR} or
- * {LinkType.ANNOTATION}.
+ * {LinkType.CLASS}, {LinkType.ENUM}, {LinkType.EXCEPTION}, {LinkType.ERROR},
+ * {LinkType.ANNOTATION} or {LinkType.SCRIPT}.
  * @param {LinkType} type The type of this link.
  * @param {string} packageName The package name.
  * @param {string} className The class name.
@@ -1830,6 +1835,7 @@ function getClassLinks(classesInnerHtml) {
     LinkType.EXCEPTION,
     LinkType.ERROR,
     LinkType.ANNOTATION,
+    LinkType.SCRIPT,
   ];
   classLinkTypes.forEach(function (type) {
     classLinksMap[type] = [];
