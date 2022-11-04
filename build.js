@@ -36,6 +36,13 @@ async function main() {
 
   // Google Chrome extension
   copyDir('src/googlechrome', 'dist/googlechrome');
+  copyFile(
+    'src/googlechrome/event-page.js',
+    'dist/googlechrome/event-page.js',
+    {
+      append: [readFile('src/common/lib/Frames.js')],
+    }
+  );
   copyDir('src/common', 'dist/googlechrome');
   zipLib.archiveFolder(
     'dist/googlechrome',

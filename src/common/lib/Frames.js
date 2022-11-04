@@ -13,10 +13,10 @@ Frames = {};
  * Hide the packages frame. If the packages frame does not exist, calling this
  * function will have no effect.
  *
- * @param {Document} parentDocument The document containing the Javadoc frames or iframes.
+ * @param {Document} [parentDocument] The document containing the Javadoc frames or iframes.
  */
 Frames.hideAllPackagesFrame = function (parentDocument) {
-  var framesets = parentDocument.getElementsByTagName('frameset');
+  var framesets = (parentDocument || document).getElementsByTagName('frameset');
   if (framesets.length > 1) {
     // Javadoc created with Java 8 or earlier
     var frameset = framesets[1];

@@ -40,19 +40,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
   });
 });
 
-function openOptionsPage(sender) {
-  if (chrome.runtime.openOptionsPage) {
-    chrome.runtime.openOptionsPage();
-  } else {
-    var tabProperties = {
-      windowId: sender.tab.windowId,
-      index: sender.tab.index + 1,
-      url: chrome.extension.getURL('options.html'),
-    };
-    chrome.tabs.create(tabProperties);
-  }
-}
-
 function hideAllPackagesFrame(sender) {
   chrome.webNavigation.getFrame(
     {
@@ -60,26 +47,17 @@ function hideAllPackagesFrame(sender) {
       frameId: sender.frameId,
     },
     function (details) {
-      chrome.tabs.executeScript(
-        sender.tab.id,
-        {
-          file: 'lib/Frames.js',
-          frameId: details.parentFrameId,
-        },
-        function () {
-          chrome.tabs.executeScript(sender.tab.id, {
-            code: 'Frames.hideAllPackagesFrame(document)',
-            frameId: details.parentFrameId,
-          });
-        }
-      );
+      chrome.scripting.executeScript({
+        target: { tabId: sender.tab.id, frameIds: [details.parentFrameId] },
+        func: Frames.hideAllPackagesFrame,
+      });
     }
   );
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.operation === 'open-options-page') {
-    openOptionsPage(sender);
+    chrome.runtime.openOptionsPage();
     sendResponse();
     return false;
   }
