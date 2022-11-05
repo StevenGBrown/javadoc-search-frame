@@ -1,4 +1,5 @@
 import esMain from 'es-main';
+import child_process from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import zipLib from 'zip-lib';
@@ -52,22 +53,19 @@ async function main() {
 }
 
 /**
- * Get the version from package.json.
+ * Get the version from Git.
  */
-function version() {
-  if (
-    !Object.keys(process.env).some((name) => name.startsWith('npm_package_'))
-  ) {
-    // Must run this script via npm which provides the npm_package_*
-    // environment variables.
-    throw new Error('Usage: npm run build');
-  }
-  const version = process.env['npm_package_version'];
-  if (!version) {
-    throw new Error('Version not found in package.json');
-  }
-  return version;
-}
+const version = (() => {
+  let cachedValue;
+  return () =>
+    (cachedValue =
+      cachedValue ||
+      child_process
+        .execFileSync('git', ['describe', '--dirty'], {
+          encoding: 'utf-8',
+        })
+        .trim());
+})();
 
 /**
  * Read a file to a string.
