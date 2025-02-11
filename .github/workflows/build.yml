@@ -33,14 +33,14 @@ jobs:
       - run: npm run build
 
       - name: 'Build Artifact: Google Chrome extension'
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: Google Chrome extension
           path: dist/googlechrome/javadoc_search_frame_*.zip
           if-no-files-found: error
 
       - name: 'Build Artifact: Userscript'
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: Userscript
           path: dist/userscript/javadoc_search_frame_*.user.js
