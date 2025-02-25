@@ -22,7 +22,7 @@
     "@types/node": "18.11.9",
     "es-main": "1.2.0",
     "prettier": "2.7.1",
-    "vitest": "2.1.9",
+    "vitest": "3.0.7",
     "zip-lib": "0.7.3"
   }
 }
