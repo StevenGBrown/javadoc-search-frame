@@ -1,29 +1,23 @@
 name: Build
 
-on:
-  push:
-    branches: ['**']
-    tags: ['**']
-  pull_request:
-    branches: ['**']
+on: push
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
       - run: git fetch --tags origin --force
 
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v2.5.1
-        if: github.event_name == 'pull_request'
-
       - name: Use Node.js
-        uses: actions/setup-node@v3.5.1
+        uses: actions/setup-node@v4.3.0
         with:
           node-version: 18.x
           cache: 'npm'
@@ -33,14 +27,14 @@ jobs:
       - run: npm run build
 
       - name: 'Build Artifact: Google Chrome extension'
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Google Chrome extension
           path: dist/googlechrome/javadoc_search_frame_*.zip
           if-no-files-found: error
 
       - name: 'Build Artifact: Userscript'
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Userscript
           path: dist/userscript/javadoc_search_frame_*.user.js
